@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="author" value="@alexbcberio">
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    <link rel="shortcut icon" href="./assets/img/favicon.png" type="image/png">
+    <title>
+        Peproductor de música
+    </title>
+    <!-- -->
+    <script>
+        // add jQuery
+        window.$ = window.jQuery = require("./assets/lib/jQuery/jquery.js");
+    </script>
+
+    <link rel="stylesheet" href="./assets/lib/bootstrap/css/bootstrap.css">
+    <script src="./assets/lib/bootstrap/js/bootstrap.js"></script>
+
+    <link rel="stylesheet" href="./assets/lib/sweetalert/sweetalert.css">
+    <script src="./assets/lib/sweetalert/sweetalert.js"></script>
+
+    <link rel="stylesheet" href="./assets/lib/font-awesome/css/font-awesome.css">
+    <!-- -->
+    <link rel="stylesheet" href="./assets/css/ui.css">
+    <script src="./assets/js/ui.js"></script>
+    
+    <link rel="stylesheet" href="./assets/css/utilities.css">
+    <link rel="stylesheet" href="./assets/css/main.css">
+    
+    <script src="./assets/js/main.js"></script>
+    <script src="./assets/js/audioplayer.js"></script>
+    
+
+</head>
+<body class="dark">
+    <div id="titleBar">
+        <i class="fa fa-close" data-action="close"></i>
+        <i class="fa fa-window-maximize" data-action="maximize"></i>
+        <i class="fa fa-window-minimize" data-action="minimize"></i>
+    </div>
+    
+    <div id="audioplayer">
+        <div class="info">
+            <img src="./assets/img/default.jpg" draggable="false">
+            <span class="title">
+                Seleccione una canción
+            </span>
+            <div class="moreinfo">
+                <span class="artist">
+                    <span class="content">ARTISTA</span>
+                </span>
+                <span class="album">
+                    <span class="content">ALBUM</span>
+                </span>
+            </div>
+        </div>
+
+        <div class="clear"></div>
+
+        <div class="timeline">
+            <span class="begin">
+                00:00
+            </span>
+            <div class="range">
+                <div class="input"></div>
+            </div>
+            <span class="end">
+                00:00
+            </span>
+        </div>
+
+        <button name="play">
+            <i class="fa fa-play"></i>
+        </button>
+        <button name="pause" style="display:none;">
+            <i class="fa fa-pause"></i>
+        </button>
+
+        <button name="before">
+            <i class="fa fa-backward"></i>
+        </button>
+        <button name="stop">
+            <i class="fa fa-stop"></i>
+        </button>
+        <button name="after">
+            <i class="fa fa-forward"></i>
+        </button>
+
+        <button name="repeat" data-mode="none">
+            <i class="fa fa-repeat"></i>
+        </button>
+        <button name="repeat" data-mode="all" style="display:none;">
+            <i class="fa fa-refresh"></i>
+        </button>
+        <button name="repeat" data-mode="one" style="display:none;">
+            <i class="fa fa-refresh"></i>
+        </button>
+
+        <button name="volume" data-mode="mute" style="display:none">
+            <i class="fa fa-volume-off"></i>
+        </button>
+        <button name="volume" data-mode="down" data-volume="" style="display:none">
+            <i class="fa fa-volume-down"></i>
+        </button>
+        <button name="volume" data-mode="up" data-volume="">
+            <i class="fa fa-volume-up"></i>
+        </button>
+
+        <button name="random" data-mode="active" style="display:none;">
+            <i class="fa fa-random"></i>
+        </button>
+        <button class="hidden" name="random" data-mode="disabled">
+            <i class="fa fa-random"></i>
+        </button>
+
+        <div class="clearfix"></div>
+    </div>
+
+
+    <div class="content">
+
+        <ul id="songs" data-order="moddate">
+            <noscript>
+                <li>
+                   <?php echo $trans["music"]["noscript"];?>
+                </li>
+            </noscript>
+            <li style="display:none"></li>
+        </ul>
+        <script>
+            $(function(){
+                loadSongs("/",$loadAfter, "moddate", 0);
+            });
+
+        </script>
+    </div>
+    <div class="clearfix"></div>
+
+</body>
+</html>
