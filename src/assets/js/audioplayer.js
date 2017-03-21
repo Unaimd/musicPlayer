@@ -1,30 +1,30 @@
 $(document).ready(function() {
-    
-    
+
+
     /************************************
     |
     |    Variable declaration
     |
     ************************************/
-    
+
     /**
      * Document variables
      **/
-    
+
     // tab title
     $documentTitle = document.title;
     // tab icon
     $documentIcon = $('link[rel="shortcut icon"]');
     // default tab icon
     $defaultDocumentIcon = $documentIcon.attr('href');
-    
+
     /**
      * Audio player HTML elements
      **/
-    
+
     // player element
     $player = $('#audioplayer');
-    
+
     // audio file path
     $musicFile     = $player.find('.title').attr('data-path');
     // audio title
@@ -39,30 +39,30 @@ $(document).ready(function() {
     $musicBitrate  = $player.find('.bitrate').children('.content');
     // audio album cover
     $musicCover    = $player.find('img');
-    
+
     /**
      * Buttons of the player
      **/
-    
+
     // audio files
     $newAudio = $('[data-type="audio"]');
-    
+
     // time buttons remain with active effect in ms
     $activeTime = 150;
-    
+
     // play button
     $play = $player.find('[name="play"]');
     // pause button
     $pause = $player.find('[name="pause"]');
-    
+
     // stop button
     $stop = $player.find('[name="stop"]');
-    
+
     // previous song button
     $previousSong = $player.find('[name="before"]');
     // next song button
     $nextSong = $player.find('[name="after"]');
-    
+
     // repeat mode
     $repeatMode = $player.find('[name="repeat"]');
     // no repeat button
@@ -71,7 +71,7 @@ $(document).ready(function() {
     $repeatAll = $player.find('[name="repeat"][data-mode="all"]');
     // repeat only one song
     $repeatOne = $player.find('[name="repeat"][data-mode="one"]');
-    
+
     // volume hight
     $volumeUp = $player.find('[name="volume"][data-mode="up"]');
     // voume low
@@ -80,7 +80,7 @@ $(document).ready(function() {
     $volumeMute = $player.find('[name="volume"][data-mode="mute"]')
     // volume indicator
     $volumeIndicator = $player.find('[name="volume"]');
-    
+
     // timeline
     $timeline = $player.find('.range');
     // timeline input (show actual time)
@@ -89,11 +89,11 @@ $(document).ready(function() {
     $currentTime = $player.find('.timeline').children('.begin');
     // audio length
     $totalTime = $player.find('.timeline').children('.end');
-    
+
     /**
      * Audio object & properties
      **/
-    
+
     // audio object
     $audio = new Audio($musicFile);
     // current audio played time
@@ -106,7 +106,7 @@ $(document).ready(function() {
     $audioMuted = false;
     // where show volume up icon
     $volumeUpValue = 0.5;
-    
+
     // allowed to load more songs via AJAX
     $moreSongs = true;
     // folder from to take the audio
@@ -119,17 +119,17 @@ $(document).ready(function() {
     $scrollAnimationDuration = 500;
     // scroll to active song
     $scrollEnabled = true;
-    
+
     /**
      * Initialize
      **/
-    
+
     // the initialization is done on the document itself
-    
+
     /**
      * Get & set values to store some information on local storage
      **/
-    
+
     // localStorage audio volume
     $lsAudioVolume = localStorage.audioVolume;
     if (typeof $lsAudioVolume == 'undefined'){
@@ -138,7 +138,7 @@ $(document).ready(function() {
         $audioVolume = parseInt($lsAudioVolume)/100;
     }
     $volumeIndicator.attr('data-volume',Math.floor($audioVolume*100));
-    
+
     // audio repeat mode all|one|none
     $lsAudioRepeat = localStorage.audioRepeat
     if (typeof $lsAudioRepeat == 'undefined'){
@@ -146,7 +146,7 @@ $(document).ready(function() {
         $lsAudioRepeat = localStorage.audioRepeat;
     } else {
         $audioRepeat = localStorage.audioRepeat;
-        
+
         // set the repeat mode
         $repeatMode.hide();
         if ($lsAudioRepeat == 'all'){
@@ -157,14 +157,14 @@ $(document).ready(function() {
             $repeatNone.show();
         }
     }
-        
+
 });
 
 var hotKeys;
 require("electron").ipcRenderer.on("keyPress", (event, action) => {
-    
+
     hotKeys(action);
-    
+
 });
 
 
@@ -178,10 +178,10 @@ require("electron").ipcRenderer.on("keyPress", (event, action) => {
     function newSong ($this){
         // stop previous song
         $stop.click();
-        
+
         $('[data-type="audio"]').removeClass('active');
         $this.addClass('active');
-        
+
         // get new song info
         $path = $this.attr('data-path');
         $title = $this.find('.title').text();
@@ -190,7 +190,7 @@ require("electron").ipcRenderer.on("keyPress", (event, action) => {
         $duration = $this.find('.duration').text();
         $bitrate = $this.attr('data-bitrate');
         $coverImage = $this.find('img').attr('src');
-        
+
         // set new info
         $musicTitle.text($title);
         $musicArtist.text($artist);
@@ -199,11 +199,11 @@ require("electron").ipcRenderer.on("keyPress", (event, action) => {
         $totalTime.text($duration);
         $musicBitrate.children('.content').text($artist);
         $musicCover.attr('src', $coverImage);
-        
+
         // test if browser supports audio format
         $extensionSplit = $path.split('.');
         $format = $extensionSplit[$extensionSplit.length - 1];
-        
+
         if (!!$audio.canPlayType('audio/'+$format) === false){
             swal ('Formato no soportado','No es posible reproducir la canción, tu navegador no soporta el formato '+$format.toUpperCase(),'error');
         } else {
@@ -211,8 +211,8 @@ require("electron").ipcRenderer.on("keyPress", (event, action) => {
             $audio = new Audio($path);
             $play.click();
         }
-        
-        
+
+
         update();
     }
 
@@ -224,28 +224,28 @@ require("electron").ipcRenderer.on("keyPress", (event, action) => {
     var accesible = false;
     function isAccesible() {
         ajaxUrl = localStorage.getItem("ajaxUrl");
-        
+
         while(!accesible && response) {
             response = false;
-            
+
             // request server
             if (ajaxUrl === null) {
                 $.ajax({
                     url: "http://alexbcberio.ddns.net" + url,
                     complete: function(xhr, data) {
-                        
+
                         if (xhr.responseText.indexOf("Welcome to your Vodafone Router") > 0) {
                             localStorage.setItem("ajaxUrl", "alexbcberio.local");
-                            
+
                         } else if (data == "success") {
                             localStorage.setItem("ajaxUrl", "alexbcberio.ddns.net");
                         }
                         ajaxUrl = localStorage.getItem("ajaxUrl");
-                        
+
                         accesible = true;
                         response = true;
                     }
-                    
+
                 });
 
             } else if (typeof ajaxUrl === "string") {
@@ -263,52 +263,52 @@ require("electron").ipcRenderer.on("keyPress", (event, action) => {
 
                         } else if (data == "error") {
                             localStorage.removeItem("ajaxUrl");
-                            ajaxUrl = localStorage.removeIten("ajaxUrl");
+                            ajaxUrl = localStorage.removeItem("ajaxUrl");
                         }
-                        
+
                         response = true;
                         accesible = true;
                     }
                 });
-                
+
             }
         }
-        
+
         return true;
     }
 
     // ajax to load the songs
     function loadSongs($folder,$num,$order,$lastNum) {
-        
+
         if (!$moreSongs) {
             return false;
         }
-        
+
         // add a loader
         $loader = '<li id="loader"><div class="loader"></div></li>';
         $('#songs').find('li').last().after($loader);
-        
+
         if (!isAccesible()) {
             return false;
         }
-        
+
         if (typeof $order === 'undefined'){
             $order = $('#songs').attr('data-order');
         }
         if (typeof $lastNum === 'undefined') {
             $lastNum = $newAudio.length;
         }
-        
-        
-        
+
+
+
         $lastFile = '';
         if (typeof $('[data-type="audio"]').attr('data-type') !== 'undefined') {
             $lastFile = $('[data-type="audio"]').last().attr('data-path').split('/');
             $lastFile = $('[data-type="audio"]').last().attr('data-path').split('/')[$lastFile.length - 1];
         }
-        
+
         if ($moreSongs == true) {
-            
+
             $ajax = new XMLHttpRequest;
             $ajax.onreadystatechange = function (){
                 if ($ajax.readyState == 4 && $ajax.status == 200) {
@@ -324,18 +324,18 @@ require("electron").ipcRenderer.on("keyPress", (event, action) => {
                     $("#loader").remove();
                 }
             };
-            
+
             $ajax.open('POST','http://' + ajaxUrl + url, true);
             $ajax.setRequestHeader('Content-type','application/x-www-form-urlencoded');
             $ajax.send('listDir='+$folder+'&numFiles='+$num+'&lastFile='+$lastFile+'&lastNum='+$lastNum+'&order='+$order+"&addIp");
-            
+
         }
         $moreSongs = false;
     }
-    
+
 
 function update() {
-    
+
     /************************************
     |
     |    Events when clicking elements
@@ -347,46 +347,46 @@ function update() {
     $play.unbind('click').click(function(){
         play();
     });
-    
+
     $pause.unbind('click').click(function(){
         pause();
     });
-    
+
     $stop.unbind('click').click(function(){
         stop();
     });
-    
+
     $nextSong.unbind('click').click(function(){
         nextSong();
     });
-    
+
     $previousSong.unbind('click').click(function(){
         previousSong();
     });
-    
+
     $newAudio.unbind('click').click(function(){
         newSong($(this));
     });
-    
+
     $repeatMode.unbind('click').click(function(){
         repeat($(this));
     });
-    
+
     $volumeIndicator.unbind('click').click(function(){
         volumeMute();
     });
-    
-    
-    
+
+
+
     /************************************
     |
     |            Hotkeys
     |
     ************************************/
-    
-    
+
+
     hotKeys = function (name){
-        
+
         // playPause
         if (name == "playPause"){
             if ($audio.paused){
@@ -396,7 +396,7 @@ function update() {
                 pause();
                 $play.addClass('active');
             }
-        
+
         // previousSong
         } else if (name == "previousSong") {
             previousSong();
@@ -411,32 +411,32 @@ function update() {
 
         // volumeDown
         } else if (name == "volumeDown") {
-           volumeDown(); 
+           volumeDown();
 
         // volumeUp
         } else if (name == "volumeUp") {
             volumeUp();
-            
+
         // toggleMute
         } else if (name == "toggleMute") {
             volumeMute();
-            
+
         } else {
             swal("hotKeys", name);
         }
-                    
+
     };
-    
-    
+
+
 
     /************************************
     |
     |             Functions
     |
     ************************************/
-    
-    
-    
+
+
+
     // give active effect to element and remove it after $activeTime
     function active($element){
         $element.addClass('active');
@@ -444,65 +444,65 @@ function update() {
             $element.removeClass('active');
         },$activeTime);
     }
-    
+
     // play the audio
     function play(){
         $audio.volume = $audioVolume;
         $audio.muted = $audioMuted;
         $audio.play();
         $duration = $audio.duration;
-        
+
         document.title = $musicTitle.text();
-        
+
         if ($musicCover.attr('src').indexOf('default.jpg') > -1){
             $documentIcon.attr('href', $defaultDocumentIcon);
         } else {
             $documentIcon.attr('href', $musicCover.attr('src'));
         }
         scroll($("[data-type=audio].active"));
-        
+
         $play.hide();
         $pause.show();
-        
+
         active($pause);
-        
+
     }
-    
+
     // pause the audio
     function pause(){
         $audio.pause();
-        
+
         document.title = $documentTitle;
         $pause.hide();
         $play.show();
-        
+
         active($play);
     }
-    
+
     // stop the audio
     function stop(){
         pause(false);
         $audio.currentTime = 0;
-        
+
         $timelineInput.css('marginLeft','0px');
-        
+
         active($stop);
     }
-    
+
     // previous song
     function nextSong(){
         $active = parseInt($('#songs').find('.active').attr('data-num'));
         $totalSongs = $('#songs').find('[data-type="audio"]').length;
-        
+
         $loadOn = $totalSongs - $loadAfter;
-        
+
         // if there are more songs to play
         if ($active < $totalSongs){
             $next = $('#songs').find('[data-num="'+($active+1)+'"]');
             newSong($next);
-            
+
             active($nextSong);
-            
+
             // load more songs via ajax
             if ($active >= $loadOn && $moreSongs == true){
             loadSongs($audioFolder,10);
@@ -517,16 +517,16 @@ function update() {
             });
         }
     }
-    
+
     // previous song
     function previousSong(){
         $active = parseInt($('#songs').find('.active').attr('data-num'));
-        
+
         // if actual is first
         if ($active > 0){
             $previous = $('#songs').find('[data-num="'+($active-1)+'"]');
             newSong($previous);
-            
+
             active($previousSong)
         } else {
             swal({
@@ -537,15 +537,15 @@ function update() {
                 timer: $swalTimer
             });
         }
-        
+
     }
-    
+
     // channge what repeat mode is
     function repeat($this){
         $mode = $this.attr('data-mode');
-        
+
         active($repeatMode);
-        
+
         $this.hide();
         if ($mode == 'none'){
             $repeatAll.show();
@@ -559,18 +559,18 @@ function update() {
         }
         localStorage.audioRepeat = $audioRepeat;
     }
-    
+
     // volume up
     function volumeUp(){
         if ($audioVolume < 1) {
             // round volume to decimal
             $newVolume = Math.round(($audioVolume + 0.02)*100)/100;
-            
+
             $audio.volume = $newVolume;
             $audioVolume = $audio.volume;
-            
+
             active($volumeIndicator);
-            
+
             // update the volume icon
             $volumeIndicator.attr('data-volume',Math.ceil($audioVolume*100));
             if ($audioVolume >= $volumeUpValue && $audioMuted == false){
@@ -583,18 +583,18 @@ function update() {
             localStorage.audioVolume = $audioVolume*100;
         }
     }
-    
+
     // volume down
     function volumeDown (){
         if ($audioVolume > 0){
             // round volume to decimal
             $newVolume = Math.round(($audioVolume - 0.02)*100)/100;
-            
+
             $audio.volume = $newVolume;
             $audioVolume = $audio.volume;
-            
+
             active($volumeIndicator);
-            
+
             // update the volume icon
             $volumeIndicator.attr('data-volume',Math.ceil($audioVolume*100));
             if ($audioVolume >= $volumeUpValue && $audioMuted == false){
@@ -607,17 +607,17 @@ function update() {
             localStorage.audioVolume = $audioVolume*100;
         }
     }
-    
+
     // mute and unmute
     function volumeMute (){
-        
+
         active($volumeIndicator);
-        
+
         // mute
         if (!$audio.muted){
             $audio.muted = true;
             $audioMuted = true;
-            
+
             // hide volume up or down
             $volumeUp.hide()
             $volumeDown.hide()
@@ -626,7 +626,7 @@ function update() {
         } else {
             $audio.muted = false;
             $audioMuted = false;
-            
+
             $volumeMute.hide();
             // hide volume up or down
             if ($audioVolume > $volumeUpValue){
@@ -636,11 +636,11 @@ function update() {
             }
         }
     }
-    
+
     // when ending current audio
     $audio.onended = function(){
         stop();
-        
+
         if ($audioRepeat == 'none'){
             // do nothing
         } else if ($audioRepeat == 'all'){
@@ -649,28 +649,28 @@ function update() {
             play();
         }
     };
-    
+
     // update timeline
     $audio.addEventListener('timeupdate', timeUpdate, false);
-    
+
     // change current time by clicking on the timeline
     $timeline.click(function (event){
         moveplayhead(event);
         $audio.currentTime = $audio.duration * clickPercent(event);
     });
-    
+
     // update the position on the input on the timeline
     function timeUpdate(){
         $duration = $audio.duration;
         $percent = ($audioCurrentTime/$duration)*100;
         $timelineInput.css('left','calc('+$percent+'% - 5px)');
-        
+
         $audioCurrentTime = $audio.currentTime;
         $intCurTime = Math.round($audioCurrentTime);
-        
+
         $curMin = 0;
         $curSec = 0;
-        
+
         // get minutes
         if ($intCurTime < 60){
             $curSec = $intCurTime;
@@ -678,22 +678,22 @@ function update() {
             $curMin = Math.floor($intCurTime/60);
             $curSec = $intCurTime - $curMin * 60;
         }
-        
+
         if ($curSec < 10){
             $curSec = '0'+$curSec;
         }
         if ($curMin < 10){
             $curMin = '0'+$curMin;
         }
-        
+
         $currentTime.text($curMin+':'+$curSec);
     }
-    
+
     // return percentage of the song on clicked position
     function clickPercent(e){
         return (e.pageX - $('.range').offset().left) / $timelineWidth;
     }
-    
+
     // moves the input from the timeline
     function moveplayhead(e){
         $timelineWidth = parseInt($timeline.css('width'));
@@ -709,16 +709,16 @@ function update() {
             $timelineInput.css('left',$timelineWidth + "px");
         }
     }
-    
+
     // scroll to next song
     $("#songs").mouseover(function() {
-       $scrollEnabled = false; 
+       $scrollEnabled = false;
     });
-    
+
     $("#songs").mouseout(function() {
-       $scrollEnabled = true; 
+       $scrollEnabled = true;
     });
-    
+
     function scroll($element) {
         if ($scrollEnabled) {
             var px = $("#songs").scrollTop() + $element.position().top - $element.height();
@@ -728,11 +728,11 @@ function update() {
             }, $scrollAnimationDuration);
         }
     }
-    
+
     // load more songs when scrolling
     $('#songs').scroll(function(){
         $lastSong = $('[data-type="audio"]').last();
-        
+
         if ($(window).scrollTop() + $(window).height() > $lastSong.offset().top - 400){
             loadSongs($audioFolder,$loadAfter);
         }

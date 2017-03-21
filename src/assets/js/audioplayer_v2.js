@@ -6,12 +6,258 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 
 var audioplayer = {
-    version: "0.0.1",
+    version: "0.0.2",
     name: "Audioplayer",
 
-    play: function(song) {
-        alert(song );
+    newSong: function(aElement) {
+        audioplayer.stop();
+
+        try {
+            document.querySelector("[data-type='audio'].active").className = document.querySelector("[data-type='audio'].active").className.replace("active", "");
+        } catch (error) {
+            // no element was active
+        }
+        aElement.className += "active";
+
+        // get song info
+        var path = aElement.getAttribute("data-path");
+        var title = aElement.getElementsByClassName("title")[0];
+        var artist = aElement.getElementsByClassName("artist")[0];
+        var album = aElement.getElementsByClassName("album")[0];
+        var duration = aElement.getElementsByClassName("duration")[0];
+        var coverImage = aElement.getElementsByTagName("img")[0].getAttribute("src");
+
+        // set new info
+        audioplayer.elements.title.innerHTML = title.innerHTML;
+
+        if (typeof artist != "undefined") {
+            audioplayer.elements.artist.innerHTML = artist.innerHTML;
+        } else {
+            audioplayer.elements.artist.innerHTML = null;
+        }
+
+        if (typeof album != "undefined") {
+            audioplayer.elements.album.innerHTML = album.innerHTML;
+        } else {
+            audioplayer.elements.album.innerHTML = null;
+        }
+
+        audioplayer.elements.cover.setAttribute("src", coverImage);
+        audioplayer.elements.timeline.total.innerHTML = duration.innerHTML;
+
+        // test if browser supports audio format
+        var extSplit = path.split(".");
+        var format = extSplit[extSplit.length - 1];
+
+        if (!! audioplayer.audio.object.canPlayType("audio/" + format) === false) {
+
+            swal("Formato no soportado", "No es posible reproducir la cancion, tu navegador no soporta el formato " + format.toUpperCase(), "error");
+
+        } else {
+            // start new object
+            audioplayer.audio.object = new Audio(path);
+            audioplayer.play();
+
+            audioplayer.audio.object.addEventListener("timeupdate", audioplayer.timeUpdate, false);
+        }
+
     },
+    play: function() {
+        audioplayer.audio.object.volume = audioplayer.audio.volume;
+        audioplayer.audio.object.muted = audioplayer.audio.muted;
+
+        audioplayer.audio.object.play();
+        //audioplayer.audio.object.onended = audioplayer.onended();
+
+        audioplayer.elements.timeline.total.innerHTML = audioplayer.audio.duration;
+
+        // update document title
+        // update doument icon
+
+        // scroll to active song
+
+        audioplayer.elements.buttons.play.style.display = "none";
+        audioplayer.elements.buttons.pause.style.display = "inline-block";
+
+    },
+    pause: function() {
+        audioplayer.audio.object.pause();
+
+        // set default document title
+
+        audioplayer.elements.buttons.pause.style.display = "none";
+        audioplayer.elements.buttons.play.style.display = "inline-bloc";
+    },
+    stop: function() {
+        audioplayer.audio.object.currentTime = 0;
+        audioplayer.elements.timeline.input.style.marginLeft = "0px";
+    },
+    nextSong: function() {
+        var active = parseInt(document.querySelector("#songs .active").getAttribute("data-num"));
+        var totalSongs = parseInt(document.querySelectorAll("#songs [data-type='audio']").length);
+
+        // $loadOn = $totalSongs - $loadAfter;
+
+        if (active < totalSongs) {
+            var next = document.querySelector("#songs [data-num='" + (active + 1) + "']");
+            audioplayer.newSong(next);
+
+            // load more songs via ajax
+
+        } else {
+            swal({
+                title:'Siguiente canción no disponible',
+                text:'No hay mas canciones que reproducir',
+                type:'info',
+                showConfirmButton: false,
+                timer: audioplayer.config.swalTimer
+            });
+        }
+    },
+    previousSong: function() {
+        var active = parseInt(document.querySelector("#songs .active").getAttribute("data-num"));
+
+        if (active > 0) {
+            var previous = document.querySelector("#songs [data-num='" + (active - 1)  + "']");
+
+            audioplayer.newSong(previous);
+
+        } else {
+            swal({
+                title: '¡Canción anterior no disponible!',
+                text: 'No hay ninguna cancion anterior a la actual',
+                type: 'error',
+                showConfirmButton: false,
+                timer: audioplayer.config.swalTimer
+            });
+        }
+    },
+    repeat: function(repeat) {
+        var mode = repeat.attr("data-mode");
+        var button;
+
+        repeat.style.display = "none";
+
+        switch (mode) {
+            case "none":
+                mode = "all";
+                button = audioplayer.elements.buttons.repeatAll;
+                break;
+            case "all":
+                mode = "one";
+                button = audioplayer.elements.buttons.repeatOne;
+                break;
+            case "one":
+                mode = "none";
+                button = audioplayer.elements.buttons.repeatNone;
+                break;
+        }
+
+        audioplayer.audio.repeat = mode;
+        button.style.display = "inline-block";
+    },
+    volumeUp: function() {
+        if (audioplayer.audio.volume < 1) {
+            var newVolume = Math.round((audioplayer.audio.volume + 0.02) * 100) / 100;
+
+            audioplayer.audio.object.volume = newVolume;
+            audioplayer.audio.volume = newVolume;
+
+            audioplayer.elements.buttons.volumeIndicator.setAttribute("data-volume", Math.ceil(audioplayer.audio.volume * 100));
+
+            if (audioplayer.audio.volume >= audioplayer.audio.volumeUpValue && audioplayer.audio.muted == false) {
+                audioplayer.elements.buttons.volumeUp.style.display = "inline-block";
+                audioplayer.elements.buttons.volumeDown.style.display = "none";
+
+            } else if (audioplayer.audio.volume < audioplayer.audio.volumeUpValue && audioplayer.audio.muted == false) {
+                audioplayer.elements.buttons.volumeDown.style.display = "inline-block";
+                audioplayer.elements.buttons.volumeUp.style.display = "none";
+            }
+
+            localStorage.audioVolume = audioplayer.audio.volume * 100;
+        }
+    },
+    volumeDown: function() {
+        if (audioplayer.audio.volume > 0) {
+            var newVolume = Math.round((audioplayer.audio.volume - 0.02) * 100) / 100;
+
+            audioplayer.audio.object.volume = newVolume;
+            audioplayer.audio.volume = newVolume;
+
+            audioplayer.elements.buttons.volumeIndicator.setAttribute("data-volume", Math.ceil(audioplayer.audio.volume * 100));
+
+            if (audioplayer.audio.volume >= audioplayer.audio.volumeUpValue && audioplayer.audio.muted == false) {
+                audioplayer.elements.buttons.volumeUp.style.display = "inline-block";
+                audioplayer.elements.buttons.volumeDown.style.display = "none";
+
+            } else if (audioplayer.audio.volume < audioplayer.audio.volumeUpValue && audioplayer.audio.muted == false) {
+                audioplayer.elements.buttons.volumeDown.style.display = "inline-block";
+                audioplayer.elements.buttons.volumeUp.style.display = "none";
+            }
+
+            localStorage.audioVolume = audioplayer.audio.volume * 100;
+        }
+    },
+    volumeMute: function() {
+        if (!audioplayer.audio.muted) {
+            audioplayer.audio.object.muted = true;
+            audioplayer.audio.muted = true;
+
+            audioplayer.elements.buttons.volumeUp.style.display = "none";
+            audioplayer.elements.buttons.volumeDown.style.display = "none";
+            audioplayer.elements.buttons.volumeMute.style.display = "inline-block";
+
+        } else {
+            audioplayer.audio.object.muted = false;
+            audioplayer.audio.muted = false;
+
+            audioplayer.elements.buttons.volumeMute.style.display = "none";
+
+            if (audioplayer.audio.volume > audioplayer.audio.volumeUpValue) {
+                audioplayer.elements.buttons.volumeUp.style.display = "inline-block";
+            } else {
+                audioplayer.elements.buttons.volumeDown.style.display = "inline-block";
+            }
+        }
+    },
+    onended: function() {
+        audioplayer.stop();
+
+        switch (audioplayer.audio.repeat) {
+            case "all":
+                audioplayer.nextSong();
+                break;
+            case "one":
+
+        }
+    },
+    timeUpdate: function() {
+        var percent = (audioplayer.audio.object.currentTime / audioplayer.audio.object.duration) * 100;
+        audioplayer.elements.timeline.input.style.left = "calc(" + percent + "% - 5px)";
+
+        var curTime = Math.round(audioplayer.audio.object.currentTime);
+
+        var curMin = 0;
+        var curSec = 0;
+
+        if (curTime < 60) {
+            curSec = curTime;
+        } else {
+            curMin = Math.floor(curTime / 60);
+            curSec = curTime - curMin * 60;
+        }
+
+        if (curMin < 10) {
+            curMin = "0" + curMin;
+        }
+        if (curSec < 10) {
+            curSec = "0" + curSec;
+        }
+
+        audioplayer.elements.timeline.played.innerHTML = curMin + ":" + curSec;
+
+    },
+
     log: function(txt) {
         console.info(audioplayer.name + " v" + audioplayer.version + ": " + txt);
     }
@@ -52,9 +298,9 @@ function initVariables() {
     audioplayer.elements.timeline = {};
 
     audioplayer.elements.timeline.timeline = audioplayer.elements.player.getElementsByClassName("range")[0];
-    audioplayer.elements.timeline.input = audioplayer.elements.timeline.timeline.getElementsByClassName("input")[0];
-    audioplayer.elements.timeline.played = audioplayer.elements.timeline.timeline.getElementsByClassName("begin")[0];
-    audioplayer.elements.timeline.total = audioplayer.elements.timeline.timeline.getElementsByClassName("end")[0];
+    audioplayer.elements.timeline.input = audioplayer.elements.player.getElementsByClassName("input")[0];
+    audioplayer.elements.timeline.played = audioplayer.elements.player.getElementsByClassName("begin")[0];
+    audioplayer.elements.timeline.total = audioplayer.elements.player.getElementsByClassName("end")[0];
 
     audioplayer.log("Variabled loaded");
 }
@@ -115,3 +361,10 @@ function loadFromLocalStorage() {
             break;
     }
 }
+
+var hotKeys;
+require("electron").ipcRenderer.on("keyPress", (event, action) => {
+
+    hotKeys(action);
+
+});
