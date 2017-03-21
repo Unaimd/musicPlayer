@@ -69,8 +69,6 @@ var audioplayer = {
         audioplayer.audio.object.play();
         //audioplayer.audio.object.onended = audioplayer.onended();
 
-        audioplayer.elements.timeline.total.innerHTML = audioplayer.audio.duration;
-
         // update document title
         // update doument icon
 
@@ -89,6 +87,7 @@ var audioplayer = {
         audioplayer.elements.buttons.play.style.display = "inline-bloc";
     },
     stop: function() {
+        audioplayer.pause();
         audioplayer.audio.object.currentTime = 0;
         audioplayer.elements.timeline.input.style.marginLeft = "0px";
     },
@@ -255,7 +254,6 @@ var audioplayer = {
         }
 
         audioplayer.elements.timeline.played.innerHTML = curMin + ":" + curSec;
-
     },
 
     log: function(txt) {
