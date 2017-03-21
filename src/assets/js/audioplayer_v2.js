@@ -72,7 +72,7 @@ var audioplayer = {
         // update document title
         // update doument icon
 
-        // scroll to active song
+        audioplayer.scroll(document.getElementById("songs"), document.querySelector("#songs .active"), audioplayer.config.scrollAnimationDuration);
 
         audioplayer.elements.buttons.play.style.display = "none";
         audioplayer.elements.buttons.pause.style.display = "inline-block";
@@ -84,7 +84,7 @@ var audioplayer = {
         // set default document title
 
         audioplayer.elements.buttons.pause.style.display = "none";
-        audioplayer.elements.buttons.play.style.display = "inline-bloc";
+        audioplayer.elements.buttons.play.style.display = "inline-block";
     },
     stop: function() {
         audioplayer.pause();
@@ -254,6 +254,32 @@ var audioplayer = {
         }
 
         audioplayer.elements.timeline.played.innerHTML = curMin + ":" + curSec;
+    },
+
+    scroll: function(parent, element, duration) {
+        if (duration <= 0) {
+            return
+        }
+
+        // mouse not over parent
+        if (parent.querySelector(":hover") === null) {
+            if (typeof element == "object") {
+                var px = parent.scrollTop + element.getBoundingClientRect().top - element.clientHeight / 2;
+            } else {
+                var px = element;
+            }
+
+            var diff = px - parent.scrollTop;
+            var perTick = diff / duration * 10;
+
+            setTimeout(function () {
+                parent.scrollTop = parent.scrollTop + perTick;
+                if (parent.scrollTop == px) {
+                    return;
+                }
+                audioplayer.scroll(parent, px, duration -10);
+            }, 10);
+        }
     },
 
     log: function(txt) {
