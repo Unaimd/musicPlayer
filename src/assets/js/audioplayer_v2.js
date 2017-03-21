@@ -328,7 +328,6 @@ function initObject() {
      audioplayer.log("Object and Properties loaded");
 }
 
-// load data from localStorage
 function loadFromLocalStorage() {
     var lsAudioVolume = localStorage.audioVolume;
     if (typeof lsAudioVolume == "undefined") {
@@ -363,6 +362,6 @@ function loadFromLocalStorage() {
 var hotKeys;
 require("electron").ipcRenderer.on("keyPress", (event, action) => {
 
-    hotKeys(action);
+    //audioplayer.hotKeys(action);
 
 });
