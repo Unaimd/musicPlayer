@@ -6,7 +6,7 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 
 var audioplayer = {
-    version: "0.0.2",
+    version: "0.0.5",
     name: "Audioplayer",
 
     newSong: function(aElement) {
@@ -132,7 +132,7 @@ var audioplayer = {
         }
     },
     repeat: function(repeat) {
-        var mode = repeat.attr("data-mode");
+        var mode = repeat.getAttribute("data-mode");
         var button;
 
         repeat.style.display = "none";
@@ -162,7 +162,9 @@ var audioplayer = {
             audioplayer.audio.object.volume = newVolume;
             audioplayer.audio.volume = newVolume;
 
-            audioplayer.elements.buttons.volumeIndicator.setAttribute("data-volume", Math.ceil(audioplayer.audio.volume * 100));
+            for (var i=0; i < audioplayer.elements.buttons.volumeIndicator.length; i++) {
+                audioplayer.elements.buttons.volumeIndicator[i].setAttribute("data-volume", Math.ceil(audioplayer.audio.volume * 100));
+            }
 
             if (audioplayer.audio.volume >= audioplayer.audio.volumeUpValue && audioplayer.audio.muted == false) {
                 audioplayer.elements.buttons.volumeUp.style.display = "inline-block";
@@ -183,7 +185,9 @@ var audioplayer = {
             audioplayer.audio.object.volume = newVolume;
             audioplayer.audio.volume = newVolume;
 
-            audioplayer.elements.buttons.volumeIndicator.setAttribute("data-volume", Math.ceil(audioplayer.audio.volume * 100));
+            for (var i=0; i < audioplayer.elements.buttons.volumeIndicator.length; i++) {
+                audioplayer.elements.buttons.volumeIndicator[i].setAttribute("data-volume", Math.ceil(audioplayer.audio.volume * 100));
+            }
 
             if (audioplayer.audio.volume >= audioplayer.audio.volumeUpValue && audioplayer.audio.muted == false) {
                 audioplayer.elements.buttons.volumeUp.style.display = "inline-block";
@@ -308,12 +312,12 @@ function initVariables() {
     audioplayer.elements.buttons.previousSong = audioplayer.elements.player.querySelector("[name='before']");
     audioplayer.elements.buttons.nextSong = audioplayer.elements.player.querySelector("[name='after']");
 
-    audioplayer.elements.buttons.repeat = audioplayer.elements.player.querySelector("[name='repeat']");
+    audioplayer.elements.buttons.repeat = audioplayer.elements.player.querySelectorAll("[name='repeat']");
     audioplayer.elements.buttons.repeatNone = audioplayer.elements.player.querySelector("[name='repeat'][data-mode='none']");
     audioplayer.elements.buttons.repeatAll = audioplayer.elements.player.querySelector("[name='repeat'][data-mode='all']");
     audioplayer.elements.buttons.repeatOne = audioplayer.elements.player.querySelector("[name='repeat'][data-mode='one']");
 
-    audioplayer.elements.buttons.volumeIndicator = audioplayer.elements.player.querySelector("[name='volume']");
+    audioplayer.elements.buttons.volumeIndicator = audioplayer.elements.player.querySelectorAll("[name='volume']");
     audioplayer.elements.buttons.volumeUp = audioplayer.elements.player.querySelector("[name='volume'][data-mode='up']");
     audioplayer.elements.buttons.volumeDown = audioplayer.elements.player.querySelector("[name='volume'][data-mode='down']");
     audioplayer.elements.buttons.volumeMute = audioplayer.elements.player.querySelector("[name='volume'][data-mode='mute']");
@@ -361,7 +365,10 @@ function loadFromLocalStorage() {
     } else {
         audioplayer.audio.volume = parseInt(lsAudioVolume) / 100;
     }
-    audioplayer.elements.buttons.volumeIndicator.setAttribute("data-volume", Math.floor(audioplayer.audio.volume * 100));
+
+    for (var i=0; i < audioplayer.elements.buttons.volumeIndicator.length; i++) {
+        audioplayer.elements.buttons.volumeIndicator[i].setAttribute("data-volume", Math.floor(audioplayer.audio.volume * 100));
+    }
 
     var lsAudioRepeat = localStorage.audioRepeat;
     if (typeof lsAudioRepeat == "undefined") {
@@ -370,7 +377,9 @@ function loadFromLocalStorage() {
         audioplayer.audio.repeat = lsAudioRepeat;
     }
 
-    audioplayer.elements.buttons.repeat.style.display = "none";
+    for (var i=0; i < audioplayer.elements.buttons.repeat.length; i++) {
+        audioplayer.elements.buttons.repeat[i].style.display = "none";
+    }
 
     switch(audioplayer.audio.repeat) {
         case "all":
@@ -384,10 +393,3 @@ function loadFromLocalStorage() {
             break;
     }
 }
-
-var hotKeys;
-require("electron").ipcRenderer.on("keyPress", (event, action) => {
-
-    //audioplayer.hotKeys(action);
-
-});

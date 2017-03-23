@@ -27,10 +27,6 @@
 
     <link rel="stylesheet" href="./assets/css/utilities.css">
     <link rel="stylesheet" href="./assets/css/main.css">
-
-    <script src="./assets/js/main.js"></script>
-    <script src="./assets/js/audioplayer.js"></script>
-
 </head>
 <body class="dark">
     <div id="titleBar">
@@ -122,20 +118,21 @@
         <ul id="songs" data-order="moddate">
             <noscript>
                 <li>
-                   <?php echo $trans["music"]["noscript"];?>
+                   JavaScript is required in order to use this.
                 </li>
             </noscript>
             <li style="display:none"></li>
         </ul>
         <script>
             $(function(){
-                loadSongs("/",$loadAfter, "moddate", 0);
+                loadSongs("/", 40, "moddate", 0);
             });
 
         </script>
     </div>
     <div class="clearfix"></div>
-    
+    <script src="./assets/js/main.js"></script>
     <script src="./assets/js/audioplayer_v2.js"></script>
+    <script src="./assets/js/controls.js"></script>
 </body>
 </html>
