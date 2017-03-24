@@ -123,13 +123,19 @@ $('#songs').scroll(function(){
 
 // change current time by clicking on the timeline
 $(".range").click(function (event){
-    moveplayhead(event);
-    audioplayer.audio.object.currentTime = audioplayer.audio.object.duration * clickPercent(event);
+    if (audioplayer.audio.object.src != "") {
+        moveplayhead(event);
+        audioplayer.audio.object.currentTime = audioplayer.audio.object.duration * clickPercent(event);
+    }
+});
+
+$(".range").find(".input").mousedown(() => {
+    moveplayhead(event)
 });
 
 // return percentage of the song on clicked position
 function clickPercent(e){
-    return (e.pageX - $('.range').offset().left) / $timelineWidth;
+    return (e.pageX - $('.range').offset().left) / $(".range").width();
 }
 
 // moves the input from the timeline
