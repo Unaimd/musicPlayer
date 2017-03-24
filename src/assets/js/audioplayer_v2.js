@@ -389,7 +389,7 @@ function loadFromLocalStorage() {
             audioplayer.elements.buttons.repeatOne.style.display = "inline-block";
             break;
         case "none":
-            audioplayer.elements.buttons.repeaNone.style.display = "inline-block";
+            audioplayer.elements.buttons.repeatNone.style.display = "inline-block";
             break;
     }
 }
