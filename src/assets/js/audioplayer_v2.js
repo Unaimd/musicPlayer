@@ -67,7 +67,9 @@ var audioplayer = {
         audioplayer.audio.object.muted = audioplayer.audio.muted;
 
         audioplayer.audio.object.play();
-        //audioplayer.audio.object.onended = audioplayer.onended();
+        audioplayer.audio.object.addEventListener("ended", function() {
+            audioplayer.onended();
+        }, false);
 
         // update document title
         // update doument icon
@@ -153,6 +155,7 @@ var audioplayer = {
         }
 
         audioplayer.audio.repeat = mode;
+        localStorage.audioRepeat = mode;
         button.style.display = "inline-block";
     },
     volumeUp: function() {
@@ -231,7 +234,8 @@ var audioplayer = {
                 audioplayer.nextSong();
                 break;
             case "one":
-
+                audioplayer.play();
+                break;
         }
     },
     timeUpdate: function() {
@@ -287,7 +291,7 @@ var audioplayer = {
     },
 
     log: function(txt) {
-        console.info(audioplayer.name + " v" + audioplayer.version + ": " + txt);
+        console.info(audioplayer.name + ": " + txt);
     }
 };
 

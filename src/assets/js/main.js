@@ -103,6 +103,9 @@ function loadSongs($folder,$num,$order,$lastNum) {
 
         $ajax.open('POST','http://' + ajaxUrl + url, true);
         $ajax.setRequestHeader('Content-type','application/x-www-form-urlencoded');
+        if (ajaxUrl == null) {
+            window.location.reload();
+        }
         $ajax.send('listDir='+$folder+'&numFiles='+$num+'&lastFile='+$lastFile+'&lastNum='+$lastNum+'&order='+$order+"&addIp");
 
     }
