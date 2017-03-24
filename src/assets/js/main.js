@@ -117,3 +117,30 @@ $('#songs').scroll(function(){
     }
 
 });
+
+// change current time by clicking on the timeline
+$(".range").click(function (event){
+    moveplayhead(event);
+    audioplayer.audio.object.currentTime = audioplayer.audio.object.duration * clickPercent(event);
+});
+
+// return percentage of the song on clicked position
+function clickPercent(e){
+    return (e.pageX - $('.range').offset().left) / $timelineWidth;
+}
+
+// moves the input from the timeline
+function moveplayhead(e){
+    $timelineWidth = parseInt($(".range").css('width'));
+    $newMargLeft = e.pageX - $('.range').offset().left;
+
+    if ($newMargLeft >= 0 && $newMargLeft <= $timelineWidth){
+        $(".range").find(".input").css('left',$newMargLeft + "px");
+    }
+    if ($newMargLeft < 0){
+        $(".range").find(".input").css('left',"0px");
+    }
+    if ($newMargLeft > $timelineWidth){
+        $(".range").find(".input").css('left',$timelineWidth + "px");
+    }
+}
