@@ -3,6 +3,16 @@ document.addEventListener("DOMContentLoaded", function() {
     initObject();
 
     loadFromLocalStorage();
+    /*
+     create events and dispatch them when loading and changing states
+     var varName = new CustomEvent('name', {
+            detail: state, // custom info, it can be anything
+            bubbles: true, // bubble to antecesors
+            cancelable: true // cancelable using stopPropagation() method
+        }
+    );
+     window.dispatchEvent(varName);
+     */
 });
 
 var audioplayer = {
