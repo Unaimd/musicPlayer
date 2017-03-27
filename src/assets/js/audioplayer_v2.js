@@ -63,6 +63,11 @@ var audioplayer = {
 
     },
     play: function() {
+        if (!audioplayer.audio.object.src) {
+            swal("Error", "No hay ninguna canción seleccionada", "error");
+            return;
+        }
+
         audioplayer.audio.object.volume = audioplayer.audio.volume;
         audioplayer.audio.object.muted = audioplayer.audio.muted;
 
@@ -94,10 +99,13 @@ var audioplayer = {
         audioplayer.elements.timeline.input.style.marginLeft = "0px";
     },
     nextSong: function() {
-        var active = parseInt(document.querySelector("#songs .active").getAttribute("data-num"));
-        var totalSongs = parseInt(document.querySelectorAll("#songs [data-type='audio']").length);
+        var active = parseInt(document.querySelector("#songs .active"));
+        if (!active) {
+            return;
+        }
 
-        // $loadOn = $totalSongs - $loadAfter;
+        active = active.getAttribute("data-num");
+        var totalSongs = parseInt(document.querySelectorAll("#songs [data-type='audio']").length);
 
         if (active < totalSongs) {
             var next = document.querySelector("#songs [data-num='" + (active + 1) + "']");
@@ -116,7 +124,12 @@ var audioplayer = {
         }
     },
     previousSong: function() {
-        var active = parseInt(document.querySelector("#songs .active").getAttribute("data-num"));
+        var active = parseInt(document.querySelector("#songs .active"));
+        if (!active) {
+            return;
+        }
+
+        active = active.getAttribute("data-num");
 
         if (active > 0) {
             var previous = document.querySelector("#songs [data-num='" + (active - 1)  + "']");
@@ -266,7 +279,7 @@ var audioplayer = {
 
     scroll: function(parent, element, duration) {
         if (duration <= 0) {
-            return
+            return;
         }
 
         // mouse not over parent

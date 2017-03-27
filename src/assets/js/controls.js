@@ -13,7 +13,24 @@ if (typeof audioplayer == "undefined") {
         audioplayer.newSong(this);
     }
 
+
+    function clickPercent(element, e) {
+        return (e.pageX - element.getBoundingClientRect().left) / element.offsetWidth;
+    }
+
+    function movePlayHead(element, e) {
+        var timelintWidth = parseInt(element.offsetWidth);
+        var newLeftMargin = e.pageX - element.getBoundingClientRect().left;
+    }
+
     setTimeout(function() {
+        audioplayer.elements.timeline.timeline.addEventListener("click", function() {
+            if (audioplayer.audio.object.src) {
+                movePlayHead(audioplayer.elements.timeline.timeline, event);
+                audioplayer.audio.object.currentTime = audioplayer.audio.object.duration * clickPercent(audioplayer.elements.timeline.timeline, event);
+            }
+        }, false);
+
         audioplayer.elements.buttons.play.addEventListener("click", function() {
             audioplayer.play();
         }, false);
