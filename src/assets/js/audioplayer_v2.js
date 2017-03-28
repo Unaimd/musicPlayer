@@ -62,7 +62,7 @@ var audioplayer = {
     },
     config: {
         swalTimer: 1500,
-        scrollArnimationDuration: 500,
+        scrollAnimationDuration: 500,
         scrollEnabled: true
     },
 
@@ -347,6 +347,7 @@ var audioplayer = {
     },
 
     scroll: function(parent, element, duration) {
+        console.log("scrolling..." + parent + " " + element + " " +duration);
         if (duration <= 0) {
             return;
         }
@@ -367,7 +368,7 @@ var audioplayer = {
                 if (parent.scrollTop == px) {
                     return;
                 }
-                audioplayer.scroll(parent, px, duration -10);
+                audioplayer.scroll(parent, px, parseInt(duration - 10));
             }, 10);
         }
     },
