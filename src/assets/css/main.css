@@ -26,11 +26,19 @@
   background-color: darkgrey;
   outline: 1px solid slategrey;
 }
+* {
+    box-sizing: border-box;
+}
 
 body {
     color: #fff;
     background-color: #333;
     font-family: Montserrat;
+    font-size: 14px;
+}
+
+body > :not(#titleBar) {
+    margin-top: 25px;
 }
 
 
@@ -60,7 +68,7 @@ body {
     padding: 3px;
     border: 1px solid #393939;
     border-radius: 5px;
-    
+
     background-color: #262626;
     box-shadow: 0px 0px 3px white;
 }
@@ -94,7 +102,7 @@ body.light #audioplayer .info img {
     position: relative;
     top: -2.5px;
     left: 0px;
-    
+
     background-color: white;
 }
 
@@ -109,7 +117,7 @@ body.light #audioplayer .info .moreinfo .album::before {
     margin-bottom: 10px;
 }
 
-#audioplayer .timeline .begin, 
+#audioplayer .timeline .begin,
 #audioplayer .timeline .end {
     font-size: .75em;
     text-align: center;
@@ -118,11 +126,11 @@ body.light #audioplayer .info .moreinfo .album::before {
 
 #audioplayer .timeline .begin {
     float: left;
-} 
+}
 
 #audioplayer .timeline .end {
     float: right;
-} 
+}
 
 #audioplayer .timeline .range {
     position: relative;
@@ -133,7 +141,7 @@ body.light #audioplayer .info .moreinfo .album::before {
     margin-left: 5px;
     background-color: grey;
     border-radius: 4px;
-    
+
     border: 4px solid transparent;
 }
 
@@ -149,7 +157,7 @@ body.dark #audioplayer .timeline .range {
     width: 10px;
     height: 10px;
     border-radius: 10px;
-    
+
     border: 2px solid white;
     background-color: black;
 }
@@ -167,7 +175,7 @@ body.light #audioplayer .timeline .range .input {
     background-color: transparent;
     border-radius: 100%;
     transition: all .1s;
-    
+
     color: white;
     border: 2px solid white;
 }
@@ -193,7 +201,7 @@ body.light #audioplayer button {
     font-size: .7em;
     border-radius: 100%;
     font-weight: bolder;
-    
+
     background-color: white;
     color: black;
 }
@@ -220,7 +228,7 @@ body.light #audioplayer button {
     list-style: none;
     padding-left: 0px;
     overflow-y: auto;
-    max-height: 100vh;
+    max-height: calc(100vh - 50px);
 }
 
 #songs li {
@@ -228,7 +236,7 @@ body.light #audioplayer button {
     min-height: 40px;
     padding: 5px;
     transition: background .5s;
-    
+
     border-bottom: 1px solid white;
 }
 
@@ -237,11 +245,11 @@ body.light #songs li {
 }
 
 #songs li[data-type="audio"]:hover {
-    cursor: pointer;    
+    cursor: pointer;
 }
 
 #songs li[data-type="audio"]:not(.active):hover {
-    
+
     background-color: white;
     color: black;
 }
@@ -292,7 +300,7 @@ body.light #songs li:nth-child(3) {
     position: relative;
     top: -3px;
     margin: 0px 4px 0px 2px;
-    
+
     background-color: white;
 }
 
@@ -309,18 +317,18 @@ body.light #songs li:nth-child(3) {
         max-width: none;
         margin: auto;
     }
-    
+
     #audioplayer {
         float: right;
         width: 45%;
         margin-right: 10px;
-        margin-top: 10px;
+        margin-top: 0px !important;
     }
-    
+
     #songs {
         float: left;
         width: 50%;
-        max-height: calc(100vh - 20px);
+        max-height: calc(100vh - 50px);;
         margin-top: 10px;
         overflow-y: auto;
         margin-left: 10px;

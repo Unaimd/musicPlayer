@@ -8,6 +8,14 @@
     left: 0;
 }
 
+#titleBar img {
+    display: inline-block;
+    width: 20px;
+    margin: 5px 0px 0px 5px;
+    border: 1px solid white;
+    border-radius: 3px;
+}
+
 #titleBar i {
     -webkit-app-region: no-drag;
     display: inline-block;

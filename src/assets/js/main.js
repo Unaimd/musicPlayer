@@ -28,7 +28,7 @@ function isAccesible() {
 
             });
 
-        } else if (typeof ajaxUrl === "string") {
+        } else if (typeof ajaxUrl === "string" && ajaxUrl !== null) {
             $.ajax({
                 url: "http://" + ajaxUrl + url,
                 complete: function(xhr, data) {
