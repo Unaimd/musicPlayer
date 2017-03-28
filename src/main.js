@@ -2,11 +2,15 @@ const {
     app,
     BrowserWindow,
     globalShortcut,
-    ipcMain
+    ipcMain,
+    dialog
 } = require('electron');
 
 const path = require('path');
 const url = require('url');
+
+const fs = require('fs');
+const id3 = require('musicmetadata');
 
 // window object
 let win;
@@ -107,6 +111,9 @@ app.on('ready', () => {
 
         } else if (arg == "minimize") {
             win.minimize();
+
+        } else if (arg == "loadFolder") {
+            event.returnValue = loadMusicFromFolder();
         }
 
         event.returnValue = "ok";
@@ -114,9 +121,66 @@ app.on('ready', () => {
 
 });
 
-
-
 // Quit when all windows are closed.
 app.on('window-all-closed', () => {
     app.quit();
 });
+
+function selectFolder() {
+    var dir = undefined;
+    while(dir === undefined) {
+        dir = dialog.showOpenDialog({
+            properties: ['openDirectory']
+        });
+    }
+    return dir = dir[0];
+}
+
+function loadMusicFromFolder() {
+    var dir = selectFolder();
+    var songs = [];
+
+    if (fs.existsSync(dir)) {
+        fs.readdir(dir, (error, files) => {
+            files.forEach((file) => {
+                if (fs.lstatSync(dir + "/" + file).isDirectory()) {
+                    // directory
+                }
+
+                var f = file.split(".");
+                if (f[f.length - 1].toUpperCase() == "MP3") {
+                    file = path.resolve(dir, file);
+
+                    var filemtime;
+                    fs.stat(file, (err, stats) => {
+                        filemtime = new Date(stats.mtime).valueOf();
+                    });
+
+                    // doc: https://github.com/leetreveil/musicmetadata
+                    var readableStream = fs.createReadStream(file);
+                    var parser = id3(readableStream, {duration: true}, function (err, metadata) {
+                        if (typeof metadata.picture[0] != "undefined") {
+                            metadata.picture[0].data = metadata.picture[0].data.toString("base64");
+                        }
+
+                        var resp = {
+                            title: metadata.title,
+                            artist: metadata.artist,
+                            album: metadata.album,
+                            duration: metadata.duration,
+                            cover: metadata.picture,
+                            moddate: filemtime
+                        }
+
+                        console.log(resp.title + " - " + resp.artist);
+
+                        readableStream.close();
+                        songs.push(resp);
+                    });
+                }
+            });
+        });
+    }
+
+    return songs;
+}
