@@ -13,7 +13,6 @@ if (typeof audioplayer == "undefined") {
         audioplayer.newSong(this);
     }
 
-
     function clickPercent(element, e) {
         return (e.pageX - element.getBoundingClientRect().left) / element.offsetWidth;
     }
@@ -23,7 +22,7 @@ if (typeof audioplayer == "undefined") {
         var newLeftMargin = e.pageX - element.getBoundingClientRect().left;
     }
 
-    setTimeout(function() {
+    window.addEventListener("variablesLoaded", function() {
         audioplayer.elements.timeline.timeline.addEventListener("click", function() {
             if (audioplayer.audio.object.src) {
                 movePlayHead(audioplayer.elements.timeline.timeline, event);

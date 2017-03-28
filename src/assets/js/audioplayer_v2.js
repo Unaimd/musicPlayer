@@ -1,8 +1,8 @@
 document.addEventListener("DOMContentLoaded", function() {
     initVariables();
-    initObject();
 
-    loadFromLocalStorage();
+    window.addEventListener("variablesLoaded", audioplayer.loadFromLocalStorage(), false);
+
     /*
      create events and dispatch them when loading and changing states
      var varName = new CustomEvent('name', {
@@ -16,18 +16,65 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 
 var audioplayer = {
-    version: "0.0.5",
-    name: "Audioplayer",
+    name: "audioplayer",
+    log: true,
+
+    elements: {
+        player: null,
+        title: null,
+        artist: null,
+        album: null,
+        cover: null,
+
+        buttons: {
+            play: null,
+            pause: null,
+
+            stop: null,
+
+            previousSong: null,
+            nextSong: null,
+
+            repeat: null,
+            repeatNone: null,
+            repeatAll: null,
+            repeatOne: null,
+
+            volumeIndicator: null,
+            volumeUp: null,
+            volumeDown: null,
+            volumeMute: null
+        },
+        timeline: {
+            timeline: null,
+            input: null,
+            played: null,
+            total: null
+        }
+    },
+    audio: {
+        object: new Audio(),
+        currentTime: 0,
+        volume: 100,
+        repeat: "none",
+        muted: false,
+        volumeUpValue: 50
+    },
+    config: {
+        swalTimer: 1500,
+        scrollArnimationDuration: 500,
+        scrollEnabled: true
+    },
 
     newSong: function(aElement) {
         audioplayer.stop();
 
         try {
-            document.querySelector("[data-type='audio'].active").className = document.querySelector("[data-type='audio'].active").className.replace("active", "");
+            document.querySelector("[data-type='audio'].active").className = document.querySelector("[data-type='audio'].active").className.replace(" active", "");
         } catch (error) {
             // no element was active
         }
-        aElement.className += "active";
+        aElement.className += " active";
 
         // get song info
         var path = aElement.getAttribute("data-path");
@@ -61,7 +108,13 @@ var audioplayer = {
 
         if (!! audioplayer.audio.object.canPlayType("audio/" + format) === false) {
 
-            swal("Formato no soportado", "No es posible reproducir la cancion, tu navegador no soporta el formato " + format.toUpperCase(), "error");
+            swal({
+                title: "Formato no soportado",
+                text: "No es posible reproducir la cancion, tu navegador no soporta el formato " + format.toUpperCase(),
+                type:  "error",
+                showConfirmButton: false,
+                timer: audioplayer.config.swalTimer
+            });
 
         } else {
             // start new object
@@ -74,11 +127,17 @@ var audioplayer = {
     },
     play: function() {
         if (!audioplayer.audio.object.src) {
-            swal("Error", "No hay ninguna canción seleccionada", "error");
+            swal({
+                title: 'Error',
+                text: 'No hay ninguna canción seleccionada',
+                type: 'error',
+                showConfirmButton: false,
+                timer: audioplayer.config.swalTimer
+            });
             return;
         }
 
-        audioplayer.audio.object.volume = audioplayer.audio.volume;
+        audioplayer.audio.object.volume = audioplayer.audio.volume / 100;
         audioplayer.audio.object.muted = audioplayer.audio.muted;
 
         audioplayer.audio.object.play();
@@ -110,7 +169,6 @@ var audioplayer = {
     },
     nextSong: function() {
         var active = document.querySelector("#songs .active");
-        console.log(active);
         if (!active) {
             return;
         }
@@ -126,9 +184,9 @@ var audioplayer = {
 
         } else {
             swal({
-                title:'Siguiente canción no disponible',
-                text:'No hay mas canciones que reproducir',
-                type:'info',
+                title: 'Siguiente canción no disponible',
+                text: 'No hay mas canciones que reproducir',
+                type: 'info',
                 showConfirmButton: false,
                 timer: audioplayer.config.swalTimer
             });
@@ -183,14 +241,14 @@ var audioplayer = {
         button.style.display = "inline-block";
     },
     volumeUp: function() {
-        if (audioplayer.audio.volume < 1) {
-            var newVolume = Math.round((audioplayer.audio.volume + 0.02) * 100) / 100;
+        if (audioplayer.audio.volume < 100) {
+            var newVolume = audioplayer.audio.volume + 2;
 
-            audioplayer.audio.object.volume = newVolume;
+            audioplayer.audio.object.volume = newVolume / 100;
             audioplayer.audio.volume = newVolume;
 
             for (var i=0; i < audioplayer.elements.buttons.volumeIndicator.length; i++) {
-                audioplayer.elements.buttons.volumeIndicator[i].setAttribute("data-volume", Math.ceil(audioplayer.audio.volume * 100));
+                audioplayer.elements.buttons.volumeIndicator[i].setAttribute("data-volume", audioplayer.audio.volume);
             }
 
             if (audioplayer.audio.volume >= audioplayer.audio.volumeUpValue && audioplayer.audio.muted == false) {
@@ -202,18 +260,18 @@ var audioplayer = {
                 audioplayer.elements.buttons.volumeUp.style.display = "none";
             }
 
-            localStorage.audioVolume = audioplayer.audio.volume * 100;
+            localStorage.audioVolume = audioplayer.audio.volume;
         }
     },
     volumeDown: function() {
         if (audioplayer.audio.volume > 0) {
-            var newVolume = Math.round((audioplayer.audio.volume - 0.02) * 100) / 100;
+            var newVolume = audioplayer.audio.volume - 2;
 
-            audioplayer.audio.object.volume = newVolume;
+            audioplayer.audio.object.volume = newVolume / 100;
             audioplayer.audio.volume = newVolume;
 
             for (var i=0; i < audioplayer.elements.buttons.volumeIndicator.length; i++) {
-                audioplayer.elements.buttons.volumeIndicator[i].setAttribute("data-volume", Math.ceil(audioplayer.audio.volume * 100));
+                audioplayer.elements.buttons.volumeIndicator[i].setAttribute("data-volume", audioplayer.audio.volume);
             }
 
             if (audioplayer.audio.volume >= audioplayer.audio.volumeUpValue && audioplayer.audio.muted == false) {
@@ -225,7 +283,7 @@ var audioplayer = {
                 audioplayer.elements.buttons.volumeUp.style.display = "none";
             }
 
-            localStorage.audioVolume = audioplayer.audio.volume * 100;
+            localStorage.audioVolume = audioplayer.audio.volume;
         }
     },
     volumeMute: function() {
@@ -313,15 +371,55 @@ var audioplayer = {
             }, 10);
         }
     },
+    loadFromLocalStorage: function() {
+        var lsAudioVolume = localStorage.getItem("audioVolume");
+        if (lsAudioVolume == null) {
+            localStorage.setItem("audioVolume", audioplayer.audio.volume)
+        } else {
+            audioplayer.audio.volume = parseInt(lsAudioVolume);
+        }
 
+        for (var i = 0; i < audioplayer.elements.buttons.volumeIndicator.length; i++) {
+            audioplayer.elements.buttons.volumeIndicator[i].setAttribute("data-volume", Math.floor(audioplayer.audio.volume))
+        }
+
+        var lsAudioRepeat = localStorage.getItem("audioRepeat");
+        if (lsAudioRepeat == null) {
+            localStorage.setItem("audioRepeat", audioplayer.audio.repeat);
+        } else {
+            audioplayer.audio.repeat = lsAudioRepeat;
+        }
+
+        for (var i = 0; i < audioplayer.elements.buttons.repeat.length; i++) {
+            audioplayer.elements.buttons.repeat[i].style.display = "none";
+        }
+
+        switch (audioplayer.audio.repeat) {
+            case "none":
+                audioplayer.elements.buttons.repeatNone.style.display = "inline-block";
+                break;
+            case "all":
+                audioplayer.elements.buttons.repeatAll.style.display = "inline-block";
+                break;
+            case "one":
+                audioplayer.elements.buttons.repeatOne.style.display = "inline-block";
+                break;
+        }
+    },
     log: function(txt) {
-        console.info(audioplayer.name + ": " + txt);
+        if (audioplayer.log) {
+            console.info(audioplayer.name + ": " + txt);
+        }
     }
 };
 
 // audioplayer HTML elements
 function initVariables() {
-    audioplayer.elements = {};
+    var variablesLoadedEvnt = new CustomEvent("variablesLoaded", {
+        detail: "Audioplayer variables loaded",
+        bubbles: false,
+        cancelable: false
+    });
 
     audioplayer.elements.player = document.getElementById("audioplayer");
     audioplayer.elements.title = audioplayer.elements.player.getElementsByClassName("title")[0];
@@ -330,15 +428,13 @@ function initVariables() {
     audioplayer.elements.cover = audioplayer.elements.player.getElementsByTagName("img")[0];
 
 
-    audioplayer.elements.buttons = {};
-
     audioplayer.elements.buttons.play = audioplayer.elements.player.querySelector("[name='play']");
     audioplayer.elements.buttons.pause = audioplayer.elements.player.querySelector("[name='pause']");
 
     audioplayer.elements.buttons.stop = audioplayer.elements.player.querySelector("[name='stop']");
 
-    audioplayer.elements.buttons.previousSong = audioplayer.elements.player.querySelector("[name='before']");
-    audioplayer.elements.buttons.nextSong = audioplayer.elements.player.querySelector("[name='after']");
+    audioplayer.elements.buttons.previousSong = audioplayer.elements.player.querySelector("[name='previousSong']");
+    audioplayer.elements.buttons.nextSong = audioplayer.elements.player.querySelector("[name='nextSong']");
 
     audioplayer.elements.buttons.repeat = audioplayer.elements.player.querySelectorAll("[name='repeat']");
     audioplayer.elements.buttons.repeatNone = audioplayer.elements.player.querySelector("[name='repeat'][data-mode='none']");
@@ -351,73 +447,11 @@ function initVariables() {
     audioplayer.elements.buttons.volumeMute = audioplayer.elements.player.querySelector("[name='volume'][data-mode='mute']");
 
 
-    audioplayer.elements.timeline = {};
-
     audioplayer.elements.timeline.timeline = audioplayer.elements.player.getElementsByClassName("range")[0];
     audioplayer.elements.timeline.input = audioplayer.elements.player.getElementsByClassName("input")[0];
     audioplayer.elements.timeline.played = audioplayer.elements.player.getElementsByClassName("begin")[0];
     audioplayer.elements.timeline.total = audioplayer.elements.player.getElementsByClassName("end")[0];
 
     audioplayer.log("Variabled loaded");
-}
-
-// audio objects & properties
-function initObject() {
-     audioplayer.audio = {};
-
-     audioplayer.audio.object = new Audio();
-
-     audioplayer.audio.currentTime = audioplayer.audio.object.currentTime;
-     audioplayer.audio.volume = 1;
-     audioplayer.audio.repeat = "none";
-     audioplayer.audio.muted = false;
-     audioplayer.audio.volumeUpValue = 0.5;
-
-
-     audioplayer.config = {};
-
-     audioplayer.config.moreSongs = true;
-     audioplayer.config.folder = "/";
-     audioplayer.config.loadAfter = 30;
-     audioplayer.config.swalTimer = 1500;
-     audioplayer.config.scrollAnimationDuration = 500;
-     audioplayer.config.scrollEnabled = true;
-
-     audioplayer.log("Object and Properties loaded");
-}
-
-function loadFromLocalStorage() {
-    var lsAudioVolume = localStorage.audioVolume;
-    if (typeof lsAudioVolume == "undefined") {
-        localStorage.audioVolume = audioplayer.audio.volume * 100;
-    } else {
-        audioplayer.audio.volume = parseInt(lsAudioVolume) / 100;
-    }
-
-    for (var i=0; i < audioplayer.elements.buttons.volumeIndicator.length; i++) {
-        audioplayer.elements.buttons.volumeIndicator[i].setAttribute("data-volume", Math.floor(audioplayer.audio.volume * 100));
-    }
-
-    var lsAudioRepeat = localStorage.audioRepeat;
-    if (typeof lsAudioRepeat == "undefined") {
-        localStorage.audioRepeat = audioplayer.audio.repeat;
-    } else {
-        audioplayer.audio.repeat = lsAudioRepeat;
-    }
-
-    for (var i=0; i < audioplayer.elements.buttons.repeat.length; i++) {
-        audioplayer.elements.buttons.repeat[i].style.display = "none";
-    }
-
-    switch(audioplayer.audio.repeat) {
-        case "all":
-            audioplayer.elements.buttons.repeatAll.style.display = "inline-block";
-            break;
-        case "one":
-            audioplayer.elements.buttons.repeatOne.style.display = "inline-block";
-            break;
-        case "none":
-            audioplayer.elements.buttons.repeatNone.style.display = "inline-block";
-            break;
-    }
+    window.dispatchEvent(variablesLoadedEvnt);
 }
