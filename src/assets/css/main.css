@@ -26,7 +26,10 @@
   background-color: darkgrey;
   outline: 1px solid slategrey;
 }
-* {
+
+*,
+*::before,
+*::after {
     box-sizing: border-box;
 }
 
@@ -211,7 +214,7 @@ body.light #audioplayer button {
     position: absolute;
     display: block;
     width: 25px;
-    margin-top: -6px;
+    margin-top: -2px;
     font-size: .7em;
     text-align: center;
 }
