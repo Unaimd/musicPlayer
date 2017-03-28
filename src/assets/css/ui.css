@@ -8,6 +8,10 @@
     left: 0;
 }
 
+#titleBar > * {
+    -webkit-app-region: no-drag;
+}
+
 #titleBar img {
     display: inline-block;
     width: 20px;
@@ -17,7 +21,6 @@
 }
 
 #titleBar i {
-    -webkit-app-region: no-drag;
     display: inline-block;
     width: 35px;
     line-height: 30px;
