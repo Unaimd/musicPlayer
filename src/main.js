@@ -172,8 +172,6 @@ function loadMusicFromFolder() {
                             moddate: filemtime
                         }
 
-                        console.log(resp.title + " - " + resp.artist);
-
                         readableStream.close();
                         songs.push(resp);
                     });
