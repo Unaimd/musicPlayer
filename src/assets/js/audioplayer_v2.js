@@ -354,7 +354,7 @@ var audioplayer = {
         // mouse not over parent
         if (parent.querySelector(":hover") === null) {
             if (typeof element == "object") {
-                var px = parent.scrollTop + element.getBoundingClientRect().top - element.clientHeight / 2;
+                var px = parent.scrollTop + element.getBoundingClientRect().top - element.clientHeight * 1.25;
             } else {
                 var px = element;
             }
