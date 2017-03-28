@@ -109,12 +109,13 @@ var audioplayer = {
         audioplayer.elements.timeline.input.style.marginLeft = "0px";
     },
     nextSong: function() {
-        var active = parseInt(document.querySelector("#songs .active"));
+        var active = document.querySelector("#songs .active");
+        console.log(active);
         if (!active) {
             return;
         }
 
-        active = active.getAttribute("data-num");
+        active = parseInt(active.getAttribute("data-num"));
         var totalSongs = parseInt(document.querySelectorAll("#songs [data-type='audio']").length);
 
         if (active < totalSongs) {
@@ -134,12 +135,12 @@ var audioplayer = {
         }
     },
     previousSong: function() {
-        var active = parseInt(document.querySelector("#songs .active"));
+        var active = document.querySelector("#songs .active");
         if (!active) {
             return;
         }
 
-        active = active.getAttribute("data-num");
+        active = parseInt(active.getAttribute("data-num"));
 
         if (active > 0) {
             var previous = document.querySelector("#songs [data-num='" + (active - 1)  + "']");
