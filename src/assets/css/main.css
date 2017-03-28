@@ -303,6 +303,13 @@ body.light #songs li:nth-child(3) {
 
     background-color: white;
 }
+#songs li .title {
+    display: inline-block;
+    text-overflow: ellipsis;
+    max-width: 80%;
+    overflow: hidden;
+    white-space: nowrap;
+}
 
 #songs li .duration {
     float: right;
