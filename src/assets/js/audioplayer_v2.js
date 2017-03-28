@@ -347,7 +347,6 @@ var audioplayer = {
     },
 
     scroll: function(parent, element, duration) {
-        console.log("scrolling..." + parent + " " + element + " " +duration);
         if (duration <= 0) {
             return;
         }
