@@ -17,30 +17,52 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 
     ipcRenderer.on("addSong", (event, msg) => {
-        const base64 = "data:image/png;base64,";
-        var path = msg.path;
-        var title = msg.title;
-        var artist = msg.artist[0];
-        var album = msg.album;
-        var duration = formatDuration(msg.duration);
-        var cover = msg.cover;
-        var moddate = msg.moddate;
-
         var num = 0;
+        var path = msg.path;
+
+        var title = msg.title;
+        if (typeof title === "undefined") {
+            title = "unknown title";
+        }
+
+        var artist = msg.artist[0];
+        if (typeof artist === "undefined") {
+            artist = "unknown artist";
+        }
+
+        var album = msg.album;
+        if (typeof album === "undefined" || album == "") {
+            album = null;
+        }
+        var duration = formatDuration(msg.duration);
+        var moddate = msg.moddate;
+        var cover = null;
+
+        if (typeof msg.cover != "undefined") {
+            cover = "data:image/" + msg.cover.format + ";base64,";
+            cover += msg.cover.data;
+        } else {
+            cover = "./assets/img/default.jpg";
+        }
+
         var songs = document.querySelectorAll("#songs [data-type='audio']");
         if (songs.length > 0) {
             num = parseInt(songs[songs.length - 1].getAttribute("data-num")) + 1;
         }
 
-        var template = '<li data-type="audio" data-num="' + num + '" data-path="' + path + '" data-cover-path="' + base64 + cover.data + '">';
-        template += '<img src="' + base64 + cover.data + '" draggable="false">';
-        template += '<p><span class="artist">' + artist.toUpperCase() + '</span>&nbsp;<span class="album">' + album.toUpperCase() + '</span></p>';
-        template += '<p><span class="title">' + title.toUpperCase() + '</span><span class="duration">' + duration + '</span></p></li>';
+        var template = '<li data-type="audio" data-num="' + num + '" data-path="' + path + '" data-cover-path="' + cover + '">';
+        template += '<img src="' + cover + '" draggable="false">';
+        template += '<p><span class="artist">' + artist.toUpperCase() + '</span>';
+        if (album) {
+            template += '&nbsp;<span class="album">' + album.toUpperCase() + '</span>';
+        }
+        template += '</p><p><span class="title">' + title.toUpperCase() + '</span><span class="duration">' + duration + '</span></p></li>';
 
         document.getElementById("songs").innerHTML += template;
 
-        setTimeout(function() { // else not working
-            updateSong(document.querySelector("#songs [data-num='" + num + "']"));
+        // as it's on a timeout it only will be executed one
+        setTimeout(function() {
+            updateSongs();
         });
     });
 
