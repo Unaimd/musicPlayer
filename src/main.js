@@ -113,7 +113,9 @@ app.on('ready', () => {
             win.minimize();
 
         } else if (arg == "loadFolder") {
-            event.returnValue = loadMusicFromFolder();
+            var ret = loadMusicFromFolder();
+            console.log(ret);
+            event.returnValue = ret;
         }
 
         event.returnValue = "ok";
@@ -138,7 +140,7 @@ function selectFolder() {
 
 function loadMusicFromFolder() {
     var dir = selectFolder();
-    var songs = [];
+    var songs = new Array();
 
     if (fs.existsSync(dir)) {
         fs.readdir(dir, (error, files) => {
@@ -172,8 +174,8 @@ function loadMusicFromFolder() {
                             moddate: filemtime
                         }
 
+                        songs = (resp);
                         readableStream.close();
-                        songs.push(resp);
                     });
                 }
             });

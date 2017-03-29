@@ -10,9 +10,10 @@ document.addEventListener("DOMContentLoaded", function() {
 
     document.querySelector("#titleBar img").addEventListener("click", function() {
         var resp = ipcRenderer.sendSync("titleBar", "loadFolder");
-        console.log(typeof resp);
+        console.log(typeof resp + " " + resp.title);
+        
         resp.forEach(function(value) {
-            console.console.log(value.title + " " + value.artist);
+            console.log(value.title + " " + value.artist);
         });
 
     });
