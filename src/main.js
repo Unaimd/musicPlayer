@@ -138,8 +138,10 @@ function selectFolder() {
     }
 }
 
-function loadMusicFromFolder(event) {
-    var dir = selectFolder();
+function loadMusicFromFolder(event, dir) {
+    if (typeof dir === "undefined") {
+        dir = selectFolder();
+    }
 
     if (dir == false) {
         return false;
@@ -149,7 +151,9 @@ function loadMusicFromFolder(event) {
         fs.readdir(dir, (error, files) => {
             files.forEach((file) => {
                 if (fs.lstatSync(dir + "/" + file).isDirectory()) {
-                    // directory
+                    // recursive
+                    //loadMusicFromFolder(event, dir + "/" + file);
+                    //console.log(dir+"/"+file);
                 }
 
                 var f = file.split(".");
