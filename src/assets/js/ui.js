@@ -10,6 +10,8 @@ document.addEventListener("DOMContentLoaded", function() {
 
     document.querySelector("#titleBar img").addEventListener("click", function() {
         if (ipcRenderer.sendSync("titleBar", "loadFolder")) {
+            document.querySelector("#songs [data-type='info']").remove();
+            
             while (document.querySelectorAll("#songs [data-type='audio']").length > 0) {
                 document.querySelector("#songs [data-type='audio']").remove();
             }
