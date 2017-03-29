@@ -113,9 +113,7 @@ app.on('ready', () => {
             win.minimize();
 
         } else if (arg == "loadFolder") {
-            var ret = loadMusicFromFolder();
-            console.log(ret);
-            event.returnValue = ret;
+            loadMusicFromFolder(event);
         }
 
         event.returnValue = "ok";
@@ -138,9 +136,8 @@ function selectFolder() {
     return dir = dir[0];
 }
 
-function loadMusicFromFolder() {
+function loadMusicFromFolder(event) {
     var dir = selectFolder();
-    var songs = new Array();
 
     if (fs.existsSync(dir)) {
         fs.readdir(dir, (error, files) => {
@@ -166,21 +163,20 @@ function loadMusicFromFolder() {
                         }
 
                         var resp = {
+                            path: file,
                             title: metadata.title,
                             artist: metadata.artist,
                             album: metadata.album,
                             duration: metadata.duration,
-                            cover: metadata.picture,
+                            cover: metadata.picture[0],
                             moddate: filemtime
                         }
 
-                        songs.push(resp);
+                        event.sender.send("addSong", resp);
                         readableStream.close();
                     });
                 }
             });
         });
     }
-
-    return songs;
 }

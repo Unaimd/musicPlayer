@@ -236,7 +236,7 @@ body.light #audioplayer button {
 
 #songs li {
     width: calc(100% - 10px);
-    height: 47px;
+    min-height: 47px;
     padding: 5px;
     transition: background .5s;
 
@@ -310,6 +310,11 @@ body.light #songs li:nth-child(3) {
 
     background-color: white;
 }
+
+#songs li:hover .album::before {
+    background-color: black;
+}
+
 #songs li .title {
     display: inline-block;
     text-overflow: ellipsis;

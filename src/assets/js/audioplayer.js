@@ -1,741 +1,456 @@
-$(document).ready(function() {
+document.addEventListener("DOMContentLoaded", function() {
+    initVariables();
 
+    window.addEventListener("variablesLoaded", audioplayer.loadFromLocalStorage(), false);
+});
 
-    /************************************
-    |
-    |    Variable declaration
-    |
-    ************************************/
+var audioplayer = {
+    name: "audioplayer",
+    log: true,
 
-    /**
-     * Document variables
-     **/
+    elements: {
+        player: null,
+        title: null,
+        artist: null,
+        album: null,
+        cover: null,
 
-    // tab title
-    $documentTitle = document.title;
-    // tab icon
-    $documentIcon = $('link[rel="shortcut icon"]');
-    // default tab icon
-    $defaultDocumentIcon = $documentIcon.attr('href');
+        buttons: {
+            play: null,
+            pause: null,
 
-    /**
-     * Audio player HTML elements
-     **/
+            stop: null,
 
-    // player element
-    $player = $('#audioplayer');
+            previousSong: null,
+            nextSong: null,
 
-    // audio file path
-    $musicFile     = $player.find('.title').attr('data-path');
-    // audio title
-    $musicTitle    = $player.find('.title');
-    // audio artist
-    $musicArtist   = $player.find('.artist').children('.content');
-    // audio album
-    $musicAlbum    = $player.find('.album').children('.content');
-    // audio duration
-    $musicDuration = $player.find('.duration').children('.content');
-    // audio bitrate
-    $musicBitrate  = $player.find('.bitrate').children('.content');
-    // audio album cover
-    $musicCover    = $player.find('img');
+            repeat: null,
+            repeatNone: null,
+            repeatAll: null,
+            repeatOne: null,
 
-    /**
-     * Buttons of the player
-     **/
-
-    // audio files
-    $newAudio = $('[data-type="audio"]');
-
-    // time buttons remain with active effect in ms
-    $activeTime = 150;
-
-    // play button
-    $play = $player.find('[name="play"]');
-    // pause button
-    $pause = $player.find('[name="pause"]');
-
-    // stop button
-    $stop = $player.find('[name="stop"]');
-
-    // previous song button
-    $previousSong = $player.find('[name="before"]');
-    // next song button
-    $nextSong = $player.find('[name="after"]');
-
-    // repeat mode
-    $repeatMode = $player.find('[name="repeat"]');
-    // no repeat button
-    $repeatNone = $player.find('[name="repeat"][data-mode="none"]');
-    // repeat all songs
-    $repeatAll = $player.find('[name="repeat"][data-mode="all"]');
-    // repeat only one song
-    $repeatOne = $player.find('[name="repeat"][data-mode="one"]');
-
-    // volume hight
-    $volumeUp = $player.find('[name="volume"][data-mode="up"]');
-    // voume low
-    $volumeDown = $player.find('[name="volume"][data-mode="down"]');
-    // volume muted
-    $volumeMute = $player.find('[name="volume"][data-mode="mute"]')
-    // volume indicator
-    $volumeIndicator = $player.find('[name="volume"]');
-
-    // timeline
-    $timeline = $player.find('.range');
-    // timeline input (show actual time)
-    $timelineInput = $timeline.children('.input');
-    // played time
-    $currentTime = $player.find('.timeline').children('.begin');
-    // audio length
-    $totalTime = $player.find('.timeline').children('.end');
-
-    /**
-     * Audio object & properties
-     **/
-
-    // audio object
-    $audio = new Audio($musicFile);
-    // current audio played time
-    $audioCurrentTime = $audio.currentTime;
-    // audio volume
-    $audioVolume = 1;
-    // repeat mode none|all|one
-    $audioRepeat = 'none';
-    // audio is muted or no
-    $audioMuted = false;
-    // where show volume up icon
-    $volumeUpValue = 0.5;
-
-    // allowed to load more songs via AJAX
-    $moreSongs = true;
-    // folder from to take the audio
-    $audioFolder = '/';
-    // every how many elements before have to load more
-    $loadAfter = 30;
-    // how much time should notification be displayed
-    $swalTimer = 1500;
-    // scroll animation duration
-    $scrollAnimationDuration = 500;
-    // scroll to active song
-    $scrollEnabled = true;
-
-    /**
-     * Initialize
-     **/
-
-    // the initialization is done on the document itself
-
-    /**
-     * Get & set values to store some information on local storage
-     **/
-
-    // localStorage audio volume
-    $lsAudioVolume = localStorage.audioVolume;
-    if (typeof $lsAudioVolume == 'undefined'){
-        localStorage.audioVolume = $audioVolume*100;
-    } else {
-        $audioVolume = parseInt($lsAudioVolume)/100;
-    }
-    $volumeIndicator.attr('data-volume',Math.floor($audioVolume*100));
-
-    // audio repeat mode all|one|none
-    $lsAudioRepeat = localStorage.audioRepeat
-    if (typeof $lsAudioRepeat == 'undefined'){
-        localStorage.audioRepeat = $audioRepeat;
-        $lsAudioRepeat = localStorage.audioRepeat;
-    } else {
-        $audioRepeat = localStorage.audioRepeat;
-
-        // set the repeat mode
-        $repeatMode.hide();
-        if ($lsAudioRepeat == 'all'){
-            $repeatAll.show();
-        } else if ($lsAudioRepeat == 'one'){
-            $repeatOne.show();
-        } else if ($lsAudioRepeat == 'none'){
-            $repeatNone.show();
+            volumeIndicator: null,
+            volumeUp: null,
+            volumeDown: null,
+            volumeMute: null
+        },
+        timeline: {
+            timeline: null,
+            input: null,
+            played: null,
+            total: null
         }
-    }
+    },
+    audio: {
+        object: new Audio(),
+        currentTime: 0,
+        volume: 100,
+        repeat: "none",
+        muted: false,
+        volumeUpValue: 50
+    },
+    config: {
+        swalTimer: 1500,
+        scrollAnimationDuration: 500,
+        scrollEnabled: true,
+        restartOnFirst: true,
+        restartOnLast: true
+    },
 
-});
+    newSong: function(aElement) {
+        audioplayer.stop();
 
-var hotKeys;
-require("electron").ipcRenderer.on("keyPress", (event, action) => {
+        try {
+            document.querySelector("[data-type='audio'].active").className = document.querySelector("[data-type='audio'].active").className.replace(" active", "");
+        } catch (error) {
+            // no element was active
+        }
+        aElement.className += " active";
 
-    hotKeys(action);
-
-});
-
-
-    /************************************
-    |
-    |       Non updatable functions
-    |
-    ************************************/
-
-    // put new song
-    function newSong ($this){
-        // stop previous song
-        $stop.click();
-
-        $('[data-type="audio"]').removeClass('active');
-        $this.addClass('active');
-
-        // get new song info
-        $path = $this.attr('data-path');
-        $title = $this.find('.title').text();
-        $artist = $this.find('.artist').text();
-        $album = $this.find('.album').text();
-        $duration = $this.find('.duration').text();
-        $bitrate = $this.attr('data-bitrate');
-        $coverImage = $this.find('img').attr('src');
+        // get song info
+        var path = aElement.getAttribute("data-path");
+        var title = aElement.getElementsByClassName("title")[0];
+        var artist = aElement.getElementsByClassName("artist")[0];
+        var album = aElement.getElementsByClassName("album")[0];
+        var duration = aElement.getElementsByClassName("duration")[0];
+        var coverImage = aElement.getElementsByTagName("img")[0].getAttribute("src");
 
         // set new info
-        $musicTitle.text($title);
-        $musicArtist.text($artist);
-        $musicAlbum.text($album);
-        $musicDuration.text($duration);
-        $totalTime.text($duration);
-        $musicBitrate.children('.content').text($artist);
-        $musicCover.attr('src', $coverImage);
+        audioplayer.elements.title.innerHTML = title.innerHTML;
+
+        if (typeof artist != "undefined") {
+            audioplayer.elements.artist.innerHTML = artist.innerHTML;
+        } else {
+            audioplayer.elements.artist.innerHTML = null;
+        }
+
+        if (typeof album != "undefined") {
+            audioplayer.elements.album.innerHTML = album.innerHTML;
+        } else {
+            audioplayer.elements.album.innerHTML = null;
+        }
+
+        audioplayer.elements.cover.setAttribute("src", coverImage);
+        audioplayer.elements.timeline.total.innerHTML = duration.innerHTML;
 
         // test if browser supports audio format
-        $extensionSplit = $path.split('.');
-        $format = $extensionSplit[$extensionSplit.length - 1];
+        var extSplit = path.split(".");
+        var format = extSplit[extSplit.length - 1];
 
-        if (!!$audio.canPlayType('audio/'+$format) === false){
-            swal ('Formato no soportado','No es posible reproducir la canción, tu navegador no soporta el formato '+$format.toUpperCase(),'error');
-        } else {
-            // start the new object
-            $audio = new Audio($path);
-            $play.click();
-        }
+        if (!! audioplayer.audio.object.canPlayType("audio/" + format) === false) {
 
-
-        update();
-    }
-
-    var ajaxUrl;
-    const url = "/public/controllers/music/listSongs.php";
-
-    // test access to server
-    var response = true;
-    var accesible = false;
-    function isAccesible() {
-        ajaxUrl = localStorage.getItem("ajaxUrl");
-
-        while(!accesible && response) {
-            response = false;
-
-            // request server
-            if (ajaxUrl === null) {
-                $.ajax({
-                    url: "http://alexbcberio.ddns.net" + url,
-                    complete: function(xhr, data) {
-
-                        if (xhr.responseText.indexOf("Welcome to your Vodafone Router") > 0) {
-                            localStorage.setItem("ajaxUrl", "alexbcberio.local");
-
-                        } else if (data == "success") {
-                            localStorage.setItem("ajaxUrl", "alexbcberio.ddns.net");
-                        }
-                        ajaxUrl = localStorage.getItem("ajaxUrl");
-
-                        accesible = true;
-                        response = true;
-                    }
-
-                });
-
-            } else if (typeof ajaxUrl === "string") {
-                $.ajax({
-                    url: "http://" + ajaxUrl + url,
-                    complete: function(xhr, data) {
-
-                        if (data == "success") {
-                            if (ajaxUrl == "alexbcberio.ddns.net" && xhr.responseText.indexOf("Welcome to your Vodafone Router") > -1) {
-                                localStorage.setItem("ajaxUrl", "alexbcberio.local");
-
-                            } else {
-                                ajaxUrl = localStorage.getItem("ajaxUrl");
-                            }
-
-                        } else if (data == "error") {
-                            localStorage.removeItem("ajaxUrl");
-                            ajaxUrl = localStorage.removeItem("ajaxUrl");
-                        }
-
-                        response = true;
-                        accesible = true;
-                    }
-                });
-
-            }
-        }
-
-        return true;
-    }
-
-    // ajax to load the songs
-    function loadSongs($folder,$num,$order,$lastNum) {
-
-        if (!$moreSongs) {
-            return false;
-        }
-
-        // add a loader
-        $loader = '<li id="loader"><div class="loader"></div></li>';
-        $('#songs').find('li').last().after($loader);
-
-        if (!isAccesible()) {
-            return false;
-        }
-
-        if (typeof $order === 'undefined'){
-            $order = $('#songs').attr('data-order');
-        }
-        if (typeof $lastNum === 'undefined') {
-            $lastNum = $newAudio.length;
-        }
-
-
-
-        $lastFile = '';
-        if (typeof $('[data-type="audio"]').attr('data-type') !== 'undefined') {
-            $lastFile = $('[data-type="audio"]').last().attr('data-path').split('/');
-            $lastFile = $('[data-type="audio"]').last().attr('data-path').split('/')[$lastFile.length - 1];
-        }
-
-        if ($moreSongs == true) {
-
-            $ajax = new XMLHttpRequest;
-            $ajax.onreadystatechange = function (){
-                if ($ajax.readyState == 4 && $ajax.status == 200) {
-                    // if no more songs
-                    if ($ajax.responseText == ''){
-                        $moreSongs = false;
-                    } else {
-                        $('#songs').find('li').last().after($ajax.responseText);
-                        $newAudio = $('[data-type="audio"]');
-                        $moreSongs = true;
-                        update();
-                    }
-                    $("#loader").remove();
-                }
-            };
-
-            $ajax.open('POST','http://' + ajaxUrl + url, true);
-            $ajax.setRequestHeader('Content-type','application/x-www-form-urlencoded');
-            $ajax.send('listDir='+$folder+'&numFiles='+$num+'&lastFile='+$lastFile+'&lastNum='+$lastNum+'&order='+$order+"&addIp");
-
-        }
-        $moreSongs = false;
-    }
-
-
-function update() {
-
-    /************************************
-    |
-    |    Events when clicking elements
-    |
-    ************************************/
-
-
-
-    $play.unbind('click').click(function(){
-        play();
-    });
-
-    $pause.unbind('click').click(function(){
-        pause();
-    });
-
-    $stop.unbind('click').click(function(){
-        stop();
-    });
-
-    $nextSong.unbind('click').click(function(){
-        nextSong();
-    });
-
-    $previousSong.unbind('click').click(function(){
-        previousSong();
-    });
-
-    $newAudio.unbind('click').click(function(){
-        newSong($(this));
-    });
-
-    $repeatMode.unbind('click').click(function(){
-        repeat($(this));
-    });
-
-    $volumeIndicator.unbind('click').click(function(){
-        volumeMute();
-    });
-
-
-
-    /************************************
-    |
-    |            Hotkeys
-    |
-    ************************************/
-
-
-    hotKeys = function (name){
-
-        // playPause
-        if (name == "playPause"){
-            if ($audio.paused){
-                play();
-                $pause.addClass('active');
-            } else {
-                pause();
-                $play.addClass('active');
-            }
-
-        // previousSong
-        } else if (name == "previousSong") {
-            previousSong();
-
-        // nextSong
-        } else if (name == "nextSong") {
-            nextSong();
-
-        // stop
-        } else if (name == "stop") {
-            stop();
-
-        // volumeDown
-        } else if (name == "volumeDown") {
-           volumeDown();
-
-        // volumeUp
-        } else if (name == "volumeUp") {
-            volumeUp();
-
-        // toggleMute
-        } else if (name == "toggleMute") {
-            volumeMute();
+            swal({
+                title: "Formato no soportado",
+                text: "No es posible reproducir la cancion, tu navegador no soporta el formato " + format.toUpperCase(),
+                type:  "error",
+                showConfirmButton: false,
+                timer: audioplayer.config.swalTimer
+            });
 
         } else {
-            swal("hotKeys", name);
+            audioplayer.audio.object = new Audio(path);
+            audioplayer.play();
+
+            audioplayer.audio.object.addEventListener("timeupdate", audioplayer.timeUpdate, false);
         }
 
-    };
-
-
-
-    /************************************
-    |
-    |             Functions
-    |
-    ************************************/
-
-
-
-    // give active effect to element and remove it after $activeTime
-    function active($element){
-        $element.addClass('active');
-        setTimeout(function(){
-            $element.removeClass('active');
-        },$activeTime);
-    }
-
-    // play the audio
-    function play(){
-        $audio.volume = $audioVolume;
-        $audio.muted = $audioMuted;
-        $audio.play();
-        $duration = $audio.duration;
-
-        document.title = $musicTitle.text();
-
-        if ($musicCover.attr('src').indexOf('default.jpg') > -1){
-            $documentIcon.attr('href', $defaultDocumentIcon);
-        } else {
-            $documentIcon.attr('href', $musicCover.attr('src'));
+    },
+    play: function() {
+        if (!audioplayer.audio.object.src) {
+            swal({
+                title: 'Error',
+                text: 'No hay ninguna canción seleccionada',
+                type: 'error',
+                showConfirmButton: false,
+                timer: audioplayer.config.swalTimer
+            });
+            return;
         }
-        scroll($("[data-type=audio].active"));
 
-        $play.hide();
-        $pause.show();
+        audioplayer.audio.object.volume = audioplayer.audio.volume / 100;
+        audioplayer.audio.object.muted = audioplayer.audio.muted;
 
-        active($pause);
+        audioplayer.audio.object.play();
+        audioplayer.audio.object.addEventListener("ended", function() {
+            audioplayer.onended();
+        }, false);
 
-    }
+        // update document title
+        // update doument icon
 
-    // pause the audio
-    function pause(){
-        $audio.pause();
+        audioplayer.scroll(document.getElementById("songs"), document.querySelector("#songs .active"), audioplayer.config.scrollAnimationDuration);
 
-        document.title = $documentTitle;
-        $pause.hide();
-        $play.show();
+        audioplayer.elements.buttons.play.style.display = "none";
+        audioplayer.elements.buttons.pause.style.display = "inline-block";
 
-        active($play);
-    }
+    },
+    pause: function() {
+        audioplayer.audio.object.pause();
 
-    // stop the audio
-    function stop(){
-        pause(false);
-        $audio.currentTime = 0;
+        // set default document title
 
-        $timelineInput.css('marginLeft','0px');
+        audioplayer.elements.buttons.pause.style.display = "none";
+        audioplayer.elements.buttons.play.style.display = "inline-block";
+    },
+    stop: function() {
+        audioplayer.pause();
+        audioplayer.audio.object.currentTime = 0;
+        audioplayer.elements.timeline.input.style.marginLeft = "0px";
+    },
+    nextSong: function() {
+        var active = document.querySelector("#songs .active");
+        if (!active) {
+            return;
+        }
 
-        active($stop);
-    }
+        active = parseInt(active.getAttribute("data-num"));
+        var songs = document.querySelectorAll("#songs [data-type='audio']");
+        var totalSongs = parseInt(songs[songs.length - 1].getAttribute("data-num"));
 
-    // previous song
-    function nextSong(){
-        $active = parseInt($('#songs').find('.active').attr('data-num'));
-        $totalSongs = $('#songs').find('[data-type="audio"]').length;
-
-        $loadOn = $totalSongs - $loadAfter;
-
-        // if there are more songs to play
-        if ($active < $totalSongs){
-            $next = $('#songs').find('[data-num="'+($active+1)+'"]');
-            newSong($next);
-
-            active($nextSong);
+        if (active < totalSongs) {
+            var next = document.querySelector("#songs [data-num='" + (active + 1) + "']");
+            audioplayer.newSong(next);
 
             // load more songs via ajax
-            if ($active >= $loadOn && $moreSongs == true){
-            loadSongs($audioFolder,10);
-            }
+
+        } else if (audioplayer.config.restartOnLast) {
+            var next = document.querySelector("#songs [data-type='audio']");
+            audioplayer.newSong(next);
+
         } else {
             swal({
-                title:'Siguiente canción no disponible',
-                text:'No hay mas canciones que reproducir',
-                type:'info',
+                title: 'Siguiente canción no disponible',
+                text: 'No hay mas canciones que reproducir',
+                type: 'info',
                 showConfirmButton: false,
-                timer: $swalTimer
+                timer: audioplayer.config.swalTimer
             });
         }
-    }
+    },
+    previousSong: function() {
+        var firstSong = document.querySelector("#songs [data-type='audio']");
+        var active = document.querySelector("#songs .active");
+        if (!active) {
+            return;
+        }
 
-    // previous song
-    function previousSong(){
-        $active = parseInt($('#songs').find('.active').attr('data-num'));
+        active = parseInt(active.getAttribute("data-num"));
 
-        // if actual is first
-        if ($active > 0){
-            $previous = $('#songs').find('[data-num="'+($active-1)+'"]');
-            newSong($previous);
+        if (active > parseInt(firstSong.getAttribute("data-num"))) {
+            var previous = document.querySelector("#songs [data-num='" + (active - 1)  + "']");
 
-            active($previousSong)
+            audioplayer.newSong(previous);
+        } else if (active == parseInt(firstSong.getAttribute("data-num")) && audioplayer.config.restartOnFirst) {
+            var allSongs = document.querySelectorAll("#songs [data-type='audio']");
+
+            audioplayer.newSong(allSongs[allSongs.length - 1]);
         } else {
             swal({
                 title: '¡Canción anterior no disponible!',
                 text: 'No hay ninguna cancion anterior a la actual',
                 type: 'error',
                 showConfirmButton: false,
-                timer: $swalTimer
+                timer: audioplayer.config.swalTimer
             });
         }
+    },
+    repeat: function(repeat) {
+        var mode = repeat.getAttribute("data-mode");
+        var button;
 
-    }
+        repeat.style.display = "none";
 
-    // channge what repeat mode is
-    function repeat($this){
-        $mode = $this.attr('data-mode');
-
-        active($repeatMode);
-
-        $this.hide();
-        if ($mode == 'none'){
-            $repeatAll.show();
-            $audioRepeat = 'all';
-        } else if ($mode == 'all'){
-            $repeatOne.show();
-            $audioRepeat = 'one';
-        } else if ($mode == 'one'){
-            $repeatNone.show();
-            $audioRepeat = 'none';
+        switch (mode) {
+            case "none":
+                mode = "all";
+                button = audioplayer.elements.buttons.repeatAll;
+                break;
+            case "all":
+                mode = "one";
+                button = audioplayer.elements.buttons.repeatOne;
+                break;
+            case "one":
+                mode = "none";
+                button = audioplayer.elements.buttons.repeatNone;
+                break;
         }
-        localStorage.audioRepeat = $audioRepeat;
-    }
 
-    // volume up
-    function volumeUp(){
-        if ($audioVolume < 1) {
-            // round volume to decimal
-            $newVolume = Math.round(($audioVolume + 0.02)*100)/100;
+        audioplayer.audio.repeat = mode;
+        localStorage.audioRepeat = mode;
+        button.style.display = "inline-block";
+    },
+    volumeUp: function() {
+        if (audioplayer.audio.volume < 100) {
+            var newVolume = audioplayer.audio.volume + 2;
 
-            $audio.volume = $newVolume;
-            $audioVolume = $audio.volume;
+            audioplayer.audio.object.volume = newVolume / 100;
+            audioplayer.audio.volume = newVolume;
 
-            active($volumeIndicator);
-
-            // update the volume icon
-            $volumeIndicator.attr('data-volume',Math.ceil($audioVolume*100));
-            if ($audioVolume >= $volumeUpValue && $audioMuted == false){
-                $volumeUp.show();
-                $volumeDown.hide();
-            } else if ($audioVolume < $volumeUpValue && $audioMuted == false){
-                $volumeDown.show();
-                $volumeUp.hide();
+            for (var i=0; i < audioplayer.elements.buttons.volumeIndicator.length; i++) {
+                audioplayer.elements.buttons.volumeIndicator[i].setAttribute("data-volume", audioplayer.audio.volume);
             }
-            localStorage.audioVolume = $audioVolume*100;
-        }
-    }
 
-    // volume down
-    function volumeDown (){
-        if ($audioVolume > 0){
-            // round volume to decimal
-            $newVolume = Math.round(($audioVolume - 0.02)*100)/100;
+            if (audioplayer.audio.volume >= audioplayer.audio.volumeUpValue && audioplayer.audio.muted == false) {
+                audioplayer.elements.buttons.volumeUp.style.display = "inline-block";
+                audioplayer.elements.buttons.volumeDown.style.display = "none";
 
-            $audio.volume = $newVolume;
-            $audioVolume = $audio.volume;
-
-            active($volumeIndicator);
-
-            // update the volume icon
-            $volumeIndicator.attr('data-volume',Math.ceil($audioVolume*100));
-            if ($audioVolume >= $volumeUpValue && $audioMuted == false){
-                $volumeUp.show();
-                $volumeDown.hide();
-            } else if ($audioVolume < $volumeUpValue && $audioMuted == false){
-                $volumeDown.show();
-                $volumeUp.hide();
+            } else if (audioplayer.audio.volume < audioplayer.audio.volumeUpValue && audioplayer.audio.muted == false) {
+                audioplayer.elements.buttons.volumeDown.style.display = "inline-block";
+                audioplayer.elements.buttons.volumeUp.style.display = "none";
             }
-            localStorage.audioVolume = $audioVolume*100;
+
+            localStorage.audioVolume = audioplayer.audio.volume;
         }
-    }
+    },
+    volumeDown: function() {
+        if (audioplayer.audio.volume > 0) {
+            var newVolume = audioplayer.audio.volume - 2;
 
-    // mute and unmute
-    function volumeMute (){
+            audioplayer.audio.object.volume = newVolume / 100;
+            audioplayer.audio.volume = newVolume;
 
-        active($volumeIndicator);
+            for (var i=0; i < audioplayer.elements.buttons.volumeIndicator.length; i++) {
+                audioplayer.elements.buttons.volumeIndicator[i].setAttribute("data-volume", audioplayer.audio.volume);
+            }
 
-        // mute
-        if (!$audio.muted){
-            $audio.muted = true;
-            $audioMuted = true;
+            if (audioplayer.audio.volume >= audioplayer.audio.volumeUpValue && audioplayer.audio.muted == false) {
+                audioplayer.elements.buttons.volumeUp.style.display = "inline-block";
+                audioplayer.elements.buttons.volumeDown.style.display = "none";
 
-            // hide volume up or down
-            $volumeUp.hide()
-            $volumeDown.hide()
-            $volumeMute.show();
-        // unmute
+            } else if (audioplayer.audio.volume < audioplayer.audio.volumeUpValue && audioplayer.audio.muted == false) {
+                audioplayer.elements.buttons.volumeDown.style.display = "inline-block";
+                audioplayer.elements.buttons.volumeUp.style.display = "none";
+            }
+
+            localStorage.audioVolume = audioplayer.audio.volume;
+        }
+    },
+    volumeMute: function() {
+        if (!audioplayer.audio.muted) {
+            audioplayer.audio.object.muted = true;
+            audioplayer.audio.muted = true;
+
+            audioplayer.elements.buttons.volumeUp.style.display = "none";
+            audioplayer.elements.buttons.volumeDown.style.display = "none";
+            audioplayer.elements.buttons.volumeMute.style.display = "inline-block";
+
         } else {
-            $audio.muted = false;
-            $audioMuted = false;
+            audioplayer.audio.object.muted = false;
+            audioplayer.audio.muted = false;
 
-            $volumeMute.hide();
-            // hide volume up or down
-            if ($audioVolume > $volumeUpValue){
-                $volumeUp.show()
+            audioplayer.elements.buttons.volumeMute.style.display = "none";
+
+            if (audioplayer.audio.volume > audioplayer.audio.volumeUpValue) {
+                audioplayer.elements.buttons.volumeUp.style.display = "inline-block";
             } else {
-                $volumeDown.show()
+                audioplayer.elements.buttons.volumeDown.style.display = "inline-block";
             }
         }
-    }
+    },
+    onended: function() {
+        audioplayer.stop();
 
-    // when ending current audio
-    $audio.onended = function(){
-        stop();
-
-        if ($audioRepeat == 'none'){
-            // do nothing
-        } else if ($audioRepeat == 'all'){
-            nextSong();
-        } else if ($audioRepeat == 'one'){
-            play();
+        switch (audioplayer.audio.repeat) {
+            case "all":
+                audioplayer.nextSong();
+                break;
+            case "one":
+                audioplayer.play();
+                break;
         }
-    };
+    },
+    timeUpdate: function() {
+        var percent = (audioplayer.audio.object.currentTime / audioplayer.audio.object.duration) * 100;
+        audioplayer.elements.timeline.input.style.left = "calc(" + percent + "% - 5px)";
 
-    // update timeline
-    $audio.addEventListener('timeupdate', timeUpdate, false);
+        var curTime = Math.round(audioplayer.audio.object.currentTime);
 
-    // change current time by clicking on the timeline
-    $timeline.click(function (event){
-        moveplayhead(event);
-        $audio.currentTime = $audio.duration * clickPercent(event);
-    });
+        var curMin = 0;
+        var curSec = 0;
 
-    // update the position on the input on the timeline
-    function timeUpdate(){
-        $duration = $audio.duration;
-        $percent = ($audioCurrentTime/$duration)*100;
-        $timelineInput.css('left','calc('+$percent+'% - 5px)');
-
-        $audioCurrentTime = $audio.currentTime;
-        $intCurTime = Math.round($audioCurrentTime);
-
-        $curMin = 0;
-        $curSec = 0;
-
-        // get minutes
-        if ($intCurTime < 60){
-            $curSec = $intCurTime;
+        if (curTime < 60) {
+            curSec = curTime;
         } else {
-            $curMin = Math.floor($intCurTime/60);
-            $curSec = $intCurTime - $curMin * 60;
+            curMin = Math.floor(curTime / 60);
+            curSec = curTime - curMin * 60;
         }
 
-        if ($curSec < 10){
-            $curSec = '0'+$curSec;
+        if (curMin < 10) {
+            curMin = "0" + curMin;
         }
-        if ($curMin < 10){
-            $curMin = '0'+$curMin;
+        if (curSec < 10) {
+            curSec = "0" + curSec;
         }
 
-        $currentTime.text($curMin+':'+$curSec);
+        audioplayer.elements.timeline.played.innerHTML = curMin + ":" + curSec;
+    },
+
+    scroll: function(parent, element, duration) {
+        if (duration <= 0) {
+            return;
+        }
+
+        // mouse not over parent
+        if (parent.querySelector(":hover") === null) {
+            if (typeof element == "object") {
+                var px = parent.scrollTop + element.getBoundingClientRect().top - element.clientHeight * 1.25;
+            } else {
+                var px = element;
+            }
+
+            var diff = px - parent.scrollTop;
+            var perTick = diff / duration * 10;
+
+            setTimeout(function () {
+                parent.scrollTop = parent.scrollTop + perTick;
+                if (parent.scrollTop == px) {
+                    return;
+                }
+                audioplayer.scroll(parent, px, parseInt(duration - 10));
+            }, 10);
+        }
+    },
+    loadFromLocalStorage: function() {
+        var lsAudioVolume = localStorage.getItem("audioVolume");
+        if (lsAudioVolume == null) {
+            localStorage.setItem("audioVolume", audioplayer.audio.volume)
+        } else {
+            audioplayer.audio.volume = parseInt(lsAudioVolume);
+        }
+
+        for (var i = 0; i < audioplayer.elements.buttons.volumeIndicator.length; i++) {
+            audioplayer.elements.buttons.volumeIndicator[i].setAttribute("data-volume", Math.floor(audioplayer.audio.volume))
+        }
+
+        var lsAudioRepeat = localStorage.getItem("audioRepeat");
+        if (lsAudioRepeat == null) {
+            localStorage.setItem("audioRepeat", audioplayer.audio.repeat);
+        } else {
+            audioplayer.audio.repeat = lsAudioRepeat;
+        }
+
+        for (var i = 0; i < audioplayer.elements.buttons.repeat.length; i++) {
+            audioplayer.elements.buttons.repeat[i].style.display = "none";
+        }
+
+        switch (audioplayer.audio.repeat) {
+            case "none":
+                audioplayer.elements.buttons.repeatNone.style.display = "inline-block";
+                break;
+            case "all":
+                audioplayer.elements.buttons.repeatAll.style.display = "inline-block";
+                break;
+            case "one":
+                audioplayer.elements.buttons.repeatOne.style.display = "inline-block";
+                break;
+        }
+    },
+    log: function(txt) {
+        if (audioplayer.log) {
+            console.info(audioplayer.name + ": " + txt);
+        }
     }
+};
 
-    // return percentage of the song on clicked position
-    function clickPercent(e){
-        return (e.pageX - $('.range').offset().left) / $timelineWidth;
-    }
-
-    // moves the input from the timeline
-    function moveplayhead(e){
-        $timelineWidth = parseInt($timeline.css('width'));
-        $newMargLeft = e.pageX - $('.range').offset().left;
-
-        if ($newMargLeft >= 0 && $newMargLeft <= $timelineWidth){
-            $timelineInput.css('left',$newMargLeft + "px");
-        }
-        if ($newMargLeft < 0){
-            $timelineInput.css('left',"0px");
-        }
-        if ($newMargLeft > $timelineWidth){
-            $timelineInput.css('left',$timelineWidth + "px");
-        }
-    }
-
-    // scroll to next song
-    $("#songs").mouseover(function() {
-       $scrollEnabled = false;
+// audioplayer HTML elements
+function initVariables() {
+    var variablesLoadedEvnt = new CustomEvent("variablesLoaded", {
+        detail: "Audioplayer variables loaded",
+        bubbles: false,
+        cancelable: false
     });
 
-    $("#songs").mouseout(function() {
-       $scrollEnabled = true;
-    });
+    audioplayer.elements.player = document.getElementById("audioplayer");
+    audioplayer.elements.title = audioplayer.elements.player.getElementsByClassName("title")[0];
+    audioplayer.elements.artist = audioplayer.elements.player.getElementsByClassName("artist")[0].getElementsByClassName("content")[0];
+    audioplayer.elements.album = audioplayer.elements.player.getElementsByClassName("album")[0].getElementsByClassName("content")[0];
+    audioplayer.elements.cover = audioplayer.elements.player.getElementsByTagName("img")[0];
 
-    function scroll($element) {
-        if ($scrollEnabled) {
-            var px = $("#songs").scrollTop() + $element.position().top - $element.height();
 
-            $("#songs").animate({
-                scrollTop: px
-            }, $scrollAnimationDuration);
-        }
-    }
+    audioplayer.elements.buttons.play = audioplayer.elements.player.querySelector("[name='play']");
+    audioplayer.elements.buttons.pause = audioplayer.elements.player.querySelector("[name='pause']");
 
-    // load more songs when scrolling
-    $('#songs').scroll(function(){
-        $lastSong = $('[data-type="audio"]').last();
+    audioplayer.elements.buttons.stop = audioplayer.elements.player.querySelector("[name='stop']");
 
-        if ($(window).scrollTop() + $(window).height() > $lastSong.offset().top - 400){
-            loadSongs($audioFolder,$loadAfter);
-        }
+    audioplayer.elements.buttons.previousSong = audioplayer.elements.player.querySelector("[name='previousSong']");
+    audioplayer.elements.buttons.nextSong = audioplayer.elements.player.querySelector("[name='nextSong']");
 
-    });
+    audioplayer.elements.buttons.repeat = audioplayer.elements.player.querySelectorAll("[name='repeat']");
+    audioplayer.elements.buttons.repeatNone = audioplayer.elements.player.querySelector("[name='repeat'][data-mode='none']");
+    audioplayer.elements.buttons.repeatAll = audioplayer.elements.player.querySelector("[name='repeat'][data-mode='all']");
+    audioplayer.elements.buttons.repeatOne = audioplayer.elements.player.querySelector("[name='repeat'][data-mode='one']");
+
+    audioplayer.elements.buttons.volumeIndicator = audioplayer.elements.player.querySelectorAll("[name='volume']");
+    audioplayer.elements.buttons.volumeUp = audioplayer.elements.player.querySelector("[name='volume'][data-mode='up']");
+    audioplayer.elements.buttons.volumeDown = audioplayer.elements.player.querySelector("[name='volume'][data-mode='down']");
+    audioplayer.elements.buttons.volumeMute = audioplayer.elements.player.querySelector("[name='volume'][data-mode='mute']");
+
+
+    audioplayer.elements.timeline.timeline = audioplayer.elements.player.getElementsByClassName("range")[0];
+    audioplayer.elements.timeline.input = audioplayer.elements.player.getElementsByClassName("input")[0];
+    audioplayer.elements.timeline.played = audioplayer.elements.player.getElementsByClassName("begin")[0];
+    audioplayer.elements.timeline.total = audioplayer.elements.player.getElementsByClassName("end")[0];
+
+    audioplayer.log("Variabled loaded");
+    window.dispatchEvent(variablesLoadedEvnt);
 }

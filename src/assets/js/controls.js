@@ -4,9 +4,13 @@ if (typeof audioplayer == "undefined") {
     function updateSongs() {
         var songs = document.querySelectorAll("[data-type='audio']");
         for (var i=0; i < songs.length; i++) {
-            songs[i].removeEventListener("click", play, false);
-            songs[i].addEventListener("click", play, false);
+            updateSong(songs[i])
         }
+    }
+    
+    function updateSong(song) {
+        song.removeEventListener("click", play, false);
+        song.addEventListener("click", play, false);
     }
 
     function play() {
