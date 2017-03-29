@@ -311,7 +311,7 @@ body.light #songs li:nth-child(3) {
     background-color: white;
 }
 
-#songs li:hover .album::before {
+#songs li:hover:not(.active) .album::before {
     background-color: black;
 }
 
