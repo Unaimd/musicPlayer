@@ -1,3 +1,4 @@
+/*
 $moreSongs = true;
 var response = true;
 var accesible = false;
@@ -117,3 +118,4 @@ $('#songs').scroll(function(){
     }
 
 });
+*/
