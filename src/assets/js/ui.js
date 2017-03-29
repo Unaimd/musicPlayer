@@ -38,7 +38,10 @@ document.addEventListener("DOMContentLoaded", function() {
         template += '<p><span class="title">' + title.toUpperCase() + '</span><span class="duration">' + duration + '</span></p></li>';
 
         document.getElementById("songs").innerHTML += template;
-        updateSong(document.querySelector("#songs [data-num='" + num + "']"));
+
+        setTimeout(function() { // else not working
+            updateSong(document.querySelector("#songs [data-num='" + num + "']"));
+        });
     });
 
     function formatDuration(seconds) {
