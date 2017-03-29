@@ -113,7 +113,7 @@ app.on('ready', () => {
             win.minimize();
 
         } else if (arg == "loadFolder") {
-            loadMusicFromFolder(event);
+            event.returnValue = loadMusicFromFolder(event);
         }
 
         event.returnValue = "ok";
@@ -127,17 +127,23 @@ app.on('window-all-closed', () => {
 });
 
 function selectFolder() {
-    var dir = undefined;
-    while(dir === undefined) {
-        dir = dialog.showOpenDialog({
-            properties: ['openDirectory']
-        });
+    var dir = dialog.showOpenDialog({
+        properties: ['openDirectory']
+    });
+
+    if (typeof dir === "undefined") {
+        return false;
+    } else {
+        return dir = dir[0];
     }
-    return dir = dir[0];
 }
 
 function loadMusicFromFolder(event) {
     var dir = selectFolder();
+
+    if (dir == false) {
+        return false;
+    }
 
     if (fs.existsSync(dir)) {
         fs.readdir(dir, (error, files) => {
@@ -179,4 +185,6 @@ function loadMusicFromFolder(event) {
             });
         });
     }
+
+    return true;
 }

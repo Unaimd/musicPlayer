@@ -9,11 +9,11 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 
     document.querySelector("#titleBar img").addEventListener("click", function() {
-        while (document.querySelectorAll("#songs [data-type='audio']").length > 0) {
-            document.querySelector("#songs [data-type='audio']").remove();
+        if (ipcRenderer.sendSync("titleBar", "loadFolder")) {
+            while (document.querySelectorAll("#songs [data-type='audio']").length > 0) {
+                document.querySelector("#songs [data-type='audio']").remove();
+            }
         }
-        ipcRenderer.sendSync("titleBar", "loadFolder");
-
     });
 
     ipcRenderer.on("addSong", (event, msg) => {
