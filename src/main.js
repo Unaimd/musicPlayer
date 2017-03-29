@@ -174,7 +174,7 @@ function loadMusicFromFolder() {
                             moddate: filemtime
                         }
 
-                        songs = (resp);
+                        songs.push(resp);
                         readableStream.close();
                     });
                 }
