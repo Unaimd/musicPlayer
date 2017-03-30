@@ -35,8 +35,9 @@ document.addEventListener("DOMContentLoaded", function() {
 
         var album = msg.album;
         if (typeof album === "undefined" || album == "") {
-            album = null;
+            album = "unknown album";
         }
+
         var duration = formatDuration(msg.duration);
         var moddate = msg.moddate;
         var cover = null;
@@ -50,6 +51,17 @@ document.addEventListener("DOMContentLoaded", function() {
         var songs = document.querySelectorAll("#songs [data-type='audio']");
         if (songs.length > 0) {
             num = parseInt(songs[songs.length - 1].getAttribute("data-num")) + 1;
+        }
+
+        const maxLoadSongs = 100
+        if (num > maxLoadSongs) {
+            swal({
+                title: "Maximun alowed songs loaded",
+                text: "To prevent a crash there's a limit of " + maxLoadSongs + " maximun songs, future versions won't have this.<br><br>Sorry for the inconvinients :(",
+                type: "info",
+                html: true
+            });
+            return;
         }
 
         var template = '<li data-type="audio" data-num="' + num + '" data-path="' + path + '" data-cover-path="' + cover + '" data-moddate="' + moddate + '">';
