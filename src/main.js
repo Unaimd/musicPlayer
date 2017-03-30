@@ -176,19 +176,35 @@ function loadMusicFromDir(event, dir) {
                     // doc: https://github.com/leetreveil/musicmetadata
                     var readableStream = fs.createReadStream(file);
                     var parser = id3(readableStream, {duration: true}, function (err, metadata) {
-                        if (typeof metadata.picture[0] != "undefined") {
-                            metadata.picture[0].data = metadata.picture[0].data.toString("base64");
-                        }
-
                         var resp = {
                             path: file,
                             title: metadata.title,
                             artist: metadata.artist,
                             album: metadata.album,
                             duration: metadata.duration,
-                            cover: metadata.picture[0],
+                            cover: null,
                             moddate: filemtime
                         }
+
+                        if (typeof metadata.picture[0] != "undefined") {
+                            var image = metadata.picture[0];
+                            var format = image.format;
+
+                            var path = "./assets/img/albumArt/" + metadata.album + "." + format;
+
+                            // create if not exists
+                            if (!fs.existsSync(path)) {
+                                var base64buffer = new Buffer(image.data, "base64");
+                                fs.writeFile(path, base64buffer, function(error) {
+                                    if (error) {
+                                        console.log(error);
+                                    }
+                                });
+                            }
+                            resp.cover = path;
+
+                        }
+
 
                         event.sender.send("addSong", resp);
                         readableStream.close();

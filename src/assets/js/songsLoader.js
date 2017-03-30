@@ -42,8 +42,7 @@ document.addEventListener("DOMContentLoaded", function() {
         var cover = null;
 
         if (typeof msg.cover != "undefined") {
-            cover = "data:image/" + msg.cover.format + ";base64,";
-            cover += msg.cover.data;
+            cover = msg.cover;
         } else {
             cover = "./assets/img/default.jpg";
         }
