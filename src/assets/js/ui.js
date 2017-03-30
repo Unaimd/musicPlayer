@@ -52,7 +52,7 @@ document.addEventListener("DOMContentLoaded", function() {
             num = parseInt(songs[songs.length - 1].getAttribute("data-num")) + 1;
         }
 
-        var template = '<li data-type="audio" data-num="' + num + '" data-path="' + path + '" data-cover-path="' + cover + '">';
+        var template = '<li data-type="audio" data-num="' + num + '" data-path="' + path + '" data-cover-path="' + cover + '" data-moddate="' + moddate + '">';
         template += '<img src="' + cover + '" draggable="false">';
         template += '<p><span class="artist">' + artist + '</span>';
         if (album) {

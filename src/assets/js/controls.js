@@ -7,7 +7,7 @@ if (typeof audioplayer == "undefined") {
             updateSong(songs[i])
         }
     }
-    
+
     function updateSong(song) {
         song.removeEventListener("click", play, false);
         song.addEventListener("click", play, false);
@@ -15,6 +15,15 @@ if (typeof audioplayer == "undefined") {
 
     function play() {
         audioplayer.newSong(this);
+        var song = new Song(this.getAttribute("data-path"), {
+            title: this.querySelector(".title"),
+            artist: this.querySelector(".artist"),
+            album: this.querySelector(".album"),
+            duration: this.querySelector(".duration"),
+            cover: this.getAttribute("data-cover-path"),
+            moddate: this.getAttribute("data-moddate")
+        });
+        //audioplayer.newSong(song);
     }
 
     function clickPercent(element, e) {

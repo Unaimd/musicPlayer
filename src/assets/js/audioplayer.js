@@ -68,12 +68,24 @@ var audioplayer = {
         aElement.className += " active";
 
         // get song info
-        var path = aElement.getAttribute("data-path");
-        var title = aElement.getElementsByClassName("title")[0];
-        var artist = aElement.getElementsByClassName("artist")[0];
-        var album = aElement.getElementsByClassName("album")[0];
-        var duration = aElement.getElementsByClassName("duration")[0];
-        var coverImage = aElement.getElementsByTagName("img")[0].getAttribute("src");
+        if (aElement instanceof Song) {
+            console.log("Audio object");
+            var path = aElement;
+            var title = aElement.title;
+            var artist = aElement.artist;
+            var album = aElement.album;
+            var duration = aElement.duration;
+            var coverImage = aElement.cover;
+        } else {
+            console.log("Not audio object");
+
+            var path = aElement.getAttribute("data-path");
+            var title = aElement.getElementsByClassName("title")[0];
+            var artist = aElement.getElementsByClassName("artist")[0];
+            var album = aElement.getElementsByClassName("album")[0];
+            var duration = aElement.getElementsByClassName("duration")[0];
+            var coverImage = aElement.getElementsByTagName("img")[0].getAttribute("src");
+        }
 
         // set new info
         audioplayer.elements.title.innerHTML = title.innerHTML;
