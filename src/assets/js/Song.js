@@ -1,4 +1,4 @@
-var Song = function(element, path, options) {
+function Song(element, path, options) {
     this.element = "";
     this.path = "";
 
