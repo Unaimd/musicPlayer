@@ -182,16 +182,26 @@ function loadMusicFromDir(event, dir) {
                             artist: metadata.artist,
                             album: metadata.album,
                             duration: metadata.duration,
-                            cover: null,
+                            cover: undefined,
                             moddate: filemtime
                         }
 
-                        if (typeof metadata.picture[0] != "undefined") {
+                        if (typeof metadata.picture[0] !== "undefined") {
                             var image = metadata.picture[0];
                             var format = image.format;
 
                             var path = "./assets/img/albumArt/";
-                            var filename = metadata.album + "." + format;
+                            var filename;
+
+                            if (metadata.album) {
+                                filename = metadata.album;
+                            } else {
+                                filename = metadata.title;
+                            }
+
+                            filename += "." + format;
+
+                            resp.cover = path + filename;
 
                             // create directory where the images are stored
                             if (!fs.existsSync(path)) {
@@ -209,14 +219,22 @@ function loadMusicFromDir(event, dir) {
                                     if (error) {
                                         console.log(error);
                                     }
-                                });
-                            }
-                            resp.cover = path + filename;
 
+                                    // return data once file created
+                                    event.sender.send("addSong", resp);
+                                });
+
+                            // if file exists return
+                            } else {
+                                event.sender.send("addSong", resp);
+                            }
+
+
+                        // has not cover
+                        } else {
+                            event.sender.send("addSong", resp);
                         }
 
-
-                        event.sender.send("addSong", resp);
                         readableStream.close();
                     });
                 }
