@@ -190,18 +190,28 @@ function loadMusicFromDir(event, dir) {
                             var image = metadata.picture[0];
                             var format = image.format;
 
-                            var path = "./assets/img/albumArt/" + metadata.album + "." + format;
+                            var path = "./assets/img/albumArt/";
+                            var filename = metadata.album + "." + format;
 
-                            // create if not exists
+                            // create directory where the images are stored
                             if (!fs.existsSync(path)) {
-                                var base64buffer = new Buffer(image.data, "base64");
-                                fs.writeFile(path, base64buffer, function(error) {
+                                fs.mkdir(path, function(error) {
                                     if (error) {
                                         console.log(error);
                                     }
                                 });
                             }
-                            resp.cover = path;
+
+                            // create image if not exists
+                            if (!fs.existsSync(path + filename)) {
+                                var base64buffer = new Buffer(image.data, "base64");
+                                fs.writeFile(path + filename, base64buffer, function(error) {
+                                    if (error) {
+                                        console.log(error);
+                                    }
+                                });
+                            }
+                            resp.cover = path + filename;
 
                         }
 
