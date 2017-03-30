@@ -89,6 +89,10 @@ body.light #audioplayer .info img {
 }
 
 #audioplayer .info .moreinfo {
+    text-transform: capitalize;
+}
+
+#audioplayer .info .moreinfo {
     display: block;
     width: 95%;
     margin: auto;
