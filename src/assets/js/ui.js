@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", function() {
     document.querySelector("#titleBar img").addEventListener("click", function() {
         if (ipcRenderer.sendSync("titleBar", "loadFolder")) {
             document.querySelector("#songs [data-type='info']").remove();
-            
+
             while (document.querySelectorAll("#songs [data-type='audio']").length > 0) {
                 document.querySelector("#songs [data-type='audio']").remove();
             }
@@ -54,11 +54,11 @@ document.addEventListener("DOMContentLoaded", function() {
 
         var template = '<li data-type="audio" data-num="' + num + '" data-path="' + path + '" data-cover-path="' + cover + '">';
         template += '<img src="' + cover + '" draggable="false">';
-        template += '<p><span class="artist">' + artist.toUpperCase() + '</span>';
+        template += '<p><span class="artist">' + artist + '</span>';
         if (album) {
-            template += '&nbsp;<span class="album">' + album.toUpperCase() + '</span>';
+            template += '&nbsp;<span class="album">' + album + '</span>';
         }
-        template += '</p><p><span class="title">' + title.toUpperCase() + '</span><span class="duration">' + duration + '</span></p></li>';
+        template += '</p><p><span class="title">' + title + '</span><span class="duration">' + duration + '</span></p></li>';
 
         document.getElementById("songs").innerHTML += template;
 
