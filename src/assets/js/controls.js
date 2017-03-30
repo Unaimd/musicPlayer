@@ -14,8 +14,7 @@ if (typeof audioplayer == "undefined") {
     }
 
     function play() {
-        audioplayer.newSong(this);
-        var song = new Song(this.getAttribute("data-path"), {
+        var song = new Song(this, this.getAttribute("data-path"), {
             title: this.querySelector(".title"),
             artist: this.querySelector(".artist"),
             album: this.querySelector(".album"),
@@ -23,7 +22,7 @@ if (typeof audioplayer == "undefined") {
             cover: this.getAttribute("data-cover-path"),
             moddate: this.getAttribute("data-moddate")
         });
-        //audioplayer.newSong(song);
+        audioplayer.newSong(song);
     }
 
     function clickPercent(element, e) {

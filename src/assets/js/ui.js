@@ -4,21 +4,35 @@ document.addEventListener("DOMContentLoaded", function() {
     // titlebar elements
     document.querySelectorAll("#titleBar i").forEach(function(value, index, array) {
         value.addEventListener("click", function() {
-            ipcRenderer.sendSync("titleBar", value.getAttribute("data-action"));
+            ipcRenderer.send("titleBar", value.getAttribute("data-action"));
         }, false);
     });
 
     document.querySelector("#titleBar img").addEventListener("click", function() {
         if (ipcRenderer.sendSync("titleBar", "loadFolder")) {
-            document.querySelector("#songs [data-type='info']").remove();
-
             while (document.querySelectorAll("#songs [data-type='audio']").length > 0) {
                 document.querySelector("#songs [data-type='audio']").remove();
             }
         }
     });
 
+    // save last selected directory
+    ipcRenderer.on("selAudioDir", (event, msg) => {
+        localStorage.setItem("selAudioDir", msg);
+    });
+
+    // load songs form last selected directory
+    if (localStorage.getItem("selAudioDir")) {
+        setTimeout(function() {
+            ipcRenderer.send("loadAudioFromDir", localStorage.getItem("selAudioDir"));
+        }, 150);
+    }
+
     ipcRenderer.on("addSong", (event, msg) => {
+        while (document.querySelectorAll("#songs [data-type='info']").length > 0) {
+            document.querySelector("#songs [data-type='info']").remove();
+        }
+
         var num = 0;
         var path = msg.path;
 

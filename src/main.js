@@ -113,10 +113,15 @@ app.on('ready', () => {
             win.minimize();
 
         } else if (arg == "loadFolder") {
-            event.returnValue = loadMusicFromFolder(event);
+            event.returnValue = loadMusicFromDir(event);
         }
 
         event.returnValue = "ok";
+    });
+
+    ipcMain.on("loadAudioFromDir", (event, dir) => {
+        loadMusicFromDir(event, dir);
+        return;
     });
 
 });
@@ -138,7 +143,7 @@ function selectFolder() {
     }
 }
 
-function loadMusicFromFolder(event, dir) {
+function loadMusicFromDir(event, dir) {
     if (typeof dir === "undefined") {
         dir = selectFolder();
     }
@@ -148,11 +153,14 @@ function loadMusicFromFolder(event, dir) {
     }
 
     if (fs.existsSync(dir)) {
+        // send the selected audio folder
+        event.sender.send("selAudioDir", dir);
+
         fs.readdir(dir, (error, files) => {
             files.forEach((file) => {
                 if (fs.lstatSync(dir + "/" + file).isDirectory()) {
                     // recursive
-                    //loadMusicFromFolder(event, dir + "/" + file);
+                    //loadMusicFromDir(event, dir + "/" + file);
                     //console.log(dir+"/"+file);
                 }
 

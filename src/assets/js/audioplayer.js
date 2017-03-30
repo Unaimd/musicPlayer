@@ -57,7 +57,30 @@ var audioplayer = {
         restartOnLast: true
     },
 
-    newSong: function(aElement) {
+    newSong: function(song) {
+        if (song instanceof Song) {
+            var path = song.path;
+            var title = song.title;
+            var artist = song.artist;
+            var album = song.album;
+            var duration = song.duration;
+            var coverImage = song.cover;
+            var aElement = song.element;
+        } else {
+            if (audioplayer.log) {
+                swal({
+                    title: "Not valid Song",
+                    text: "The given element should be a Song object",
+                    type: "error",
+                    showConfirmButton: false,
+                    timer: audioplayer.config.swalTimer
+                });
+            }
+
+            throw new Error("The given element should be a Song object");
+            return;
+        }
+
         audioplayer.stop();
 
         try {
@@ -67,25 +90,6 @@ var audioplayer = {
         }
         aElement.className += " active";
 
-        // get song info
-        if (aElement instanceof Song) {
-            console.log("Audio object");
-            var path = aElement;
-            var title = aElement.title;
-            var artist = aElement.artist;
-            var album = aElement.album;
-            var duration = aElement.duration;
-            var coverImage = aElement.cover;
-        } else {
-            console.log("Not audio object");
-
-            var path = aElement.getAttribute("data-path");
-            var title = aElement.getElementsByClassName("title")[0];
-            var artist = aElement.getElementsByClassName("artist")[0];
-            var album = aElement.getElementsByClassName("album")[0];
-            var duration = aElement.getElementsByClassName("duration")[0];
-            var coverImage = aElement.getElementsByTagName("img")[0].getAttribute("src");
-        }
 
         // set new info
         audioplayer.elements.title.innerHTML = title.innerHTML;
@@ -180,14 +184,12 @@ var audioplayer = {
         var totalSongs = parseInt(songs[songs.length - 1].getAttribute("data-num"));
 
         if (active < totalSongs) {
-            var next = document.querySelector("#songs [data-num='" + (active + 1) + "']");
-            audioplayer.newSong(next);
+            var next = new Song(document.querySelector("#songs [data-num='" + (active + 1) + "']"));
 
             // load more songs via ajax
 
         } else if (audioplayer.config.restartOnLast) {
-            var next = document.querySelector("#songs [data-type='audio']");
-            audioplayer.newSong(next);
+            var next = new Song(document.querySelector("#songs [data-type='audio']"));
 
         } else {
             swal({
@@ -197,7 +199,12 @@ var audioplayer = {
                 showConfirmButton: false,
                 timer: audioplayer.config.swalTimer
             });
+
+            return;
         }
+
+        next.parse();
+        audioplayer.newSong(next);
     },
     previousSong: function() {
         var firstSong = document.querySelector("#songs [data-type='audio']");
@@ -209,13 +216,12 @@ var audioplayer = {
         active = parseInt(active.getAttribute("data-num"));
 
         if (active > parseInt(firstSong.getAttribute("data-num"))) {
-            var previous = document.querySelector("#songs [data-num='" + (active - 1)  + "']");
+            var previous = new Song(document.querySelector("#songs [data-num='" + (active - 1)  + "']"));
 
-            audioplayer.newSong(previous);
         } else if (active == parseInt(firstSong.getAttribute("data-num")) && audioplayer.config.restartOnFirst) {
             var allSongs = document.querySelectorAll("#songs [data-type='audio']");
+            var previous = new Song(allSongs[allSongs.length - 1]);
 
-            audioplayer.newSong(allSongs[allSongs.length - 1]);
         } else {
             swal({
                 title: '¡Canción anterior no disponible!',
@@ -224,7 +230,11 @@ var audioplayer = {
                 showConfirmButton: false,
                 timer: audioplayer.config.swalTimer
             });
+
+            return;
         }
+        previous.parse();
+        audioplayer.newSong(previous);
     },
     repeat: function(repeat) {
         var mode = repeat.getAttribute("data-mode");
