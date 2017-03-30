@@ -186,18 +186,20 @@ function loadMusicFromDir(event, dir) {
                             moddate: filemtime
                         }
 
+                        var path = "./assets/img/albumArt/";
+                        var filename;
+
+                        if (metadata.album) {
+                            filename = metadata.album;
+                        } else {
+                            filename = metadata.title;
+                        }
+
                         if (typeof metadata.picture[0] !== "undefined") {
                             var image = metadata.picture[0];
                             var format = image.format;
 
-                            var path = "./assets/img/albumArt/";
-                            var filename;
 
-                            if (metadata.album) {
-                                filename = metadata.album;
-                            } else {
-                                filename = metadata.title;
-                            }
 
                             filename += "." + format;
 
@@ -232,6 +234,9 @@ function loadMusicFromDir(event, dir) {
 
                         // has not cover
                         } else {
+                            if (fs.existsSync(path + filename + ".jpg")) {
+                                resp.cover = path + filename + ".jpg";
+                            }
                             event.sender.send("addSong", resp);
                         }
 
