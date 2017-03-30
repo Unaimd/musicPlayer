@@ -291,6 +291,7 @@ body.light #songs li:nth-child(3) {
 
 #songs li p {
     margin: 0px;
+    text-transform: uppercase;
 }
 
 #songs li p:nth-child(2) {
