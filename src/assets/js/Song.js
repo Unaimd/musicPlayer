@@ -7,6 +7,7 @@ function Song(element, path, options) {
     this.album = "";
     this.duration = "";
     this.cover = "./assets/img/default.jpg";
+    this.moddate = "";
 
     if (typeof element === "undefined") {
         return;
@@ -46,6 +47,10 @@ function Song(element, path, options) {
         if (typeof options.cover !== "undefined" && options.cover) {
             this.cover = options.cover;
         }
+
+        if (typeof options.moddate !== "undefined" && options.moddate) {
+            this.moddate = options.moddate;
+        }
     }
 };
 
@@ -79,5 +84,10 @@ Song.prototype.parse = function() {
     var cover = this.element.getAttribute("data-cover-path");
     if (typeof cover !== "undefined" && cover) {
         this.cover = cover;
+    }
+
+    var moddate = this.element.getAttribute("data-moddate");
+    if (typeof moddate !== "undefined" && moddate) {
+        this.moddate = moddate;
     }
 };

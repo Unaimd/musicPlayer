@@ -143,6 +143,110 @@ function selectFolder() {
     }
 }
 
+function sortSongs(dir, files, mode, callback) {
+    var sortFunction;
+
+    if (mode == "moddate") {
+
+        sortFunction = function(a, b) {
+            var statsA = fs.statSync(dir + "/" + a);
+            var mtimeA = new Date(statsA.mtime).valueOf();
+
+            var statsB = fs.statSync(dir + "/" + b);
+            var mtimeB = new Date(statsB.mtime).valueOf();
+
+            return mtimeB - mtimeA;
+        };
+
+    }
+
+    files.sort(sortFunction);
+
+    if (typeof callback === "function") {
+        callback(files);
+    }
+}
+
+function getSongsMetadata(file, callback) {
+    var filemtime;
+    fs.stat(file, (err, stats) => {
+        filemtime = new Date(stats.mtime).valueOf();
+    });
+
+    var resp = {
+        path: file,
+        title: undefined,
+        artist: undefined,
+        album:undefined,
+        duration: undefined,
+        cover: undefined,
+        moddate: filemtime
+    };
+
+    var readableStream = fs.createReadStream(file);
+    var parser = id3(readableStream, {duration: true}, function (err, metadata) {
+
+        resp = {
+            path: file,
+            title: metadata.title,
+            artist: metadata.artist,
+            album: metadata.album,
+            duration: metadata.duration,
+            cover: undefined,
+            moddate: filemtime
+        }
+
+        var path = "./assets/img/albumArt/";
+        var filename;
+
+        if (metadata.album) {
+            filename = metadata.album;
+        } else {
+            filename = metadata.title;
+        }
+
+        if (typeof metadata.picture[0] !== "undefined") {
+            var image = metadata.picture[0];
+            var format = image.format;
+
+            filename += "." + format;
+
+            resp.cover = path + filename;
+
+            // create directory where the images are stored
+            if (!fs.existsSync(path)) {
+                fs.mkdir(path, function(error) {
+                    if (error) {
+                        console.log(error);
+                    }
+                });
+            }
+
+            // create image if not exists
+            if (!fs.existsSync(path + filename)) {
+                var base64buffer = new Buffer(image.data, "base64");
+                fs.writeFile(path + filename, base64buffer, function(error) {
+                    if (error) {
+                        console.log(error);
+                    }
+                });
+            }
+
+        // has not cover
+        } else {
+            if (fs.existsSync(path + filename + ".jpg")) {
+                resp.cover = path + filename + ".jpg";
+            }
+        }
+
+        readableStream.close();
+
+        if (typeof callback === "function") {
+            callback(resp);
+        }
+    });
+}
+
 function loadMusicFromDir(event, dir) {
     if (typeof dir === "undefined") {
         dir = selectFolder();
@@ -158,108 +262,28 @@ function loadMusicFromDir(event, dir) {
 
         fs.readdir(dir, (error, files) => {
 
-            // order files by modify date
-            files.sort(function(a, b) {
-                fs.stat(dir + "/" + a, (err, stats) => {
-                    mtimeA = new Date(stats.mtime).valueOf();
+            // sort songs
+            sortSongs(dir, files, "moddate", function() {
 
-                    fs.stat(dir + "/" + b, (err, stats) => {
-                        mtimeB = new Date(stats.mtime).valueOf();
+                files.forEach((file) => {
 
-                        console.log(mtimeA + " " + mtimeB);
-                        return mtimeB - mtimeA;
-                    });
+                    // recursive
+                    if (fs.lstatSync(dir + "/" + file).isDirectory()) {
+                        //loadMusicFromDir(event, dir + "/" + file);
+                        //console.log(dir + "/" + file);
+                    }
+
+                    var f = file.split(".");
+                    if (f[f.length - 1].toUpperCase() == "MP3") {
+                        var file = path.resolve(dir, file);
+
+                        getSongsMetadata(file, function(metadata) {
+                            event.sender.send("addSong", metadata);
+                        });
+                    }
                 });
             });
 
-            // forEach is executed before sort
-
-            files.forEach((file) => {
-
-                // recursive
-                if (fs.lstatSync(dir + "/" + file).isDirectory()) {
-                    //loadMusicFromDir(event, dir + "/" + file);
-                    //console.log(dir + "/" + file);
-                }
-
-                var f = file.split(".");
-                if (f[f.length - 1].toUpperCase() == "MP3") {
-                    file = path.resolve(dir, file);
-
-                    var filemtime;
-                    fs.stat(file, (err, stats) => {
-                        filemtime = new Date(stats.mtime).valueOf();
-                    });
-
-                    // doc: https://github.com/leetreveil/musicmetadata
-                    var readableStream = fs.createReadStream(file);
-                    var parser = id3(readableStream, {duration: true}, function (err, metadata) {
-                        var resp = {
-                            path: file,
-                            title: metadata.title,
-                            artist: metadata.artist,
-                            album: metadata.album,
-                            duration: metadata.duration,
-                            cover: undefined,
-                            moddate: filemtime
-                        }
-
-                        var path = "./assets/img/albumArt/";
-                        var filename;
-
-                        if (metadata.album) {
-                            filename = metadata.album;
-                        } else {
-                            filename = metadata.title;
-                        }
-
-                        if (typeof metadata.picture[0] !== "undefined") {
-                            var image = metadata.picture[0];
-                            var format = image.format;
-
-                            filename += "." + format;
-
-                            resp.cover = path + filename;
-
-                            // create directory where the images are stored
-                            if (!fs.existsSync(path)) {
-                                fs.mkdir(path, function(error) {
-                                    if (error) {
-                                        console.log(error);
-                                    }
-                                });
-                            }
-
-                            // create image if not exists
-                            if (!fs.existsSync(path + filename)) {
-                                var base64buffer = new Buffer(image.data, "base64");
-                                fs.writeFile(path + filename, base64buffer, function(error) {
-                                    if (error) {
-                                        console.log(error);
-                                    }
-
-                                    // return data once file created
-                                    event.sender.send("addSong", resp);
-                                });
-
-                            // if file exists return
-                            } else {
-                                event.sender.send("addSong", resp);
-                            }
-
-
-                        // has not cover
-                        } else {
-                            if (fs.existsSync(path + filename + ".jpg")) {
-                                resp.cover = path + filename + ".jpg";
-                            }
-                            event.sender.send("addSong", resp);
-                        }
-
-                        readableStream.close();
-                    });
-                }
-            });
         });
     }
 

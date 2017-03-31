@@ -12,7 +12,7 @@ document.addEventListener("DOMContentLoaded", function() {
     if (localStorage.getItem("selAudioDir")) {
         setTimeout(function() {
             ipcRenderer.send("loadAudioFromDir", localStorage.getItem("selAudioDir"));
-        }, 5);
+        }, 250);
     }
 
     ipcRenderer.on("addSong", (event, msg) => {
