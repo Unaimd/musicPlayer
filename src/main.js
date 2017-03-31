@@ -157,11 +157,29 @@ function loadMusicFromDir(event, dir) {
         event.sender.send("selAudioDir", dir);
 
         fs.readdir(dir, (error, files) => {
+
+            // order files by modify date
+            files.sort(function(a, b) {
+                fs.stat(dir + "/" + a, (err, stats) => {
+                    mtimeA = new Date(stats.mtime).valueOf();
+
+                    fs.stat(dir + "/" + b, (err, stats) => {
+                        mtimeB = new Date(stats.mtime).valueOf();
+
+                        console.log(mtimeA + " " + mtimeB);
+                        return mtimeB - mtimeA;
+                    });
+                });
+            });
+
+            // forEach is executed before sort
+
             files.forEach((file) => {
+
+                // recursive
                 if (fs.lstatSync(dir + "/" + file).isDirectory()) {
-                    // recursive
                     //loadMusicFromDir(event, dir + "/" + file);
-                    //console.log(dir+"/"+file);
+                    //console.log(dir + "/" + file);
                 }
 
                 var f = file.split(".");
@@ -198,8 +216,6 @@ function loadMusicFromDir(event, dir) {
                         if (typeof metadata.picture[0] !== "undefined") {
                             var image = metadata.picture[0];
                             var format = image.format;
-
-
 
                             filename += "." + format;
 

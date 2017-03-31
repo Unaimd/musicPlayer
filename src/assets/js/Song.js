@@ -26,8 +26,6 @@ function Song(element, path, options) {
         this.path = path
     }
 
-
-
     if (typeof options === "object") {
         if (typeof options.title !== "undefined" && options.title) {
             this.title = options.title;
