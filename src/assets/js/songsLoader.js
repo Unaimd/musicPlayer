@@ -55,14 +55,13 @@ document.addEventListener("DOMContentLoaded", function() {
 
         const maxLoadSongs = 100
         if (num > maxLoadSongs) {
-            setTimeout(function() {
-                swal({
-                    title: "Maximun alowed songs loaded",
-                    text: "To prevent a crash there's a limit of " + maxLoadSongs + " maximun songs, future versions won't have this.<br><br>Sorry for the inconvinients :(",
-                    type: "info",
-                    html: true
-                });
-            }, 150);
+            swal.close();
+            swal({
+                title: "Maximun alowed songs loaded",
+                text: "To prevent a crash there's a limit of " + maxLoadSongs + " maximun songs, future versions won't have this.<br><br>Sorry for the inconvinients :(",
+                type: "info",
+                html: true
+            });
             return;
         }
 
