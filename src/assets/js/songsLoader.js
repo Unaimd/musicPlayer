@@ -15,7 +15,13 @@ document.addEventListener("DOMContentLoaded", function() {
         }, 250);
     }
 
-    ipcRenderer.on("addSong", (event, msg) => {
+    ipcRenderer.on("addSongs", (event, msg) => {
+        msg.forEach(function (data) {
+            writeSong(data);
+        });
+    });
+
+    function writeSong(msg) {
         while (document.querySelectorAll("#songs [data-type='info']").length > 0) {
             document.querySelector("#songs [data-type='info']").remove();
         }
@@ -53,9 +59,8 @@ document.addEventListener("DOMContentLoaded", function() {
             num = parseInt(songs[songs.length - 1].getAttribute("data-num")) + 1;
         }
 
-        const maxLoadSongs = 100
+        const maxLoadSongs = 300;
         if (num > maxLoadSongs) {
-            swal.close();
             swal({
                 title: "Maximun alowed songs loaded",
                 text: "To prevent a crash there's a limit of " + maxLoadSongs + " maximun songs, future versions won't have this.<br><br>Sorry for the inconvinients :(",
@@ -79,7 +84,7 @@ document.addEventListener("DOMContentLoaded", function() {
         setTimeout(function() {
             updateSongs();
         });
-    });
+    }
 
     function formatDuration(seconds) {
         var sec = Math.round(seconds);

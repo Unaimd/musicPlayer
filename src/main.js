@@ -248,6 +248,8 @@ function getSongsMetadata(file, callback) {
 }
 
 function loadMusicFromDir(event, dir) {
+    var songs = new Array();
+
     if (typeof dir === "undefined") {
         dir = selectFolder();
     }
@@ -265,7 +267,7 @@ function loadMusicFromDir(event, dir) {
             // sort songs
             sortSongs(dir, files, "moddate", function() {
 
-                files.forEach((file) => {
+                files.forEach((file, index) => {
 
                     // recursive
                     if (fs.lstatSync(dir + "/" + file).isDirectory()) {
@@ -273,15 +275,22 @@ function loadMusicFromDir(event, dir) {
                         //console.log(dir + "/" + file);
                     }
 
-                    var f = file.split(".");
-                    if (f[f.length - 1].toUpperCase() == "MP3") {
+                    var dotSplit = file.split(".");
+                    if (dotSplit[dotSplit.length - 1].toUpperCase() == "MP3") {
                         var file = path.resolve(dir, file);
 
                         getSongsMetadata(file, function(metadata) {
-                            event.sender.send("addSong", metadata);
+                            songs.push(metadata);
+
+                            // execute code on scanning last file
+                            if (files.length - index == 1) {
+                                event.sender.send("addSongs", songs);
+                            }
                         });
                     }
+
                 });
+
             });
 
         });
