@@ -196,7 +196,7 @@ function getSongsMetadata(file, callback) {
             moddate: filemtime
         }
 
-        var path = "./assets/img/albumArt/";
+        var path = __dirname + "/assets/img/albumArt/";
         var filename;
 
         if (metadata.album) {
@@ -217,7 +217,7 @@ function getSongsMetadata(file, callback) {
             if (!fs.existsSync(path)) {
                 fs.mkdir(path, function(error) {
                     if (error) {
-                        console.log(error);
+                        console.log("error creating albums folder: " + path);
                     }
                 });
             }
@@ -227,7 +227,7 @@ function getSongsMetadata(file, callback) {
                 var base64buffer = new Buffer(image.data, "base64");
                 fs.writeFile(path + filename, base64buffer, function(error) {
                     if (error) {
-                        console.log(error);
+                        console.log("error creating album image: " + path + filename);
                     }
                 });
             }
