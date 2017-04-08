@@ -10,7 +10,9 @@ const path = require('path');
 const url = require('url');
 
 const fs = require('fs');
+
 const id3 = require('musicmetadata');
+const curl = require('curl');
 
 // window object
 let win;
@@ -167,7 +169,7 @@ function sortSongs(dir, files, mode, callback) {
     }
 }
 
-function getSongsMetadata(file, callback) {
+function getSongMetadata(file, callback) {
     var filemtime;
     fs.stat(file, (err, stats) => {
         filemtime = new Date(stats.mtime).valueOf();
@@ -177,7 +179,7 @@ function getSongsMetadata(file, callback) {
         path: file,
         title: undefined,
         artist: undefined,
-        album:undefined,
+        album: undefined,
         duration: undefined,
         cover: undefined,
         moddate: filemtime
@@ -232,12 +234,25 @@ function getSongsMetadata(file, callback) {
                 });
             }
 
-        // has not cover
-        } else {
-            if (fs.existsSync(path + filename + ".jpg")) {
-                resp.cover = path + filename + ".jpg";
-            }
-        }
+        // search for cover in folder
+        } else if (fs.existsSync(path + filename + ".jpg")) {
+            resp.cover = path + filename + ".jpg";
+
+        }/* else {
+            var albumQuery = resp.title;
+
+            curl.get("https://itunes.apple.com/search?country=US&entity=album&term=" + albumQuery, {}, (error, response) => {
+                if (error) {
+                    console.log(error);
+                } else {
+                    var json = JSON.parse(response.body);
+
+                    if (json.resultCount > 0) {
+                        resp.cover = json.results[0].artworkUrl100.replace("100x100", "512x512");
+                    }
+                }
+            });
+        }*/
 
         readableStream.close();
 
@@ -279,7 +294,7 @@ function loadMusicFromDir(event, dir) {
                     if (dotSplit[dotSplit.length - 1].toUpperCase() == "MP3") {
                         var file = path.resolve(dir, file);
 
-                        getSongsMetadata(file, function(metadata) {
+                        getSongMetadata(file, function(metadata) {
                             songs.push(metadata);
 
                             // execute code on scanning last file

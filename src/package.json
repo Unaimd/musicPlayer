@@ -9,6 +9,7 @@
 
     "dependencies": {
         "electron": "1.4.15",
-        "musicmetadata": "2.0.5"
+        "musicmetadata": "2.0.5",
+        "curl": "0.1.4"
     }
 }
