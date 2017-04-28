@@ -68,6 +68,12 @@ if (typeof audioplayer == "undefined") {
             }, false);
         }
 
+        for (var i=0; i < audioplayer.elements.buttons.random.length; i++) {
+            audioplayer.elements.buttons.random[i].addEventListener("click", function() {
+                audioplayer.random();
+            });
+        }
+
         for (var i=0; i < audioplayer.elements.buttons.volumeIndicator.length; i++) {
             audioplayer.elements.buttons.volumeIndicator[i].addEventListener("click", function() {
                 audioplayer.volumeMute();

@@ -70,7 +70,7 @@ document.addEventListener("DOMContentLoaded", function() {
             return;
         }
 
-        var template = '<li data-type="audio" data-num="' + num + '" data-path="' + path + '" data-cover-path="' + cover + '" data-moddate="' + moddate + '">';
+        var template = '<li data-type="audio" data-num="' + num + '" data-path="' + path + '" data-cover-path="' + cover + '" data-moddate="' + moddate + '" data-random-played="false">';
         template += '<img src="' + cover + '" draggable="false">';
         template += '<p><span class="artist">' + artist + '</span>';
         if (album) {
