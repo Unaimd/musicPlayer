@@ -175,6 +175,7 @@ body.light #audioplayer .timeline .range .input {
 }
 
 #audioplayer button {
+    cursor: pointer;
     width: 40px;
     height: 40px;
     margin-left: 2px;
