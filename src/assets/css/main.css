@@ -193,11 +193,6 @@ body.light #audioplayer button {
     border-color: black;
 }
 
-#audioplayer button.active,
-#audioplayer button:active {
-    background-color: #2f2f2f;
-}
-
 #audioplayer button[data-mode="one"]::after {
     content: "1";
     position: absolute;
@@ -224,8 +219,10 @@ body.light #audioplayer button {
     text-align: center;
 }
 
+#audioplayer button:active,
 #audioplayer button[name="random"][data-mode="active"] {
-    background-color: #484848;
+    background-color: #cccccc;
+    color: #333;
 }
 
 /*
