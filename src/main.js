@@ -263,6 +263,8 @@ function getSongMetadata(file, callback) {
 }
 
 function loadMusicFromDir(event, dir) {
+    var cachedDir = __dirname + "/assets/metadata.json";
+
     var songs = new Array();
 
     if (typeof dir === "undefined") {
@@ -274,42 +276,76 @@ function loadMusicFromDir(event, dir) {
     }
 
     if (fs.existsSync(dir)) {
-        // send the selected audio folder
-        event.sender.send("selAudioDir", dir);
 
-        fs.readdir(dir, (error, files) => {
+        if (fs.existsSync(cachedDir)) {
+            // send the selected audio folder
+            event.sender.send("selAudioDir", dir);
 
-            // sort songs
-            sortSongs(dir, files, "moddate", function() {
+            cachedJson = JSON.parse(fs.readFileSync(cachedDir));
 
-                files.forEach((file, index) => {
+            if (cachedJson.folder == dir) {
+                readFromJson(event, fs.readFileSync(cachedDir, {
+                    "encoding": "utf8"
+                }));
 
-                    // recursive
-                    if (fs.lstatSync(dir + "/" + file).isDirectory()) {
-                        //loadMusicFromDir(event, dir + "/" + file);
-                        //console.log(dir + "/" + file);
-                    }
+                return;
+            }
+        }
 
-                    var dotSplit = file.split(".");
-                    if (dotSplit[dotSplit.length - 1].toUpperCase() == "MP3") {
-                        var file = path.resolve(dir, file);
+        // save songs metadata to json file
+        var data = {};
+        data.folder = dir;
+        data.songs = new Array();
 
-                        getSongMetadata(file, function(metadata) {
-                            songs.push(metadata);
-
-                            // execute code on scanning last file
-                            if (files.length - index == 1) {
-                                event.sender.send("addSongs", songs);
-                            }
-                        });
-                    }
-
-                });
-
+        scanSongs(dir, (songs) => {
+            songs.forEach((song) => {
+                data.songs.push(song);
             });
 
+            fs.writeFileSync(cachedDir, JSON.stringify(data), {
+                "encoding": "utf8"
+            });
+
+            readFromJson(event, fs.readFileSync(cachedDir, {
+                "encoding": "utf8"
+            }));
         });
+
     }
 
     return true;
+}
+
+function scanSongs(dir, callback) {
+    var songs = new Array();
+    fs.readdir(dir, (error, files) => {
+
+        files.forEach((file, index) => {
+
+            var dotSplit = file.split(".");
+            if (dotSplit[dotSplit.length - 1].toUpperCase() == "MP3") {
+                var file = path.resolve(dir, file);
+
+                getSongMetadata(file, function(metadata) {
+                    songs.push(metadata);
+
+                    // execute code on scanning last file
+                    if (files.length - index == 1) {
+                        if (typeof callback === "function") {
+                            callback(songs);
+                        }
+                    }
+                });
+            }
+
+        });
+
+    });
+
+}
+
+function readFromJson(event, json) {
+    json = JSON.parse(json);
+
+    event.sender.send("addSongs", json.songs);
 }
