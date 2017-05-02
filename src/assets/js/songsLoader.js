@@ -15,11 +15,33 @@ document.addEventListener("DOMContentLoaded", function() {
         }, 250);
     }
 
-    ipcRenderer.on("addSongs", (event, msg) => {
-        msg.forEach(function (data) {
-            writeSong(data);
-        });
+    ipcRenderer.on("addSongs", (event, songs) => {
+        loadGroup(songs, 0);
+        swal("TODO", "load more files on scrolling or instantly if there's no scroll bar", "info");
     });
+
+    function loadGroup(songs, start, num, timer) {
+        if (typeof num === "undefined") {
+            num = 30;
+        }
+
+        for (i = start; i < songs.length; i++) {
+            song = songs[i];
+
+            if (i % num == 0 && i != start) {
+
+                if (typeof timer !== "undefined") {
+                    setTimeout(function() {
+                        loadGroup(songs, i, num, timer);
+                    }, timer);
+                }
+                return;
+
+            } else {
+                writeSong(song);
+            }
+        }
+    }
 
     function writeSong(msg) {
         while (document.querySelectorAll("#songs [data-type='info']").length > 0) {
@@ -80,10 +102,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
         document.getElementById("songs").innerHTML += template;
 
-        // as it's on a timeout it only will be executed one
-        setTimeout(function() {
-            updateSongs();
-        });
+        updateSongs();
     }
 
     function formatDuration(seconds) {
