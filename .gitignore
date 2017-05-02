@@ -2,3 +2,4 @@
 *.sh
 
 src/assets/img/albumArt/*
+sec/assets/metadata.json
