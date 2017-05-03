@@ -1,4 +1,4 @@
-if (typeof audioplayer == "undefined") {
+if (typeof audioplayer === "undefined") {
     throw "audioplayer is required";
 } else {
     function updateSongs() {

@@ -1,28 +1,29 @@
 var songsLoader = {
-
+    MAX_LOAD_PER_ROUND: 50
 };
 
 document.addEventListener("DOMContentLoaded", function() {
     // save last selected directory
-    ipcRenderer.on("selAudioDir", (event, msg) => {
-        localStorage.setItem("selAudioDir", msg);
+    ipcRenderer.on("selAudioDir", (event, dir) => {
+        localStorage.setItem("selAudioDir", dir);
     });
 
     // load songs from last selected directory
     if (localStorage.getItem("selAudioDir")) {
-        setTimeout(function() {
-            ipcRenderer.send("loadAudioFromDir", localStorage.getItem("selAudioDir"));
-        }, 250);
+        ipcRenderer.send("loadAudioFromDir", localStorage.getItem("selAudioDir"));
     }
 
     ipcRenderer.on("addSongs", (event, songs) => {
-        loadGroup(songs, 0);
-        swal("TODO", "load more files on scrolling or instantly if there's no scroll bar", "info");
+        removeLoadMore();
+
+        loadGroup(songs, 0, songsLoader.MAX_LOAD_PER_ROUND);
+        localStorage.setItem("songsJSON", JSON.stringify(songs));
     });
 
     function loadGroup(songs, start, num, timer) {
-        if (typeof num === "undefined") {
-            num = 30;
+        if (typeof num !== "number") {
+            throw new Error("Unspecified number of songs to be shown");
+            return;
         }
 
         for (i = start; i < songs.length; i++) {
@@ -35,43 +36,72 @@ document.addEventListener("DOMContentLoaded", function() {
                         loadGroup(songs, i, num, timer);
                     }, timer);
                 }
-                return;
+                break;
 
             } else {
                 writeSong(song);
             }
         }
+
+        // add load more button
+        if (i < songs.length) {
+            removeLoadMore();
+
+            document.getElementById("songs").innerHTML += "<li class='loadMore' style='text-align: center;cursor: pointer;'><i class='fa fa-refresh'></i>&nbsp;Load more songs</li>";
+            document.querySelector("li.loadMore").addEventListener("click", loadMore, false);
+
+            document.querySelector("li.loadMore").addEventListener("mouseenter", () => {
+                document.querySelector("li.loadMore .fa").className += " fa-spin";
+            }, false);
+
+            document.querySelector("li.loadMore").addEventListener("mouseleave", () => {
+                document.querySelector("li.loadMore .fa").className = document.querySelector("li.loadMore .fa").className.replace(" fa-spin", "");
+            }, false);
+        }
     }
 
-    function writeSong(msg) {
+    function loadMore() {
+        removeLoadMore();
+
+        var songs = document.querySelectorAll("[data-type='audio']");
+        loadGroup(JSON.parse(localStorage.getItem("songsJSON")), songs.length, songsLoader.MAX_LOAD_PER_ROUND);
+    }
+
+    function removeLoadMore() {
+        document.querySelectorAll("li.loadMore").forEach((element) => {
+            element.remove();
+        });
+    }
+
+    function writeSong(songJSON) {
         while (document.querySelectorAll("#songs [data-type='info']").length > 0) {
             document.querySelector("#songs [data-type='info']").remove();
         }
 
         var num = 0;
-        var path = msg.path;
+        var path = songJSON.path;
 
-        var title = msg.title;
+        var title = songJSON.title;
         if (typeof title === "undefined") {
             title = "unknown title";
         }
 
-        var artist = msg.artist[0];
+        var artist = songJSON.artist[0];
         if (typeof artist === "undefined") {
             artist = "unknown artist";
         }
 
-        var album = msg.album;
+        var album = songJSON.album;
         if (typeof album === "undefined" || album == "") {
             album = "unknown album";
         }
 
-        var duration = formatDuration(msg.duration);
-        var moddate = msg.moddate;
+        var duration = formatDuration(songJSON.duration);
+        var moddate = songJSON.moddate;
         var cover = null;
 
-        if (typeof msg.cover != "undefined") {
-            cover = msg.cover;
+        if (typeof songJSON.cover != "undefined") {
+            cover = songJSON.cover;
         } else {
             cover = "./assets/img/default.jpg";
         }
@@ -79,17 +109,6 @@ document.addEventListener("DOMContentLoaded", function() {
         var songs = document.querySelectorAll("#songs [data-type='audio']");
         if (songs.length > 0) {
             num = parseInt(songs[songs.length - 1].getAttribute("data-num")) + 1;
-        }
-
-        const maxLoadSongs = 300;
-        if (num > maxLoadSongs) {
-            swal({
-                title: "Maximun alowed songs loaded",
-                text: "To prevent a crash there's a limit of " + maxLoadSongs + " maximun songs, future versions won't have this.<br><br>Sorry for the inconvinients :(",
-                type: "info",
-                html: true
-            });
-            return;
         }
 
         var template = '<li data-type="audio" data-num="' + num + '" data-path="' + path + '" data-cover-path="' + cover + '" data-moddate="' + moddate + '" data-random-played="false">';
@@ -102,7 +121,9 @@ document.addEventListener("DOMContentLoaded", function() {
 
         document.getElementById("songs").innerHTML += template;
 
-        updateSongs();
+        setTimeout(() => {
+            updateSongs();
+        }, 10);
     }
 
     function formatDuration(seconds) {
