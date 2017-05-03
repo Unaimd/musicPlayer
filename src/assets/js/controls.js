@@ -4,7 +4,7 @@ if (typeof audioplayer == "undefined") {
     function updateSongs() {
         var songs = document.querySelectorAll("[data-type='audio']");
         for (var i = 0; i < songs.length; i++) {
-            updateSong(songs[i])
+            updateSong(songs[i]);
         }
     }
 
