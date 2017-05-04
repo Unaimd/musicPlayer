@@ -1,38 +1,127 @@
 var songsLoader = {
     INITIAL_LOAD: 100,
     MAX_LOAD_PER_ROUND: 50,
-    loadAll: true,
 
-    loadGroup: function(songs, start, num, timer) {
+    sortFunctions: {
+        moddate: function(a, b) {
+            return a.moddate - b.moddate;
+        },
+        title: function(a, b) {
+            a = a.title.toLowerCase();
+            b = b.title.toLowerCase();
+
+            if (a > b) {
+                return 1;
+            } else if (a < b) {
+                return - 1;
+            } else {
+                return 0;
+            }
+        },
+        artist: function(a, b) {
+            a = a.artist.toString().toLowerCase();
+            b = b.artist.toString().toLowerCase();
+
+            if (a == b && a == "") {
+                return songsLoader.sortFunctions.title;
+            }
+
+            if (a > b) {
+                return 1;
+            } else if (a < b) {
+                return - 1;
+            } else {
+                return 0;
+            }
+        },
+        album: function(a, b) {
+            a = a.album.toLowerCase();
+            b = b.album.toLowerCase();
+
+            if (a == b && a == "") {
+                return songsLoader.sortFunctions.title;
+            }
+
+            if (a > b) {
+                return 1;
+            } else if (a < b) {
+                return - 1;
+            } else {
+                return songsLoader.sortFunctions.title;
+            }
+        },
+        duration: function(a, b) {
+            return a.duration - b.duration;
+        }
+    },
+    sort: function(songs, mode, fnc) {
+        switch(mode) {
+            case "moddate":
+                fnc = songsLoader.sortFunctions.moddate;
+                break;
+
+            case "title":
+                fnc = songsLoader.sortFunctions.title;
+                break;
+
+            case "artist":
+                fnc = songsLoader.sortFunctions.artist;
+                break;
+
+            case "album":
+                fnc = songsLoader.sortFunctions.album;
+                break;
+
+            case "duration":
+                fnc = songsLoader.sortFunctions.duration;
+                break;
+
+            default:
+                fnc = null;
+                break;
+        }
+
+        if (typeof fnc === "function") {
+            return songs.sort(fnc);
+        } else {
+            return songs;
+        }
+    },
+    loadGroup: function(songs, start, num, order, method) {
         if (typeof num !== "number") {
             throw new Error("Unspecified number of songs to be shown");
             return;
+        }
+        if (typeof order === "undefined") {
+
+            if (localStorage.getItem("orderProp") != "") {
+                order = localStorage.getItem("orderProp");
+            } else {
+                order = "title";
+            }
+
+        }
+        if (typeof method === "undefined") {
+
+            if (localStorage.getItem("orderMethod") != "") {
+                method = localStorage.getItem("orderMethod");
+            } else {
+                method = "asc";
+            }
+
+        }
+
+        songs = songsLoader.sort(songs, order);
+        if (method == "desc") {
+            songs.reverse();
         }
 
         for (i = start; i < songs.length; i++) {
             song = songs[i];
 
-            if (i % num == 0 && i != start) {
-
-                if (typeof timer !== "undefined") {
-                    setTimeout(function() {
-                        songsLoader.loadGroup(songs, i, num, timer);
-                    }, timer);
-                }
-                break;
-
-            } else {
-                songsLoader.writeSong(song);
-            }
+            songsLoader.writeSong(song);
         }
 
-        songsLoader.addLoadMoreButton();
-    },
-    loadMore: function() {
-        songsLoader.removeLoadMore;
-
-        var songs = document.querySelectorAll("[data-type='audio']");
-        songsLoader.loadGroup(JSON.parse(localStorage.getItem("songsJSON")), songs.length, songsLoader.MAX_LOAD_PER_ROUND);
     },
     writeSong: function(songJSON) {
         while (document.querySelectorAll("#songs [data-type='info']").length > 0) {
@@ -112,25 +201,8 @@ var songsLoader = {
             return min + ":" + sec;
         }
     },
-    addLoadMoreButton: function() {
-        songsLoader.removeLoadMoreButton();
-
-        document.getElementById("songs").insertAdjacentHTML("beforeend", "<li class='loadMore' style='text-align: center;cursor: pointer;'><i class='fa fa-refresh'></i>&nbsp;Load more songs</li>");
-        document.querySelector("li.loadMore").addEventListener("click", songsLoader.loadMore, false);
-
-        document.querySelector("li.loadMore").addEventListener("mouseenter", () => {
-            document.querySelector("li.loadMore .fa").className += " fa-spin";
-        }, false);
-
-        document.querySelector("li.loadMore").addEventListener("mouseleave", () => {
-            document.querySelector("li.loadMore .fa").className = document.querySelector("li.loadMore .fa").className.replace(" fa-spin", "");
-        }, false);
-
-    },
-    removeLoadMoreButton: function () {
-        document.querySelectorAll("li.loadMore").forEach((element) => {
-            element.remove();
-        });
+    addLoader: function () {
+        document.getElementById("songs").innerHTML = "<li data-type='info' style='text-align: center;'>Scanning songs...<br><div class='loader'></div><small>If this remains too long songs couldn't be found</small></li>";
     }
 };
 
@@ -139,7 +211,7 @@ document.addEventListener("DOMContentLoaded", function() {
     ipcRenderer.on("selAudioDir", (event, dir) => {
         localStorage.setItem("selAudioDir", dir);
 
-        document.getElementById("songs").innerHTML = "<li data-type='info' style='text-align: center;'>Scanning songs...<br><div class='loader'></div><small>If this remains too long songs couldn't be found</small></li>";
+        songsLoader.addLoader();
     });
 
     // load songs from last selected directory
@@ -148,14 +220,42 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     ipcRenderer.on("addSongs", (event, songs) => {
-        songsLoader.removeLoadMoreButton();
-
-        if (songsLoader.loadAll) {
-            songsLoader.loadGroup(songs, 0, songsLoader.INITIAL_LOAD, 0);
-        } else {
-            songsLoader.loadGroup(songs, 0, songsLoader.INITIAL_LOAD);
-        }
+        songsLoader.loadGroup(songs, 0, songsLoader.INITIAL_LOAD);
 
         localStorage.setItem("songsJSON", JSON.stringify(songs));
     });
+
+    document.querySelector("select[name='order']").addEventListener("change", order, false);
+    document.querySelectorAll("input[name='method']").forEach((element) => {
+        element.addEventListener("change", order, false);
+    });
+
+    function order() {
+        var order = document.querySelector("select[name='order']").value;
+        var method = document.querySelector("[name='method']:checked").value;
+
+        document.getElementById("songs").innerHTML = "";
+        songsLoader.addLoader();
+
+        localStorage.setItem("orderProp", order);
+        localStorage.setItem("orderMethod", method);
+
+        songsLoader.loadGroup(JSON.parse(localStorage.getItem("songsJSON")), 0, songsLoader.INITIAL_LOAD, order, method);
+    }
+
+
+    if (localStorage.getItem("orderProp")) {
+        document.querySelector("option[value='" + localStorage.getItem("orderProp") + "']").setAttribute("selected", "selected");
+    }
+
+    if (localStorage.getItem("orderMethod")) {
+        document.querySelectorAll("[name='method']").forEach((element) => {
+            if (element.getAttribute("value") == localStorage.getItem("orderMethod")) {
+                element.setAttribute("checked", "checked");
+            } else {
+                element.removeAttribute("checked");
+            }
+        });
+    }
+
 }, false);
