@@ -1,35 +1,9 @@
 var songsLoader = {
     INITIAL_LOAD: 100,
     MAX_LOAD_PER_ROUND: 50,
-    loadAll: true
-};
+    loadAll: true,
 
-document.addEventListener("DOMContentLoaded", function() {
-    // save last selected directory
-    ipcRenderer.on("selAudioDir", (event, dir) => {
-        localStorage.setItem("selAudioDir", dir);
-
-        document.getElementById("songs").innerHTML = "<li data-type='info' style='text-align: center;'>Scanning songs...<br><div class='loader'></div><small>If this remains too long songs couldn't be found</small></li>";
-    });
-
-    // load songs from last selected directory
-    if (localStorage.getItem("selAudioDir")) {
-        ipcRenderer.send("loadAudioFromDir", localStorage.getItem("selAudioDir"));
-    }
-
-    ipcRenderer.on("addSongs", (event, songs) => {
-        removeLoadMore();
-
-        if (songsLoader.loadAll) {
-            loadGroup(songs, 0, songsLoader.INITIAL_LOAD, 0);
-        } else {
-            loadGroup(songs, 0, songsLoader.INITIAL_LOAD);
-        }
-
-        localStorage.setItem("songsJSON", JSON.stringify(songs));
-    });
-
-    function loadGroup(songs, start, num, timer) {
+    loadGroup: function(songs, start, num, timer) {
         if (typeof num !== "number") {
             throw new Error("Unspecified number of songs to be shown");
             return;
@@ -42,47 +16,25 @@ document.addEventListener("DOMContentLoaded", function() {
 
                 if (typeof timer !== "undefined") {
                     setTimeout(function() {
-                        loadGroup(songs, i, num, timer);
+                        songsLoader.loadGroup(songs, i, num, timer);
                     }, timer);
                 }
                 break;
 
             } else {
-                writeSong(song);
+                songsLoader.writeSong(song);
             }
         }
 
-        // add load more button
-        if (i < songs.length) {
-            removeLoadMore();
-
-            document.getElementById("songs").insertAdjacentHTML("beforeend", "<li class='loadMore' style='text-align: center;cursor: pointer;'><i class='fa fa-refresh'></i>&nbsp;Load more songs</li>");
-            document.querySelector("li.loadMore").addEventListener("click", loadMore, false);
-
-            document.querySelector("li.loadMore").addEventListener("mouseenter", () => {
-                document.querySelector("li.loadMore .fa").className += " fa-spin";
-            }, false);
-
-            document.querySelector("li.loadMore").addEventListener("mouseleave", () => {
-                document.querySelector("li.loadMore .fa").className = document.querySelector("li.loadMore .fa").className.replace(" fa-spin", "");
-            }, false);
-        }
-    }
-
-    function loadMore() {
-        removeLoadMore();
+        songsLoader.addLoadMoreButton();
+    },
+    loadMore: function() {
+        songsLoader.removeLoadMore;
 
         var songs = document.querySelectorAll("[data-type='audio']");
-        loadGroup(JSON.parse(localStorage.getItem("songsJSON")), songs.length, songsLoader.MAX_LOAD_PER_ROUND);
-    }
-
-    function removeLoadMore() {
-        document.querySelectorAll("li.loadMore").forEach((element) => {
-            element.remove();
-        });
-    }
-
-    function writeSong(songJSON) {
+        songsLoader.loadGroup(JSON.parse(localStorage.getItem("songsJSON")), songs.length, songsLoader.MAX_LOAD_PER_ROUND);
+    },
+    writeSong: function(songJSON) {
         while (document.querySelectorAll("#songs [data-type='info']").length > 0) {
             document.querySelector("#songs [data-type='info']").remove();
         }
@@ -105,7 +57,7 @@ document.addEventListener("DOMContentLoaded", function() {
             album = "unknown album";
         }
 
-        var duration = formatDuration(songJSON.duration);
+        var duration = songsLoader.formatDuration(songJSON.duration);
         var moddate = songJSON.moddate;
         var cover = null;
 
@@ -131,9 +83,8 @@ document.addEventListener("DOMContentLoaded", function() {
         document.getElementById("songs").insertAdjacentHTML("beforeend",template);
 
         updateSongs();
-    }
-
-    function formatDuration(seconds) {
+    },
+    formatDuration: function (seconds) {
         var sec = Math.round(seconds);
         var min = 0;
         var hour = 0;
@@ -160,5 +111,51 @@ document.addEventListener("DOMContentLoaded", function() {
         } else {
             return min + ":" + sec;
         }
+    },
+    addLoadMoreButton: function() {
+        songsLoader.removeLoadMoreButton();
+
+        document.getElementById("songs").insertAdjacentHTML("beforeend", "<li class='loadMore' style='text-align: center;cursor: pointer;'><i class='fa fa-refresh'></i>&nbsp;Load more songs</li>");
+        document.querySelector("li.loadMore").addEventListener("click", songsLoader.loadMore, false);
+
+        document.querySelector("li.loadMore").addEventListener("mouseenter", () => {
+            document.querySelector("li.loadMore .fa").className += " fa-spin";
+        }, false);
+
+        document.querySelector("li.loadMore").addEventListener("mouseleave", () => {
+            document.querySelector("li.loadMore .fa").className = document.querySelector("li.loadMore .fa").className.replace(" fa-spin", "");
+        }, false);
+
+    },
+    removeLoadMoreButton: function () {
+        document.querySelectorAll("li.loadMore").forEach((element) => {
+            element.remove();
+        });
     }
+};
+
+document.addEventListener("DOMContentLoaded", function() {
+    // save last selected directory
+    ipcRenderer.on("selAudioDir", (event, dir) => {
+        localStorage.setItem("selAudioDir", dir);
+
+        document.getElementById("songs").innerHTML = "<li data-type='info' style='text-align: center;'>Scanning songs...<br><div class='loader'></div><small>If this remains too long songs couldn't be found</small></li>";
+    });
+
+    // load songs from last selected directory
+    if (localStorage.getItem("selAudioDir")) {
+        ipcRenderer.send("loadAudioFromDir", localStorage.getItem("selAudioDir"));
+    }
+
+    ipcRenderer.on("addSongs", (event, songs) => {
+        songsLoader.removeLoadMoreButton();
+
+        if (songsLoader.loadAll) {
+            songsLoader.loadGroup(songs, 0, songsLoader.INITIAL_LOAD, 0);
+        } else {
+            songsLoader.loadGroup(songs, 0, songsLoader.INITIAL_LOAD);
+        }
+
+        localStorage.setItem("songsJSON", JSON.stringify(songs));
+    });
 }, false);
