@@ -115,7 +115,11 @@ app.on('ready', () => {
             win.minimize();
 
         } else if (arg == "loadFolder") {
-            event.returnValue = loadMusicFromDir(event);
+            if (loadMusicFromDir(event)) {
+                event.returnValue = true;
+            } else {
+                event.returnValue = false;
+            }
         }
 
         event.returnValue = "ok";
@@ -271,7 +275,7 @@ function loadMusicFromDir(event, dir) {
         dir = selectFolder();
     }
 
-    if (dir == false) {
+    if (dir === false) {
         return false;
     }
 
@@ -288,7 +292,7 @@ function loadMusicFromDir(event, dir) {
                     "encoding": "utf8"
                 }));
 
-                return;
+                return true;
             }
         }
 
