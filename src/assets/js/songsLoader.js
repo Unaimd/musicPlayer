@@ -9,7 +9,7 @@ document.addEventListener("DOMContentLoaded", function() {
     ipcRenderer.on("selAudioDir", (event, dir) => {
         localStorage.setItem("selAudioDir", dir);
 
-        document.getElementById("songs").innerHTML = "<li data-type='info' style='text-align: center;'>Scanning songs...<br><i class='fa fa-refresh fa-spin'></i><br><small>If this remains too long songs coul not be found</small></li>";
+        document.getElementById("songs").innerHTML = "<li data-type='info' style='text-align: center;'>Scanning songs...<br><div class='loader'></div><small>If this remains too long songs couldn't be found</small></li>";
     });
 
     // load songs from last selected directory
