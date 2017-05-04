@@ -14,28 +14,82 @@ const fs = require('fs');
 const id3 = require('musicmetadata');
 const curl = require('curl');
 
-// window object
-let win;
+// window objects
+let win,
+    preloadWin,
+    optionsWin;
 
 app.on('ready', () => {
-    // Create the browser window.
+    preloadWin = new BrowserWindow({
+        width: 300,
+        height: 350,
+        show: true,
+
+        center: true,
+        resizable: false,
+        autoHideMenuBar: true,
+        frame: false,
+        transparent: true
+    });
+
+    preloadWin.loadURL("file://" + __dirname + "/preload.html");
+
     win = new BrowserWindow({
+        show: false,
+
         width: 800,
         height: 600,
+        minWidth: 741,
+        minHeight: 541,
+
         center: true,
+
         icon: "assets/img/favicon.png",
         autoHideMenuBar: true,
         frame: false,
         webPreferences: {
             devTools: true
-        }
+        },
     });
 
-    // and load the index.html of the app.
     win.loadURL("file://" + __dirname + "/index.html");
+
+    optionsWin = new BrowserWindow({
+        parent: win,
+        modal: true,
+        show: false,
+
+        //width: 0,
+        //height: 0,
+        center: true,
+        resizable: false,
+        autoHideMenuBar: true,
+        frame: true
+
+    });
+
+    optionsWin.loadURL("file://" + __dirname + "/options.html");
+
+    optionsWin.on("close", (event) => {
+        optionsWin.hide();
+
+        event.preventDefault();
+    });
+
+
+    // hide preload and show main window
+    win.once("ready-to-show", () => {
+        preloadWin.close();
+        win.show();
+    });
+
 
     // hotkeys
     win.webContents.on("did-finish-load", () => {
+        // show options
+        globalShortcut.register("cmdOrCtrl+O", () => {
+            optionsWin.show();
+        });
 
         // volume up
         globalShortcut.register("volumeUp", () => {
@@ -98,6 +152,7 @@ app.on('ready', () => {
         // close
         if (arg == "close") {
             win.close();
+            app.quit();
 
         // maximize unmazimize
         } else if (arg == "maximize") {
