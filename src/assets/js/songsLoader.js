@@ -1,6 +1,8 @@
 var songsLoader = {
     INITIAL_LOAD: 100,
     MAX_LOAD_PER_ROUND: 50,
+    sortProp: null,
+    sortMethod: null,
 
     sortFunctions: {
         moddate: function(a, b) {
@@ -94,8 +96,8 @@ var songsLoader = {
         }
         if (typeof order === "undefined") {
 
-            if (localStorage.getItem("orderProp") != "") {
-                order = localStorage.getItem("orderProp");
+            if (songsLoader.orderProperty != "") {
+                order = songsLoader.orderProperty;
             } else {
                 order = "title";
             }
@@ -103,8 +105,8 @@ var songsLoader = {
         }
         if (typeof method === "undefined") {
 
-            if (localStorage.getItem("orderMethod") != "") {
-                method = localStorage.getItem("orderMethod");
+            if (songsLoader.orderMethod != "") {
+                method = songsLoader.orderMethod;
             } else {
                 method = "asc";
             }
@@ -237,20 +239,24 @@ document.addEventListener("DOMContentLoaded", function() {
         document.getElementById("songs").innerHTML = "";
         songsLoader.addLoader();
 
-        localStorage.setItem("orderProp", order);
+        localStorage.setItem("orderProperty", order);
+        songsLoader.orderProperty = order;
         localStorage.setItem("orderMethod", method);
+        songsLoader.orderMethod = method;
 
         songsLoader.loadGroup(JSON.parse(localStorage.getItem("songsJSON")), 0, songsLoader.INITIAL_LOAD, order, method);
     }
 
 
-    if (localStorage.getItem("orderProp")) {
-        document.querySelector("option[value='" + localStorage.getItem("orderProp") + "']").setAttribute("selected", "selected");
+    if (localStorage.getItem("orderProperty")) {
+        songsLoader.orderProperty = localStorage.getItem("orderProperty")
+        document.querySelector("option[value='" + songsLoader.orderProperty + "']").setAttribute("selected", "selected");
     }
 
     if (localStorage.getItem("orderMethod")) {
+        songsLoader.orderMethod = localStorage.getItem("orderMethod");
         document.querySelectorAll("[name='method']").forEach((element) => {
-            if (element.getAttribute("value") == localStorage.getItem("orderMethod")) {
+            if (element.getAttribute("value") == songsLoader.orderMethod) {
                 element.setAttribute("checked", "checked");
             } else {
                 element.removeAttribute("checked");
