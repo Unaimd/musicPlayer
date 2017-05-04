@@ -2,15 +2,18 @@ if (typeof audioplayer === "undefined") {
     throw "audioplayer is required";
 } else {
     function updateSongs() {
-        var songs = document.querySelectorAll("[data-type='audio']");
+        var songs = document.querySelectorAll(".hidden[data-type='audio']");
         for (var i = 0; i < songs.length; i++) {
             updateSong(songs[i]);
         }
     }
 
     function updateSong(song) {
-        song.removeEventListener("click", play, false);
+        song.className = song.className.replace("hidden", "");
+        song.className = song.className.replace("  ", " ");
+
         song.addEventListener("click", play, false);
+        song.addEventListener("contextmenu", contextMenu, false);
     }
 
     function play() {
@@ -23,6 +26,10 @@ if (typeof audioplayer === "undefined") {
             moddate: this.getAttribute("data-moddate")
         });
         audioplayer.newSong(song);
+    }
+
+    function contextMenu() {
+        swal(this.querySelector(".title").innerHTML, this.querySelector(".artist").innerHTML);
     }
 
     function clickPercent(element, e) {

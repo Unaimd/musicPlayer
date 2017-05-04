@@ -141,7 +141,7 @@ function selectFolder() {
     if (typeof dir === "undefined") {
         return false;
     } else {
-        return dir = dir[0];
+        return dir[0];
     }
 }
 

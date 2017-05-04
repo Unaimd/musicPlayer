@@ -1,11 +1,15 @@
 var songsLoader = {
-    MAX_LOAD_PER_ROUND: 50
+    INITIAL_LOAD: 100,
+    MAX_LOAD_PER_ROUND: 50,
+    loadAll: true
 };
 
 document.addEventListener("DOMContentLoaded", function() {
     // save last selected directory
     ipcRenderer.on("selAudioDir", (event, dir) => {
         localStorage.setItem("selAudioDir", dir);
+
+        document.getElementById("songs").innerHTML = "<li data-type='info' style='text-align: center;'>Scanning songs...<br><i class='fa fa-refresh fa-spin'></i><br><small>If this remains too long songs coul not be found</small></li>";
     });
 
     // load songs from last selected directory
@@ -16,7 +20,12 @@ document.addEventListener("DOMContentLoaded", function() {
     ipcRenderer.on("addSongs", (event, songs) => {
         removeLoadMore();
 
-        loadGroup(songs, 0, songsLoader.MAX_LOAD_PER_ROUND);
+        if (songsLoader.loadAll) {
+            loadGroup(songs, 0, songsLoader.INITIAL_LOAD, 0);
+        } else {
+            loadGroup(songs, 0, songsLoader.INITIAL_LOAD);
+        }
+
         localStorage.setItem("songsJSON", JSON.stringify(songs));
     });
 
@@ -47,7 +56,7 @@ document.addEventListener("DOMContentLoaded", function() {
         if (i < songs.length) {
             removeLoadMore();
 
-            document.getElementById("songs").innerHTML += "<li class='loadMore' style='text-align: center;cursor: pointer;'><i class='fa fa-refresh'></i>&nbsp;Load more songs</li>";
+            document.getElementById("songs").insertAdjacentHTML("beforeend", "<li class='loadMore' style='text-align: center;cursor: pointer;'><i class='fa fa-refresh'></i>&nbsp;Load more songs</li>");
             document.querySelector("li.loadMore").addEventListener("click", loadMore, false);
 
             document.querySelector("li.loadMore").addEventListener("mouseenter", () => {
@@ -111,7 +120,7 @@ document.addEventListener("DOMContentLoaded", function() {
             num = parseInt(songs[songs.length - 1].getAttribute("data-num")) + 1;
         }
 
-        var template = '<li data-type="audio" data-num="' + num + '" data-path="' + path + '" data-cover-path="' + cover + '" data-moddate="' + moddate + '" data-random-played="false">';
+        var template = '<li class="hidden" data-type="audio" data-num="' + num + '" data-path="' + path + '" data-cover-path="' + cover + '" data-moddate="' + moddate + '" data-random-played="false">';
         template += '<img src="' + cover + '" draggable="false">';
         template += '<p><span class="artist">' + artist + '</span>';
         if (album) {
@@ -119,11 +128,9 @@ document.addEventListener("DOMContentLoaded", function() {
         }
         template += '</p><p><span class="title">' + title + '</span><span class="duration">' + duration + '</span></p></li>';
 
-        document.getElementById("songs").innerHTML += template;
+        document.getElementById("songs").insertAdjacentHTML("beforeend",template);
 
-        setTimeout(() => {
-            updateSongs();
-        }, 10);
+        updateSongs();
     }
 
     function formatDuration(seconds) {
