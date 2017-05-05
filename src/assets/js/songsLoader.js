@@ -205,6 +205,30 @@ var songsLoader = {
     },
     addLoader: function () {
         document.getElementById("songs").innerHTML = "<li data-type='info' style='text-align: center;'>Scanning songs...<br><div class='loader'></div><small>If this remains too long songs couldn't be found</small></li>";
+    },
+    updateSortIcons: function(mode) {
+        if (mode != "num" & mode != "alpha") {
+            mode = "other";
+        }
+
+        document.querySelectorAll("[name='method'] + label > i").forEach((element) => {
+            var classes = element.className;
+            var type = element.getAttribute("data-mode");
+
+            // show
+            if (mode == type) {
+                if (classes.indexOf("hidden") > 0) {
+                    element.className = classes.replace("hidden", "").replace("  ", "");
+                }
+
+            // hide
+            } else {
+                if (classes.indexOf("hidden") < 0) {
+                    element.className += " hidden";
+                }
+            }
+
+        });
     }
 };
 
@@ -233,24 +257,30 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 
     function order() {
-        var order = document.querySelector("select[name='order']").value;
-        var method = document.querySelector("[name='method']:checked").value;
+        var order = document.querySelector("select[name='order']");
+        var method = document.querySelector("[name='method']:checked");
 
         document.getElementById("songs").innerHTML = "";
         songsLoader.addLoader();
 
-        localStorage.setItem("orderProperty", order);
-        songsLoader.orderProperty = order;
-        localStorage.setItem("orderMethod", method);
-        songsLoader.orderMethod = method;
+        localStorage.setItem("orderProperty", order.value);
+        songsLoader.orderProperty = order.value;
+        localStorage.setItem("orderMethod", method.value);
+        songsLoader.orderMethod = method.value;
 
-        songsLoader.loadGroup(JSON.parse(localStorage.getItem("songsJSON")), 0, songsLoader.INITIAL_LOAD, order, method);
+        songsLoader.updateSortIcons(order.options[order.selectedIndex].getAttribute("data-mode"));
+
+        songsLoader.loadGroup(JSON.parse(localStorage.getItem("songsJSON")), 0, songsLoader.INITIAL_LOAD, order.value, method.value);
     }
 
 
     if (localStorage.getItem("orderProperty")) {
-        songsLoader.orderProperty = localStorage.getItem("orderProperty")
-        document.querySelector("option[value='" + songsLoader.orderProperty + "']").setAttribute("selected", "selected");
+        songsLoader.orderProperty = localStorage.getItem("orderProperty");
+
+        var option = document.querySelector("option[value='" + songsLoader.orderProperty + "']");
+
+        option.setAttribute("selected", "selected");
+        songsLoader.updateSortIcons(option.getAttribute("data-mode"));
     }
 
     if (localStorage.getItem("orderMethod")) {
@@ -258,9 +288,11 @@ document.addEventListener("DOMContentLoaded", function() {
         document.querySelectorAll("[name='method']").forEach((element) => {
             if (element.getAttribute("value") == songsLoader.orderMethod) {
                 element.setAttribute("checked", "checked");
+
             } else {
                 element.removeAttribute("checked");
             }
+
         });
     }
 

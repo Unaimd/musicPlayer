@@ -225,6 +225,58 @@ body.light #audioplayer button {
     color: #333;
 }
 
+#audioplayer .sorting {
+    margin-top: 20px;
+}
+
+#audioplayer .sorting [name="order"] {
+    display: inline-block;
+    width: calc(100% - 40px - 40px);
+    height: 34px;
+    padding: 6px 12px;
+
+    color: #fff;
+    background-color: #333333;
+    border: 1px solid #fff;
+    border-radius: 4px;
+    box-shadow: inset 0px 1px 1px rgba(0, 0, 0, .075);
+}
+
+#audioplayer .sorting [name="order"]:focus {
+    outline: 0px;
+    border-color: #cccccc;
+    box-shadow:
+        inset 0px 1px 1px rgba(0, 0, 0, .075),
+        0px 0px 8px #cccccc;
+}
+
+#audioplayer .sorting [name="method"] {
+    display: none;
+}
+
+#audioplayer .sorting [name="method"] + label {
+    display: inline-block;
+    width: 34px;
+    height: 34px;
+    padding: 6px;
+    text-align: center;
+    cursor: pointer;
+}
+
+#audioplayer .sorting [name="method"] + label:hover {
+    border: 1px solid #fff;
+    border-radius: 4px;
+    box-shadow: inset 0px 1px 1px rgba(0, 0, 0, .075);
+}
+
+#audioplayer .sorting [name="method"]:checked + label {
+    color: #4caf50;
+
+    border: 1px solid #4caf50;
+    border-radius: 4px;
+    box-shadow: inset 0px 1px 1px rgba(0, 0, 0, .075);
+}
+
 /*
  * songs
  */

@@ -105,24 +105,26 @@
         <div class="clearfix"></div>
 
         <div class="sorting">
-            <br>
             <select name="order">
-                <option value="title" >Title</option>
-                <option value="artist">Artist</option>
-                <option value="album">Album</option>
-                <option value="moddate">Modify Date</option>
-                <option value="duration">Duration</option>
+                <option value="title" data-mode="alpha">Title</option>
+                <option value="artist" data-mode="alpha">Artist</option>
+                <option value="album" data-mode="alpha">Album</option>
+                <option value="moddate" data-mode="num">Modify Date</option>
+                <option value="duration" data-mode="num">Duration</option>
             </select>
-            <br>
 
-            <input type="radio" name="method" value="asc" checked id="ascendentSort">
+            <input type="radio" name="method" value="asc" id="ascendentSort" checked>
             <label for="ascendentSort">
-                Ascendent
+                <i class="fa fa-sort-alpha-asc" data-mode="alpha"></i>
+                <i class="fa fa-sort-numeric-asc" data-mode="num"></i>
+                <i class="fa fa-sort-asc hidden" data-mode="other"></i>
             </label>
 
             <input type="radio" name="method" value="desc" id="descencentSort">
             <label for="descencentSort">
-                Descendent
+                <i class="fa fa-sort-alpha-desc" data-mode="alpha"></i>
+                <i class="fa fa-sort-numeric-desc" data-mode="num"></i>
+                <i class="fa fa-sort-desc hidden" data-mode="other"></i>
             </label>
         </div>
     </div>
