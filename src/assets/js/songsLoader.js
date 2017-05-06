@@ -257,6 +257,7 @@ document.addEventListener("DOMContentLoaded", function() {
         if (!songs) {
             swal("No songs found", "Please select other folder", "info");
         } else {
+            document.getElementById("songs").innerHTML = "";
             songsLoader.loadGroup(songs, 0, songsLoader.INITIAL_LOAD);
 
             localStorage.setItem("songsJSON", JSON.stringify(songs));

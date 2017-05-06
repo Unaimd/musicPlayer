@@ -323,6 +323,7 @@ function getSongMetadata(file, callback) {
 
 function loadMusicFromDir(event, dir) {
     var cachedDir = __dirname + "/assets/metadata.json";
+    var mostRecentFileModdate = -1;
 
     var songs = new Array();
 
@@ -337,23 +338,43 @@ function loadMusicFromDir(event, dir) {
     if (fs.existsSync(dir)) {
 
         if (fs.existsSync(cachedDir)) {
+
             // send the selected audio folder
             event.sender.send("selAudioDir", dir);
 
             cachedJson = JSON.parse(fs.readFileSync(cachedDir));
 
             if (cachedJson.folder == dir) {
-                readFromJson(event, fs.readFileSync(cachedDir, {
-                    "encoding": "utf8"
-                }));
+                scanSongs(dir, (songs) => {
+                    songs.forEach((song, index) => {
 
-                return true;
+                        if (song.moddate > mostRecentFileModdate) {
+                            mostRecentFileModdate = song.moddate;
+                        }
+
+                        // execute on end
+                        if ((songs.length - 1) == index) {
+
+                            // json updated
+                            if (cachedJson.mostRecentFileModdate <= mostRecentFileModdate) {
+                                readFromJson(event, fs.readFileSync(cachedDir, {
+                                    "encoding": "utf8"
+                                }));
+
+                                return true;
+                            }
+
+                        }
+                    });
+                });
+
             }
         }
 
         // save songs metadata to json file
         var data = {};
         data.folder = dir;
+        data.mostRecentFileModdate = null;
         data.songs = new Array();
 
         scanSongs(dir, (songs) => {
@@ -362,17 +383,27 @@ function loadMusicFromDir(event, dir) {
                 event.sender.send("addSongs", false);
             }
 
-            songs.forEach((song) => {
+            songs.forEach((song, index) => {
                 data.songs.push(song);
+
+                if (song.moddate > mostRecentFileModdate) {
+                    mostRecentFileModdate = song.moddate;
+                }
+
+                // execute on end
+                if ((songs.length - 1) == index) {
+                    data.mostRecentFileModdate = song.moddate;
+
+                    fs.writeFileSync(cachedDir, JSON.stringify(data), {
+                        "encoding": "utf8"
+                    });
+
+                    readFromJson(event, fs.readFileSync(cachedDir, {
+                        "encoding": "utf8"
+                    }));
+                }
             });
 
-            fs.writeFileSync(cachedDir, JSON.stringify(data), {
-                "encoding": "utf8"
-            });
-
-            readFromJson(event, fs.readFileSync(cachedDir, {
-                "encoding": "utf8"
-            }));
         });
 
     }
