@@ -7,6 +7,7 @@ document.addEventListener("DOMContentLoaded", function() {
 var audioplayer = {
     name: "audioplayer",
     log: true,
+    windowDefaultTitle: null,
 
     elements: {
         player: null,
@@ -139,14 +140,23 @@ var audioplayer = {
     play: function() {
         if (!audioplayer.audio.object.src) {
             swal({
-                title: 'Error',
-                text: 'No hay ninguna canción seleccionada',
+                title: 'No song playing',
+                text: 'Select a song to play!',
                 type: 'error',
                 showConfirmButton: false,
                 timer: audioplayer.config.swalTimer
             });
             return;
         }
+
+        // update window title with songs info
+        console.log(window.document.title);
+        if (audioplayer.windowDefaultTitle === null) {
+            audioplayer.windowDefaultTitle = document.body.getAttribute("data-default-title");
+        }
+        var activeSong = document.querySelector("#songs .active");
+        // ─ = alt + 196
+        document.title = activeSong.querySelector(".title").innerHTML + " ─ " + activeSong.querySelector(".artist").innerHTML + " ── " + audioplayer.windowDefaultTitle;
 
         audioplayer.audio.object.volume = audioplayer.audio.volume / 100;
         audioplayer.audio.object.muted = audioplayer.audio.muted;
@@ -170,6 +180,7 @@ var audioplayer = {
         audioplayer.audio.object.pause();
 
         // set default document title
+        document.title = audioplayer.windowDefaultTitle;
 
         audioplayer.elements.buttons.pause.style.display = "none";
         audioplayer.elements.buttons.play.style.display = "inline-block";
