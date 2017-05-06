@@ -134,8 +134,16 @@ var songsLoader = {
         var path = songJSON.path;
 
         var title = songJSON.title;
-        if (typeof title === "undefined") {
-            title = "unknown title";
+        if (!title) {
+            while(path.indexOf("\\") > 0) {
+                path = path.replace("\\", "/");
+            }
+
+            var splPath = path.split("/");
+            filename = splPath[splPath.length - 1];
+
+            // take title from filename without extension
+            title = filename.replace("." + filename.split(".")[filename.split(".").length - 1], "");
         }
 
         var artist = songJSON.artist[0];
@@ -246,9 +254,13 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     ipcRenderer.on("addSongs", (event, songs) => {
-        songsLoader.loadGroup(songs, 0, songsLoader.INITIAL_LOAD);
+        if (!songs) {
+            swal("No songs found", "Please select other folder", "info");
+        } else {
+            songsLoader.loadGroup(songs, 0, songsLoader.INITIAL_LOAD);
 
-        localStorage.setItem("songsJSON", JSON.stringify(songs));
+            localStorage.setItem("songsJSON", JSON.stringify(songs));
+        }
     });
 
     document.querySelector("select[name='order']").addEventListener("change", order, false);

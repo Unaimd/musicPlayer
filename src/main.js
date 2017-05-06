@@ -357,6 +357,11 @@ function loadMusicFromDir(event, dir) {
         data.songs = new Array();
 
         scanSongs(dir, (songs) => {
+            // no songs found
+            if (songs.length == 0) {
+                event.sender.send("addSongs", false);
+            }
+
             songs.forEach((song) => {
                 data.songs.push(song);
             });
@@ -377,24 +382,38 @@ function loadMusicFromDir(event, dir) {
 
 function scanSongs(dir, callback) {
     var songs = new Array();
+    var totalSongs = 0;
     fs.readdir(dir, (error, files) => {
 
         files.forEach((file, index) => {
+            var filePath = path.resolve(dir, file);
 
-            var dotSplit = file.split(".");
-            if (dotSplit[dotSplit.length - 1].toUpperCase() == "MP3") {
-                var file = path.resolve(dir, file);
+            // directory
+            if (fs.lstatSync(filePath).isDirectory()) {
 
-                getSongMetadata(file, function(metadata) {
-                    songs.push(metadata);
+            // file
+            } else if (fs.lstatSync(filePath).isFile()) {
+                var dotSplit = file.split(".");
 
-                    // execute code on scanning last file
-                    if (files.length - index == 1) {
+                if (dotSplit[dotSplit.length - 1].toUpperCase() == "MP3") {
+                    totalSongs++;
+
+                    getSongMetadata(filePath, function(metadata) {
+                        songs.push(metadata);
+                    });
+                }
+            }
+
+            // execute code on scanning last file
+            if (files.length - index == 1) {
+                var interval = setInterval(() => {
+                    if (songs.length == totalSongs) {
                         if (typeof callback === "function") {
                             callback(songs);
                         }
+                        clearInterval(interval);
                     }
-                });
+                }, 10);
             }
 
         });
