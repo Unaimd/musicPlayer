@@ -257,7 +257,7 @@ function getSongMetadata(file, callback) {
             moddate: filemtime
         }
 
-        var path = __dirname + "/assets/img/albumArt/";
+        var imgPath = path.resolve(__dirname, "assets/img/albumArt/");
         var filename;
 
         if (metadata.album) {
@@ -272,30 +272,30 @@ function getSongMetadata(file, callback) {
 
             filename += "." + format;
 
-            resp.cover = path + filename;
+            resp.cover = path.resolve(imgPath, filename);
 
             // create directory where the images are stored
-            if (!fs.existsSync(path)) {
-                fs.mkdir(path, function(error) {
+            if (!fs.existsSync(imgPath)) {
+                fs.mkdir(imgPath, function(error) {
                     if (error) {
-                        console.log("error creating albums folder: " + path);
+                        console.log("error creating albums folder: " + imgPath);
                     }
                 });
             }
 
             // create image if not exists
-            if (!fs.existsSync(path + filename)) {
+            if (!fs.existsSync(imgPath + filename)) {
                 var base64buffer = new Buffer(image.data, "base64");
-                fs.writeFile(path + filename, base64buffer, function(error) {
+                fs.writeFile(path.resolve(imgPath, filename), base64buffer, function(error) {
                     if (error) {
-                        console.log("error creating album image: " + path + filename);
+                        console.log("error creating album image: " + path.resolve(imgPath, filename));
                     }
                 });
             }
 
         // search for cover in folder
-        } else if (fs.existsSync(path + filename + ".jpg")) {
-            resp.cover = path + filename + ".jpg";
+    } else if (fs.existsSync(path.resolve(imgPath, filename + ".jpg"))) {
+            resp.cover = path.resolve(imgPath, filename + ".jpg");
 
         }/* else {
             var albumQuery = resp.title;
