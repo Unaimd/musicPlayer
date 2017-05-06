@@ -237,6 +237,14 @@ var songsLoader = {
             }
 
         });
+    },
+    noSongsFound: function() {
+        document.getElementById("songs").querySelectorAll("[data-type='info']").forEach((element) => {
+            element.remove();
+        });
+
+        document.getElementById("songs").innerHTML = "<li data-type='info' style='text-align: center;'><i class='fa fa-exclamation-circle'></i>&nbsp;No songs found on the following path:<br><strong>" + localStorage.getItem("selAudioDir") + "</strong></li>";
+        swal("No songs found", "Please select other folder", "info");
     }
 };
 
@@ -255,7 +263,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
     ipcRenderer.on("addSongs", (event, songs) => {
         if (!songs) {
-            swal("No songs found", "Please select other folder", "info");
+            songsLoader.noSongsFound();
         } else {
             document.getElementById("songs").innerHTML = "";
             songsLoader.loadGroup(songs, 0, songsLoader.INITIAL_LOAD);

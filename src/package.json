@@ -4,7 +4,8 @@
 
     "main": "main.js",
 
-    "name": "musicPlayer",
+    "name": "musicplayer",
+    "productName": "musicPlayer",
     "description": "A music player",
 
     "dependencies": {
