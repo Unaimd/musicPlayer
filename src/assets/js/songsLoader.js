@@ -212,7 +212,7 @@ var songsLoader = {
         }
     },
     addLoader: function () {
-        document.getElementById("songs").innerHTML = "<li data-type='info' style='text-align: center;'>Scanning songs...<br><div class='loader'></div><small>If this remains too long songs couldn't be found</small></li>";
+        document.getElementById("songs").innerHTML = "<li data-type='info' style='text-align: center;'>Scanning songs...<br><div class='loader'></div></li>";
     },
     updateSortIcons: function(mode) {
         if (mode != "num" & mode != "alpha") {
