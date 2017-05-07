@@ -1,0 +1,80 @@
+#audioplayer .info img {
+    border: 1px solid #393939;
+    background-color: #262626;
+    box-shadow: 0px 0px 3px #fff;
+}
+
+#audioplayer .info .moreinfo .album::before {
+    background-color: #fff;
+}
+
+#audioplayer .timeline .range .input {
+    border-color: #fff;
+    background-color: #000;
+}
+
+#audioplayer button {
+    color: #fff;
+    border-color: #fff;
+}
+
+#audioplayer button[data-mode="one"]::after {
+    background-color: #fff;
+    color: #000;
+}
+
+#audioplayer button:active,
+#audioplayer button[name="random"][data-mode="active"],
+#audioplayer .sorting [name="method"]:checked + label {
+    background-color: #ccc;
+    color: #333;
+}
+
+#audioplayer .sorting [name="order"] {
+    color: #fff;
+    background-color: #333;
+    border-color: #fff;
+    box-shadow: inset 0px 1px 1px rgba(0, 0, 0, .075);
+}
+
+#audioplayer .sorting [name="order"]:focus {
+    border-color: #ccc;
+    box-shadow:
+        inset 0px 1px 1px rgba(0, 0, 0, .075),
+        0px 0px 8px #ccc;
+}
+
+#audioplayer .sorting [name="method"] + label:hover {
+    border-color: #fff;
+    box-shadow: inset 0px 1px 1px rgba(0, 0, 0, .075);
+}
+
+#audioplayer .sorting [name="method"]:checked + label {
+    border-color: #fff;
+}
+
+
+#songs li {
+    border-bottom-color: #fff;
+}
+
+#songs li:first-child {
+    border-top-color: #fff;
+}
+
+#songs li[data-type="audio"]:not(.active):hover {
+    background-color: #fff;
+    color: #000;
+}
+
+#songs li.active {
+    background-color: #747474;
+}
+
+#songs li .album::before {
+    background-color: #fff;
+}
+
+#songs li:hover:not(.active) .album::before {
+    background-color: #000;
+}

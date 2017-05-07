@@ -150,7 +150,6 @@ var audioplayer = {
         }
 
         // update window title with songs info
-        console.log(window.document.title);
         if (audioplayer.windowDefaultTitle === null) {
             audioplayer.windowDefaultTitle = document.body.getAttribute("data-default-title");
         }

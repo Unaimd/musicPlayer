@@ -15,12 +15,15 @@
 
     <link rel="stylesheet" href="./assets/lib/font-awesome/css/font-awesome.css">
     <!-- -->
+    <link rel="stylesheet" href="./assets/css/main.css">
     <link rel="stylesheet" href="./assets/css/ui.css">
 
     <link rel="stylesheet" href="./assets/css/utilities.css">
-    <link rel="stylesheet" href="./assets/css/main.css">
+    <link rel="stylesheet" href="./assets/css/player.css">
+    <link rel="stylesheet" href="./assets/css/player.dark.css">
 </head>
 <body class="dark" data-default-title="musicPlayer">
+
     <div id="titleBar">
         <img src="./assets/img/favicon.png" />
         <i class="fa fa-close" data-action="close"></i>
@@ -138,6 +141,15 @@
         </ul>
     </div>
 
+    <script type="text/javascript">
+        document.querySelector("#audioplayer img").addEventListener("dblclick", () => {
+            if (document.body.className == "dark") {
+                document.body.className = "light";
+            } else {
+                document.body.className = "dark";
+            }
+        }, false);
+    </script>
     <script src="./assets/js/ui.js"></script>
     <script src="./assets/js/Song.js"></script>
     <script src="./assets/js/audioplayer.js"></script>
