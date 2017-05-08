@@ -18,13 +18,8 @@
     margin-top: 30px;
     margin-bottom: 2.5%;
     padding: 3px;
+    border: 1px solid;
     border-radius: 5px;
-}
-
-body.light #audioplayer .info img {
-    border-color: #f0f0f0;
-    background-color: #e5e5e5;
-    box-shadow: 0px 0px 3px black;
 }
 
 #audioplayer .info .title {
@@ -54,10 +49,6 @@ body.light #audioplayer .info img {
     position: relative;
     top: -2.5px;
     left: 0px;
-}
-
-body.light #audioplayer .info .moreinfo .album::before {
-    background-color: black;
 }
 
 #audioplayer .timeline {
@@ -105,11 +96,6 @@ body.light #audioplayer .info .moreinfo .album::before {
     border: 1px solid;
 }
 
-body.light #audioplayer .timeline .range .input {
-    border: 1px solid black;
-    background-color: white;
-}
-
 #audioplayer button {
     cursor: pointer;
     width: 40px;
@@ -120,11 +106,6 @@ body.light #audioplayer .timeline .range .input {
     border-radius: 100%;
     transition: all .1s;
     border: 2px solid;
-}
-
-body.light #audioplayer button {
-    color: black;
-    border-color: black;
 }
 
 #audioplayer button[data-mode="one"]::after {
@@ -138,11 +119,6 @@ body.light #audioplayer button {
     font-size: .7em;
     border-radius: 100%;
     font-weight: bolder;
-}
-
-body.light #audioplayer button[data-mode="one"]::after {
-    background-color: black;
-    color: white;
 }
 
 #audioplayer button[name="volume"]:not([data-mode="mute"])::after {
@@ -175,20 +151,6 @@ body.light #audioplayer button[data-mode="one"]::after {
     border: 1px solid;
 }
 
-body.light #audioplayer .sorting [name="order"] {
-    color: #333333;
-    background-color: #fff;
-    border: 1px solid #333333;
-    box-shadow: inset 0px 1px 1px rgba(255, 255, 255, .075);
-}
-
-body.light #audioplayer .sorting [name="order"]:focus {
-    border-color: #333;
-    box-shadow:
-        inset 0px 1px 1px rgba(255, 255, 255, .075),
-        0px 0px 8px #333333;
-}
-
 #audioplayer .sorting [name="method"] {
     display: none;
 }
@@ -205,11 +167,6 @@ body.light #audioplayer .sorting [name="order"]:focus {
 #audioplayer .sorting [name="method"] + label:hover {
     border-radius: 4px;
     border: 1px solid;
-}
-
-body.light #audioplayer .sorting [name="method"]:not(:checked) + label:hover {
-    border: 1px solid #333;
-    box-shadow: inset 0px 1px 1px rgba(255, 255, 255, .075);
 }
 
 #audioplayer .sorting [name="method"]:checked + label {
@@ -236,30 +193,12 @@ body.light #audioplayer .sorting [name="method"]:not(:checked) + label:hover {
     transition: background .5s;
 }
 
-body.light #songs li {
-    border-bottom: 1px solid black;
-}
-
 #songs li:first-child {
     border-top: 1px solid;
 }
 
-body.light #songs li:first-child {
-    border-top: 1px solid black;
-}
-
 #songs li[data-type="audio"]:hover {
     cursor: pointer;
-}
-
-body.light #songs li[data-type="audio"]:not(.active):hover {
-    background-color: black;
-    color: white;
-}
-
-body.light #songs li.active {
-    background-color: #8b8b8b;
-    color: white;
 }
 
 #songs li img {
@@ -311,18 +250,6 @@ body.light #songs li.active {
     position: relative;
     top: -3px;
     margin: 0px 4px 0px 2px;
-}
-
-body.light #songs li .album::before {
-    background-color: black;
-}
-
-body.light #songs li.active .album::before {
-    background-color: white;
-}
-
-body.light #songs li:hover:not(.active) .album::before {
-    background-color: white;
 }
 
 #songs li .title {
