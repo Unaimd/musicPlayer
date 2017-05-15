@@ -1,5 +1,4 @@
 *.bat
 *.sh
 
-src/assets/img/albumArt/*
-src/assets/metadata.json
+src/node_modules/*
