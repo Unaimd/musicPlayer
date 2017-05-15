@@ -1,16 +1,31 @@
 {
-    "author": "alexbcberio",
-    "version": "0.1.0",
-
-    "main": "main.js",
-
     "name": "musicplayer",
     "productName": "musicPlayer",
+    "version": "1.0.0",
+    "main": "main.js",
+
+    "author": "alexbcberio",
     "description": "A music player",
 
+    "devDependencies": {
+        "electron": "^1.4.15",
+        "electron-builder": "^12.3.1"
+    },
+
     "dependencies": {
-        "electron": "1.4.15",
+        "electron-updater": "^1.4.2",
         "musicmetadata": "2.0.5",
         "curl": "0.1.4"
+    },
+    "build": {
+        "publish": [{
+            "provider": "github",
+            "owner": "alexbcberio",
+            "repo": "musicPlayer"
+        }],
+        "appId": "com.github.alexbcberio.musicPlayer",
+        "nsis": {
+            "perMachine": false
+        }
     }
 }

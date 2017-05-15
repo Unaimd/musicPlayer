@@ -291,7 +291,11 @@ document.addEventListener("DOMContentLoaded", function() {
 
         songsLoader.updateSortIcons(order.options[order.selectedIndex].getAttribute("data-mode"));
 
-        songsLoader.loadGroup(JSON.parse(localStorage.getItem("songsJSON")), 0, songsLoader.INITIAL_LOAD, order.value, method.value);
+        if (localStorage.getItem("songsJSON") !== null) {
+            songsLoader.loadGroup(JSON.parse(localStorage.getItem("songsJSON")), 0, songsLoader.INITIAL_LOAD, order.value, method.value);
+        } else {
+            songsLoader.noSongsFound();
+        }
     }
 
 

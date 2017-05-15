@@ -1,4 +1,6 @@
 # musicPlayer
+## Automatic updates available!
+
 The app reads all your MP3 files on a given directory (clicking on the top left image prompts a window to select a directory) taking the following metadata:
 * title
 * artist

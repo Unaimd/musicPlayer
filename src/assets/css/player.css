@@ -190,6 +190,10 @@
     min-height: 47px;
     padding: 5px;
     border-bottom: 1px solid;
+}
+
+#songs li,
+#songs li .album::before {
     transition: background .5s;
 }
 

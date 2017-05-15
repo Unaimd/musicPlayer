@@ -48,6 +48,6 @@ body.light {
     background-color: #fff;
 }
 
-body > :not(#titleBar) {
+body > :not(#titleBar):not(.sweet-overlay) {
     margin-top: 25px;
 }

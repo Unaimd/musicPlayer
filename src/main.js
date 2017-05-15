@@ -14,10 +14,14 @@ const fs = require('fs');
 const id3 = require('musicmetadata');
 const curl = require('curl');
 
+const {autoUpdater} = require("electron-updater");
+
 // window objects
 let win,
     preloadWin,
     optionsWin;
+
+let updateMsg
 
 app.on('ready', () => {
     preloadWin = new BrowserWindow({
@@ -76,16 +80,29 @@ app.on('ready', () => {
         event.preventDefault();
     });
 
-
     // hide preload and show main window
     win.once("ready-to-show", () => {
         preloadWin.close();
         win.show();
-    });
 
+        updateMsg = function(type, data) {
+            win.webContents.send("autoUpdater", {
+                type: type,
+                data: data
+            });
+            console.log(type + " " + data);
+        }
+
+        autoUpdater.checkForUpdates();
+    });
 
     // hotkeys
     win.webContents.on("did-finish-load", () => {
+        // toggle debugger
+        globalShortcut.register("cmdOrCtrl+F12", () => {
+            win.webContents.toggleDevTools();
+        });
+
         // show options
         globalShortcut.register("cmdOrCtrl+O", () => {
             optionsWin.show();
@@ -185,12 +202,44 @@ app.on('ready', () => {
         return;
     });
 
+    ipcMain.on("update", () => {
+        autoUpdater.quitAndInstall();
+    });
 });
+
+
 
 // Quit when all windows are closed.
 app.on('window-all-closed', () => {
     app.quit();
 });
+
+
+autoUpdater.on("checking-for-update", () => {
+    updateMsg("checking", "Checking for updates...");
+});
+
+autoUpdater.on("update-available", (event, info) => {
+    updateMsg("updateAvailable", "Update available");
+});
+
+autoUpdater.on("update-not-available", (event, info) => {
+    updateMsg("updateNotAvailable","Update not available");
+});
+
+autoUpdater.on("error", (event, error) => {
+    updateMsg("error", "Error in auto-updater:" + error);
+});
+
+autoUpdater.on("download-progress", (progressObj) => {
+    updateMsg("downloadProgress", progressObj);
+});
+
+autoUpdater.on("update-downloaded", (event, info) => {
+    updateMsg("updateDownloaded", null);
+});
+
+
 
 function selectFolder() {
     var dir = dialog.showOpenDialog({
@@ -257,7 +306,7 @@ function getSongMetadata(file, callback) {
             moddate: filemtime
         }
 
-        var imgPath = path.resolve(__dirname, "assets/img/albumArt/");
+        var imgPath = path.resolve("./albumArt/");
         var filename;
 
         if (metadata.album) {
@@ -276,9 +325,10 @@ function getSongMetadata(file, callback) {
 
             // create directory where the images are stored
             if (!fs.existsSync(imgPath)) {
+
                 fs.mkdir(imgPath, function(error) {
                     if (error) {
-                        console.log("error creating albums folder: " + imgPath);
+                        console.log("error creating albumart folder: " + imgPath);
                     }
                 });
             }
@@ -293,7 +343,7 @@ function getSongMetadata(file, callback) {
                 });
             }
 
-        // search for cover in folder
+    // search for cover in folder
     } else if (fs.existsSync(path.resolve(imgPath, filename + ".jpg"))) {
             resp.cover = path.resolve(imgPath, filename + ".jpg");
 
@@ -322,7 +372,7 @@ function getSongMetadata(file, callback) {
 }
 
 function loadMusicFromDir(event, dir) {
-    var cachedDir = __dirname + "/assets/metadata.json";
+    var cachedDir = "./metadata.json";
     var mostRecentFileModdate = -1;
 
     var songs = new Array();
