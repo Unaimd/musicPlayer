@@ -3,3 +3,6 @@
 
 src/node_modules/*
 src/dist/*
+
+albumArt/*
+metadata.json
