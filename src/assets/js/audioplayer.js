@@ -90,7 +90,7 @@ var audioplayer = {
         audioplayer.stop();
 
         try {
-            document.querySelector("[data-type='audio'].active").className = document.querySelector("[data-type='audio'].active").className.replace(" active", "");
+            document.querySelector("[data-type='audio'].active").className = document.querySelector("[data-type='audio'].active").className.replace("active", "");
         } catch (error) {
             // no element was active
         }
