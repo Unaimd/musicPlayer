@@ -24,8 +24,17 @@
             "repo": "musicPlayer"
         }],
         "appId": "com.github.alexbcberio.musicPlayer",
+
+        "win": {
+            "target": ["nsis", "7z"]
+        },
         "nsis": {
+            "oneClick": true,
             "perMachine": false
+        },
+
+        "linux": {
+            "target": ["deb", "rpm", "pacman", "7z"]
         }
     }
 }

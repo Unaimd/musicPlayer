@@ -5,21 +5,41 @@
     padding-bottom: 20px;
 }
 
-#audioplayer .info {
-    display: block;
+#audioplayer .albumArt {
+    position: relative;
     width: 100%;
+    padding-bottom: calc(50vh + 5px);
+    margin-top: 3px;
+    margin-bottom: 15px;
 }
 
-#audioplayer .info img {
+#audioplayer .albumArt img {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
     display: block;
-    width: 90%;
-    max-width: 740px;
-    margin: auto;
-    margin-top: 30px;
-    margin-bottom: 2.5%;
+    max-width: 100%;
+    max-height: calc(100vh - 250px);
+    margin: 7px auto;
     padding: 3px;
     border: 1px solid;
     border-radius: 5px;
+}
+
+#audioplayer .info {
+    display: block;
+    width: 100%;
+    height: calc(50vh - 68px);
+    position: relative;
+}
+
+#audioplayer .info > * {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
 }
 
 #audioplayer .info .title {
@@ -28,8 +48,11 @@
     text-align: center;
 }
 
+#audioplayer .info .title,
 #audioplayer .info .moreinfo {
-    text-transform: capitalize;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
 
 #audioplayer .info .moreinfo {
@@ -38,6 +61,7 @@
     margin: auto;
     margin-top: 5px;
     margin-bottom: 5px;
+    text-transform: capitalize;
 }
 
 #audioplayer .info .moreinfo .album::before {

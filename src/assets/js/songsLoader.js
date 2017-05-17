@@ -214,6 +214,30 @@ var songsLoader = {
     addLoader: function () {
         document.getElementById("songs").innerHTML = "<li data-type='info' style='text-align: center;'>Scanning songs...<br><div class='loader'></div></li>";
     },
+    order: function() {
+        var order = document.querySelector("select[name='order']");
+        var method = document.querySelector("[name='method']:checked");
+        var active;
+
+        if (document.querySelector("#songs .active")) {
+            active = document.querySelector("#songs .active").getAttribute("data-moddate");
+        }
+        songsLoader.addLoader();
+
+        localStorage.setItem("orderProperty", order.value);
+        songsLoader.orderProperty = order.value;
+        localStorage.setItem("orderMethod", method.value);
+        songsLoader.orderMethod = method.value;
+
+        songsLoader.updateSortIcons(order.options[order.selectedIndex].getAttribute("data-mode"));
+
+        if (localStorage.getItem("songsJSON") !== null) {
+            songsLoader.loadGroup(JSON.parse(localStorage.getItem("songsJSON")), 0, songsLoader.INITIAL_LOAD, order.value, method.value);
+            document.querySelector("#songs [data-moddate='" + active + "']").className = "active";
+        } else {
+            songsLoader.noSongsFound();
+        }
+    },
     updateSortIcons: function(mode) {
         if (mode != "num" & mode != "alpha") {
             mode = "other";
@@ -272,32 +296,10 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     });
 
-    document.querySelector("select[name='order']").addEventListener("change", order, false);
+    document.querySelector("select[name='order']").addEventListener("change", songsLoader.order, false);
     document.querySelectorAll("input[name='method']").forEach((element) => {
-        element.addEventListener("change", order, false);
+        element.addEventListener("change", songsLoader.order, false);
     });
-
-    function order() {
-        var order = document.querySelector("select[name='order']");
-        var method = document.querySelector("[name='method']:checked");
-
-        document.getElementById("songs").innerHTML = "";
-        songsLoader.addLoader();
-
-        localStorage.setItem("orderProperty", order.value);
-        songsLoader.orderProperty = order.value;
-        localStorage.setItem("orderMethod", method.value);
-        songsLoader.orderMethod = method.value;
-
-        songsLoader.updateSortIcons(order.options[order.selectedIndex].getAttribute("data-mode"));
-
-        if (localStorage.getItem("songsJSON") !== null) {
-            songsLoader.loadGroup(JSON.parse(localStorage.getItem("songsJSON")), 0, songsLoader.INITIAL_LOAD, order.value, method.value);
-        } else {
-            songsLoader.noSongsFound();
-        }
-    }
-
 
     if (localStorage.getItem("orderProperty")) {
         songsLoader.orderProperty = localStorage.getItem("orderProperty");
