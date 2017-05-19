@@ -1,0 +1,23 @@
+# v1.1.0 (working on it)
+
+Custom album art images, can be saved on the albumArt folder. On the case of matching more the first one will be used:
+
+albumArt/artist/title.jpg
+albumArt/artist/album.jpg
+albumArt/artist.jpg
+albumArt/title.jpg
+albumArt/album.jpg
+
+Secondary click over a song to show some options:
+ - Add to favourites (not wet implemented)
+ - Change album art (not yet implemented)
+ - Show app options (not yet implemented)
+
+GUI changes:
+ - Controls are bottom aligned
+ - Bigger album art image! Won't be scaled up
+ - Dark and light themes
+
+# v1.0.0
+
+First complete release with automatic updates
