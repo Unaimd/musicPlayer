@@ -1,7 +1,7 @@
 {
     "name": "musicplayer",
     "productName": "musicPlayer",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "main": "main.js",
 
     "author": "alexbcberio",
@@ -18,6 +18,7 @@
         "curl": "0.1.4"
     },
     "build": {
+        "AasarUnpack": "assets #folder to not compile into asar file",
         "publish": [{
             "provider": "github",
             "owner": "alexbcberio",
