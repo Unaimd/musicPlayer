@@ -38,12 +38,12 @@ body {
     font-size: 14px;
 }
 
-body.dark {
+body[data-theme="dark"] {
     color: #fff;
     background-color: #333;
 }
 
-body.light {
+body[data-theme="light"] {
     color: #333;
     background-color: #fff;
 }
