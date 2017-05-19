@@ -22,11 +22,11 @@
     border-radius: 3px;
 }
 
-body[data-theme="dark"] #titlaBar img {
+body[data-theme="dark"] #titleBar img {
     border-color: white;
 }
 
-body[data-theme="light"] #titlaBar img {
+body[data-theme="light"] #titleBar img {
     border-color: black;
 }
 
@@ -49,4 +49,62 @@ body[data-theme="dark"] #titleBar i:not([data-action="close"]):hover {
 
 body[data-theme="light"] #titleBar i:not([data-action="close"]):hover {
     background-color: rgba(0, 0, 0, 0.2);
+}
+
+
+#contextMenu {
+    position: absolute;
+    z-index: 1;
+    display: none;
+    min-width: 200px;
+    max-width: 25%;
+    height: auto;
+    max-height: 25vh;
+    border: 2px solid #2f2f2f;
+    border-radius: 5px;
+    background-color: #9a9a9a;
+    margin-top: 0px !important;
+}
+
+#contextMenu ul {
+    list-style: none;
+    padding-left: 0px;
+    margin: 0px;
+}
+
+#contextMenu > ul li {
+    display: inline-block;
+    width: 100%;
+    line-height: 25px;
+    cursor: pointer;
+    padding: 2px 5px;
+}
+
+#contextMenu > ul li.separator {
+    display: block;
+    margin-bottom: 5px;
+    cursor: default;
+    border-bottom: 1px solid white;
+}
+
+#contextMenu > ul li:not(.separator):hover {
+    background-color: #454545;
+    color: white;
+}
+
+#contextMenu > ul > li:first-child {
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+}
+
+#contextMenu > ul > li:last-child {
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+}
+
+body[data-theme="dark"] #contextMenu i.fa-moon-o {
+    display: none;
+}
+body[data-theme="light"] #contextMenu i.fa-sun-o {
+    display: none;
 }
