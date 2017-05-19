@@ -20,9 +20,9 @@
 
     <link rel="stylesheet" href="./assets/css/utilities.css">
     <link rel="stylesheet" href="./assets/css/player.css">
-    <link rel="stylesheet" href="./assets/css/player.dark.css">
+    <link rel="stylesheet" href="./assets/css/themes/dark/player.css">
 </head>
-<body class="dark" data-default-title="musicPlayer">
+<body data-theme="dark" data-default-title="musicPlayer">
 
     <div id="titleBar">
         <img src="./assets/img/favicon.png" />
@@ -130,6 +130,85 @@
                 </div>
             </div>
         </div>
+    </div>
+
+    <style media="screen">
+        #contextMenu {
+            position: absolute;
+            z-index: 1;
+            display: none;
+            min-width: 200px;
+            max-width: 25%;
+            height: auto;
+            max-height: 25vh;
+            border: 2px solid #2f2f2f;
+            border-radius: 5px;
+            background-color: #9a9a9a;
+            margin-top: 0px !important;
+        }
+
+        #contextMenu ul {
+            list-style: none;
+            padding-left: 0px;
+            margin: 0px;
+        }
+
+        #contextMenu > ul li {
+            display: inline-block;
+            width: 100%;
+            line-height: 25px;
+            cursor: pointer;
+            padding: 2px 5px;
+        }
+
+        #contextMenu > ul li.separator {
+            display: block;
+            margin-bottom: 5px;
+            cursor: default;
+            border-bottom: 1px solid white;
+        }
+
+        #contextMenu > ul li:not(.separator):hover {
+            background-color: #454545;
+            color: white;
+        }
+
+        #contextMenu > ul > li:first-child {
+            border-top-left-radius: 5px;
+            border-top-right-radius: 5px;
+        }
+
+        #contextMenu > ul > li:last-child {
+            border-bottom-left-radius: 5px;
+            border-bottom-right-radius: 5px;
+        }
+
+        body[data-theme="dark"] i.fa-moon-o {
+            display: none;
+        }
+        body[data-theme="light"] i.fa-sun-o {
+            display: none;
+        }
+    </style>
+    <div id="contextMenu">
+        <ul>
+            <li data-target="toggle-favourite">
+                <i class="fa fa-star"></i>&nbsp;Add to Favourites
+            </li>
+            <li data-target="change-albumart">
+                <i class="fa fa-picture-o"></i>&nbsp;Change albumart
+            </li>
+            <li class="separator"></li>
+            <li data-target="toggle-theme">
+                <i class="fa fa-sun-o"></i>
+                <i class="fa fa-moon-o"></i>
+                Toggle Theme
+            </li>
+            <li class="separator"></li>
+            <li data-target="settings">
+                <i class="fa fa-cog"></i>&nbsp;Settings
+            </li>
+        </ul>
     </div>
 
     <div class="content">
