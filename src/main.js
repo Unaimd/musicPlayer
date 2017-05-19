@@ -296,45 +296,75 @@ function getSongMetadata(file, callback) {
     var readableStream = fs.createReadStream(file);
     var parser = id3(readableStream, {duration: true}, function (err, metadata) {
 
-        resp = {
-            path: file,
-            title: metadata.title,
-            artist: metadata.artist,
-            album: metadata.album,
-            duration: metadata.duration,
-            cover: undefined,
-            moddate: filemtime
+        albumArt(file, (coverPath) => {
+            resp = {
+                path: file,
+                title: metadata.title,
+                artist: metadata.artist,
+                album: metadata.album,
+                duration: metadata.duration,
+                cover: coverPath,
+                moddate: filemtime
+            }
+
+            readableStream.close();
+
+            if (typeof callback === "function") {
+                callback(resp);
+            }
+        });
+
+    });
+}
+
+function albumArt(file, callback) {
+    var imgPath = path.resolve("./albumArt/");
+    var filename = undefined;
+
+    if (!fs.existsSync(imgPath)) {
+        fs.mkdir(imgPath, function(error) {
+            if (error) {
+                console.log("error creating albumArt folder: " + imgPath);
+            }
+        });
+    }
+
+    var stream = fs.createReadStream(file);
+    var parser = id3(stream, (error, meta) => {
+
+        var metadata = {
+            title: meta.title,
+            artist: meta.artist[0],
+            album: meta.album
         }
 
-        var imgPath = path.resolve("./albumArt/");
-        var filename;
-
-        if (metadata.album) {
-            filename = metadata.album;
-        } else {
-            filename = metadata.title;
-        }
-
-        if (typeof metadata.picture[0] !== "undefined") {
-            var image = metadata.picture[0];
+        if (meta.picture[0]) {
+            var image = meta.picture[0];
             var format = image.format;
+
+            if (metadata.album) {
+                filename = metadata.album;
+
+                if (metadata.artist) {
+                    imgPath = path.resolve(imgPath, metadata.artist);
+                }
+
+            } else {
+                filename = metadata.title;
+            }
 
             filename += "." + format;
 
-            resp.cover = path.resolve(imgPath, filename);
-
-            // create directory where the images are stored
             if (!fs.existsSync(imgPath)) {
 
                 fs.mkdir(imgPath, function(error) {
                     if (error) {
-                        console.log("error creating albumart folder: " + imgPath);
+                        console.log("error creating artist folder: " + imgPath);
                     }
                 });
             }
 
-            // create image if not exists
-            if (!fs.existsSync(imgPath + filename)) {
+            if (!fs.existsSync(path.resolve(imgPath, filename))) {
                 var base64buffer = new Buffer(image.data, "base64");
                 fs.writeFile(path.resolve(imgPath, filename), base64buffer, function(error) {
                     if (error) {
@@ -343,32 +373,58 @@ function getSongMetadata(file, callback) {
                 });
             }
 
-    // search for cover in folder
-    } else if (fs.existsSync(path.resolve(imgPath, filename + ".jpg"))) {
-            resp.cover = path.resolve(imgPath, filename + ".jpg");
+            imgPath = path.resolve(imgPath, filename);
 
-        }/* else {
-            var albumQuery = resp.title;
+        // artist/title.jpg
+        } else if (metadata.artist && metadata.title && fs.existsSync(path.resolve(imgPath, metadata.artist, metadata.title + ".jpg"))) {
+                imgPath = path.resolve(imgPath, metadata.artist, metadata.title + ".jpg");
 
-            curl.get("https://itunes.apple.com/search?country=US&entity=album&term=" + albumQuery, {}, (error, response) => {
-                if (error) {
-                    console.log(error);
-                } else {
-                    var json = JSON.parse(response.body);
+        // artist/album.jpg
+        } else if (metadata.artist && metadata.album && fs.existsSync(path.resolve(imgPath, metadata.artist, metadata.album + ".jpg"))) {
+            imgPath = path.resolve(imgPath, metadata.artist, metadata.album + ".jpg");
 
-                    if (json.resultCount > 0) {
-                        resp.cover = json.results[0].artworkUrl100.replace("100x100", "512x512");
-                    }
-                }
-            });
-        }*/
+        // artist.jpg
+        } else if (metadata.artist && fs.existsSync(path.resolve(imgPath, metadata.artist + ".jpg"))) {
+            imgPath = path.resolve(imgPath, metadata.artist + ".jpg");
 
-        readableStream.close();
+        // title.jpg
+        } else if ( metadata.title && fs.existsSync(path.resolve(imgPath, metadata.title + ".jpg"))) {
+            imgPath = path.resolve(imgPath, metadata.title + ".jpg");
+
+        // album.jpg
+        } else if (metadata.album && fs.existsSync(path.resolve(imgPath, metadata.album + ".jpg"))) {
+            imgPath = path.resolve(imgPath, metadata.album + ".jpg");
+
+        // default
+        } else {
+            imgPath = undefined;
+        }
 
         if (typeof callback === "function") {
-            callback(resp);
+            callback(imgPath);
         }
+
+        stream.close();
     });
+
+    /********************************************************
+
+    // iTunes API albumart query
+    var albumQuery = resp.title;
+
+    curl.get("https://itunes.apple.com/search?country=US&entity=album&term=" + albumQuery, {}, (error, response) => {
+
+    if (error) {
+        console.log(error);
+    } else {
+        var json = JSON.parse(response.body);
+
+        if (json.resultCount > 0) {
+            resp.cover = json.results[0].artworkUrl100.replace("100x100", "512x512");
+        }
+    }
+
+    ********************************************************/
 }
 
 function loadMusicFromDir(event, dir) {
