@@ -160,7 +160,7 @@ var songsLoader = {
         var moddate = songJSON.moddate;
         var cover = null;
 
-        if (typeof songJSON.cover != "undefined") {
+        if (songJSON.cover) {
             cover = songJSON.cover;
         } else {
             cover = "./assets/img/default.jpg";
