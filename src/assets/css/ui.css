@@ -22,11 +22,11 @@
     border-radius: 3px;
 }
 
-body.dark #titlaBar img {
+body[data-theme="dark"] #titlaBar img {
     border-color: white;
 }
 
-body.light #titlaBar img {
+body[data-theme="light"] #titlaBar img {
     border-color: black;
 }
 
@@ -43,10 +43,10 @@ body.light #titlaBar img {
     background-color: rgba(255, 49, 49, 0.7);
 }
 
-body.dark #titleBar i:not([data-action="close"]):hover {
+body[data-theme="dark"] #titleBar i:not([data-action="close"]):hover {
     background-color: rgba(255, 255, 255, 0.2);
 }
 
-body.light #titleBar i:not([data-action="close"]):hover {
+body[data-theme="light"] #titleBar i:not([data-action="close"]):hover {
     background-color: rgba(0, 0, 0, 0.2);
 }
