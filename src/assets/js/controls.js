@@ -13,8 +13,49 @@ if (typeof audioplayer === "undefined") {
         song.className = song.className.replace("  ", " ");
 
         song.addEventListener("click", play, false);
-        song.addEventListener("contextmenu", contextMenu, false);
+        song.addEventListener("contextmenu", showContextMenu, false);
     }
+
+    document.querySelector("*:not(#contextMenu)").addEventListener("click", hideContextMenu, false);
+    document.querySelectorAll("#contextMenu li").forEach((element) => {
+        element.addEventListener("click", () => {
+
+            switch (element.getAttribute("data-target")) {
+                case "toggle-theme":
+
+                    var styles = document.head.querySelectorAll("[href$='.css']");
+
+                    if (document.body.getAttribute("data-theme") == "dark") {
+                        document.body.setAttribute("data-theme", "light");
+
+                        styles.forEach((element) => {
+                            if (element.getAttribute("href").indexOf("/dark/") > 0) {
+                                element.setAttribute("href", element.getAttribute("href").replace("/dark/", "/light/"));
+                            }
+                        });
+
+                    } else if(document.body.getAttribute("data-theme") == "light") {
+                        document.body.setAttribute("data-theme", "dark");
+
+                        styles.forEach((element) => {
+                            if (element.getAttribute("href").indexOf("/light/") > 0) {
+                                element.setAttribute("href", element.getAttribute("href").replace("/light/", "/dark/"));
+                            }
+                        });
+
+                    }
+                    break;
+
+                default:
+                    swal({
+                        title: "WIP, selected:",
+                        text: element.getAttribute("data-target"),
+                        html: true,
+                        timer: 750
+                    });
+                }
+        }, false);
+    });
 
     function play() {
         var song = new Song(this, this.getAttribute("data-path"), {
@@ -28,8 +69,19 @@ if (typeof audioplayer === "undefined") {
         audioplayer.newSong(song);
     }
 
-    function contextMenu() {
-        swal(this.querySelector(".title").innerHTML, this.querySelector(".artist").innerHTML);
+    function hideContextMenu() {
+        document.getElementById("contextMenu").style.display = "none";
+    }
+
+    function showContextMenu(e) {
+        var posX = e.clientX;
+        var posY = e.clientY;
+
+        document.getElementById("contextMenu").style.display = "block";
+        document.getElementById("contextMenu").style.left = posX + "px";
+        document.getElementById("contextMenu").style.top = posY + "px";
+
+        e.preventDefault();
     }
 
     function clickPercent(element, e) {
