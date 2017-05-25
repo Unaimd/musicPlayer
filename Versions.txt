@@ -18,6 +18,7 @@ GUI changes:
  - Controls are bottom aligned
  - Bigger album art image! Won't be scaled up
  - Dark and light themes
+ - Volume can be graphically changed, press with the left click on the volume icon or with the right one to mute
 
 Debugger:
  - Use ctrl + shift + I to toggle the developer tools
