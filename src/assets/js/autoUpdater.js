@@ -17,7 +17,11 @@ var autoUpdater = {
         var transferred = progressObj.transferred;
         var total = progressObj.total;
 
-        swal("Downloading new update", "status: " + Math.round(percent) + "% downloaded");
+        swal({
+            title: "Downloading new update...",
+            text: "status: " + Math.round(percent) + "% downloaded",
+            showConfirmButton: false
+        });
     },
     updateDownloaded: () => {
         swal({
