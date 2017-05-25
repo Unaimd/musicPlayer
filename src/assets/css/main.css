@@ -51,3 +51,7 @@ body[data-theme="light"] {
 body > :not(#titleBar):not(.sweet-overlay) {
     margin-top: 25px;
 }
+
+body.no-transition {
+    transition: none !important;
+}
