@@ -162,6 +162,48 @@
     color: #333;
 }
 
+#audioplayer input[type=range] {
+    position: absolute;
+    top: 10px;
+    left: 253px;
+    transform: rotate(270deg);
+    display: none;
+
+    -webkit-appearance: none;
+    margin: 18px 0;
+    width: 110px;
+}
+
+#audioplayer input[type=range]:focus {
+    outline: none;
+}
+
+#audioplayer input[type=range]::-webkit-slider-runnable-track {
+    width: 100%;
+    height: 10px;
+    cursor: pointer;
+    box-shadow:
+        1px 1px 1px #000000,
+        0px 0px 1px #0d0d0d;
+    background: #cccccc;
+    border-radius: 5px;
+    border: 0.2px solid #010101;
+}
+
+#audioplayer input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    box-shadow:
+        1px 1px 1px #000000,
+        0px 0px 1px #0d0d0d;
+    border: 1px solid #000000;
+    height: 20px;
+    width: 20px;
+    border-radius: 10px;
+    background: #ffffff;
+    cursor: pointer;
+    margin-top: -6px;
+}
+
 #audioplayer .sorting {
     margin-top: 20px;
 }
