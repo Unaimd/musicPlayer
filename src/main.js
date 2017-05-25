@@ -98,16 +98,6 @@ app.on('ready', () => {
 
     // hotkeys
     win.webContents.on("did-finish-load", () => {
-        // toggle debugger
-        globalShortcut.register("cmdOrCtrl+F12", () => {
-            win.webContents.toggleDevTools();
-        });
-
-        // show options
-        globalShortcut.register("cmdOrCtrl+O", () => {
-            optionsWin.show();
-        });
-
         // volume up
         globalShortcut.register("volumeUp", () => {
             win.webContents.send("keyPress", "volumeUp");
@@ -195,6 +185,15 @@ app.on('ready', () => {
         }
 
         event.returnValue = "ok";
+    });
+
+    // toggle debugger
+    ipcMain.on("toggleDevTools", () => {
+        win.webContents.toggleDevTools();
+    });
+
+    ipcMain.on("showOptions", () => {
+        optionsWin.show();
     });
 
     ipcMain.on("loadAudioFromDir", (event, dir) => {
