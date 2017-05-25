@@ -1,5 +1,3 @@
-const {ipcRenderer} = require("electron");
-
 document.addEventListener("DOMContentLoaded", function() {
 
     // titlebar elements
@@ -10,7 +8,7 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 
     document.querySelector("#titleBar img").addEventListener("click", function() {
-        if (ipcRenderer.sendSync("titleBar", "loadFolder")) {
+        if (ipcRenderer.send("titleBar", "loadFolder")) {
             while (document.querySelectorAll("#songs [data-type='audio']").length > 0) {
                 document.querySelector("#songs [data-type='audio']").remove();
             }
