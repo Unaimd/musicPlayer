@@ -49,11 +49,11 @@ function Hotkey(shortcut, callback) {
     });
 }
 
-Hotkey.prototype.destroy = function() {
+Hotkey.prototype.destroy = () => {
     this.callback = () => {};
 }
 
-Hotkey.prototype.toString = function() {
+Hotkey.prototype.toString = () => {
     var hotkey = "";
 
     this.getShortcutKeys().forEach((key, index) => {
@@ -66,7 +66,7 @@ Hotkey.prototype.toString = function() {
     return hotkey;
 }
 
-Hotkey.prototype.getShortcutKeys = function() {
+Hotkey.prototype.getShortcutKeys = () => {
     var keys = new Array();
     if (this.ctrlKey) {
         keys.push("ctrl");
@@ -86,7 +86,7 @@ Hotkey.prototype.getShortcutKeys = function() {
     return keys;
 }
 
-Hotkey.prototype.keyUp = function() {
+Hotkey.prototype.keyUp = () => {
     this.pressingKeys = new Array();
 }
 

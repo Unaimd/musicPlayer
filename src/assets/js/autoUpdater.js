@@ -1,17 +1,17 @@
 var autoUpdater = {
-    checking: function() {
+    checking: () => {
         console.info("autoUpdater: searching for updates");
     },
-    updateAvailable: function() {
+    updateAvailable: () => {
         console.info("autoUpdater: newer update was found");
     },
-    updateNotAvailable: function() {
+    updateNotAvailable: () => {
         console.info("autoUpdater: newer update was not found");
     },
-    error: function(error) {
+    error: (error) => {
         console.error("autoUpdater: " + erorr);
     },
-    downloadProgress: function(progressObj) {
+    downloadProgress: (progressObj) => {
         var bytesPerSecond = progressObj.bytesPerSecond;
         var percent = progressObj.percent;
         var transferred = progressObj.transferred;
@@ -19,7 +19,7 @@ var autoUpdater = {
 
         swal("Downloading new update", "status: " + Math.round(percent) + "% downloaded");
     },
-    updateDownloaded: function() {
+    updateDownloaded: () => {
         swal({
             title: "New update was downloaded",
             text: "Would you like to install it now?",
@@ -29,11 +29,11 @@ var autoUpdater = {
             showCancelButton: true,
             cancelButtonText: "No"
 
-        }, function() {
+        }, () => {
             autoUpdater.quitAndInstall();
         });
     },
-    quitAndInstall: function() {
+    quitAndInstall: () => {
         ipcRenderer.send("update");
     }
 };

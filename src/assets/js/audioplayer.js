@@ -1,4 +1,4 @@
-document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", () => {
     initVariables();
 
     window.addEventListener("variablesLoaded", audioplayer.loadFromLocalStorage(), false);
@@ -37,7 +37,8 @@ var audioplayer = {
             volumeIndicator: null,
             volumeUp: null,
             volumeDown: null,
-            volumeMute: null
+            volumeMute: null,
+            volumeRange: null
         },
         timeline: {
             timeline: null,
@@ -63,7 +64,7 @@ var audioplayer = {
         restartOnLast: true
     },
 
-    newSong: function(song) {
+    newSong: (song) => {
         if (song instanceof Song) {
             var path = song.path;
             var title = song.title;
@@ -137,7 +138,7 @@ var audioplayer = {
         }
 
     },
-    play: function() {
+    play: () => {
         if (!audioplayer.audio.object.src) {
             swal({
                 title: 'No song playing',
@@ -161,7 +162,7 @@ var audioplayer = {
         audioplayer.audio.object.muted = audioplayer.audio.muted;
 
         audioplayer.audio.object.play();
-        audioplayer.audio.object.addEventListener("ended", function() {
+        audioplayer.audio.object.addEventListener("ended", () => {
             audioplayer.onended();
         }, false);
 
@@ -175,7 +176,7 @@ var audioplayer = {
         audioplayer.elements.buttons.pause.style.display = "inline-block";
 
     },
-    pause: function() {
+    pause: () => {
         audioplayer.audio.object.pause();
 
         // set default document title
@@ -184,12 +185,12 @@ var audioplayer = {
         audioplayer.elements.buttons.pause.style.display = "none";
         audioplayer.elements.buttons.play.style.display = "inline-block";
     },
-    stop: function() {
+    stop: () => {
         audioplayer.pause();
         audioplayer.audio.object.currentTime = 0;
         audioplayer.elements.timeline.input.style.marginLeft = "0px";
     },
-    nextSong: function() {
+    nextSong: () => {
         var active = document.querySelector("#songs .active");
         var next = null;
         if (!active) {
@@ -220,7 +221,7 @@ var audioplayer = {
 
             } else if (audioplayer.config.restartOnLast) {
                 var songs = document.querySelectorAll("#songs [data-type='audio'][data-random-played='true']");
-                songs.forEach(function(song) {
+                songs.forEach((song) => {
                     song.setAttribute("data-random-played", false);
                 });
 
@@ -243,7 +244,7 @@ var audioplayer = {
             audioplayer.newSong(next);
         }
     },
-    previousSong: function() {
+    previousSong: () => {
         var firstSong = document.querySelector("#songs [data-type='audio']");
         var active = document.querySelector("#songs .active");
         if (!active) {
@@ -273,7 +274,7 @@ var audioplayer = {
         previous.parse();
         audioplayer.newSong(previous);
     },
-    repeat: function(repeat) {
+    repeat: (repeat) => {
         var mode = repeat.getAttribute("data-mode");
         var button;
 
@@ -298,53 +299,43 @@ var audioplayer = {
         localStorage.audioRepeat = mode;
         button.style.display = "inline-block";
     },
-    volumeUp: function() {
+    setVolume: (newVolume) => {
+        newVolume = parseInt(newVolume);
+        if (newVolume > 100 || newVolume < 0) {
+            throw new Error("Invalid volume value must be 0-100 range");
+            return;
+        }
+
+        audioplayer.audio.object.volume = newVolume / 100;
+        audioplayer.audio.volume = newVolume;
+
+        for (var i=0; i < audioplayer.elements.buttons.volumeIndicator.length; i++) {
+            audioplayer.elements.buttons.volumeIndicator[i].setAttribute("data-volume", audioplayer.audio.volume);
+        }
+
+        if (audioplayer.audio.volume >= audioplayer.audio.volumeUpValue && audioplayer.audio.muted == false) {
+            audioplayer.elements.buttons.volumeUp.style.display = "inline-block";
+            audioplayer.elements.buttons.volumeDown.style.display = "none";
+
+        } else if (audioplayer.audio.volume < audioplayer.audio.volumeUpValue && audioplayer.audio.muted == false) {
+            audioplayer.elements.buttons.volumeDown.style.display = "inline-block";
+            audioplayer.elements.buttons.volumeUp.style.display = "none";
+        }
+
+        audioplayer.elements.buttons.volumeRange.value = audioplayer.audio.volume;
+        localStorage.audioVolume = audioplayer.audio.volume;
+    },
+    volumeUp: () => {
         if (audioplayer.audio.volume < 100) {
-            var newVolume = audioplayer.audio.volume + 2;
-
-            audioplayer.audio.object.volume = newVolume / 100;
-            audioplayer.audio.volume = newVolume;
-
-            for (var i=0; i < audioplayer.elements.buttons.volumeIndicator.length; i++) {
-                audioplayer.elements.buttons.volumeIndicator[i].setAttribute("data-volume", audioplayer.audio.volume);
-            }
-
-            if (audioplayer.audio.volume >= audioplayer.audio.volumeUpValue && audioplayer.audio.muted == false) {
-                audioplayer.elements.buttons.volumeUp.style.display = "inline-block";
-                audioplayer.elements.buttons.volumeDown.style.display = "none";
-
-            } else if (audioplayer.audio.volume < audioplayer.audio.volumeUpValue && audioplayer.audio.muted == false) {
-                audioplayer.elements.buttons.volumeDown.style.display = "inline-block";
-                audioplayer.elements.buttons.volumeUp.style.display = "none";
-            }
-
-            localStorage.audioVolume = audioplayer.audio.volume;
+            audioplayer.setVolume(audioplayer.audio.volume + 2);
         }
     },
-    volumeDown: function() {
+    volumeDown: () => {
         if (audioplayer.audio.volume > 0) {
-            var newVolume = audioplayer.audio.volume - 2;
-
-            audioplayer.audio.object.volume = newVolume / 100;
-            audioplayer.audio.volume = newVolume;
-
-            for (var i=0; i < audioplayer.elements.buttons.volumeIndicator.length; i++) {
-                audioplayer.elements.buttons.volumeIndicator[i].setAttribute("data-volume", audioplayer.audio.volume);
-            }
-
-            if (audioplayer.audio.volume >= audioplayer.audio.volumeUpValue && audioplayer.audio.muted == false) {
-                audioplayer.elements.buttons.volumeUp.style.display = "inline-block";
-                audioplayer.elements.buttons.volumeDown.style.display = "none";
-
-            } else if (audioplayer.audio.volume < audioplayer.audio.volumeUpValue && audioplayer.audio.muted == false) {
-                audioplayer.elements.buttons.volumeDown.style.display = "inline-block";
-                audioplayer.elements.buttons.volumeUp.style.display = "none";
-            }
-
-            localStorage.audioVolume = audioplayer.audio.volume;
+            audioplayer.setVolume(audioplayer.audio.volume - 2);
         }
     },
-    volumeMute: function() {
+    volumeMute: () => {
         if (!audioplayer.audio.muted) {
             audioplayer.audio.object.muted = true;
             audioplayer.audio.muted = true;
@@ -352,6 +343,8 @@ var audioplayer = {
             audioplayer.elements.buttons.volumeUp.style.display = "none";
             audioplayer.elements.buttons.volumeDown.style.display = "none";
             audioplayer.elements.buttons.volumeMute.style.display = "inline-block";
+
+            audioplayer.elements.buttons.volumeRange.value = 0;
 
         } else {
             audioplayer.audio.object.muted = false;
@@ -364,16 +357,18 @@ var audioplayer = {
             } else {
                 audioplayer.elements.buttons.volumeDown.style.display = "inline-block";
             }
+
+            audioplayer.elements.buttons.volumeRange.value = audioplayer.audio.volume;
         }
     },
-    random: function() {
+    random: () => {
         var random;
 
         if (audioplayer.audio.random) {
             random = +false;
 
             var songs = document.querySelectorAll("#songs [data-random-played='true']");
-            songs.forEach(function(song) {
+            songs.forEach((song) => {
                 song.setAttribute("data-random-played", false);
             });
 
@@ -390,7 +385,7 @@ var audioplayer = {
         audioplayer.audio.random = random;
         localStorage.setItem("audioRandom", random);
     },
-    onended: function() {
+    onended: () => {
         audioplayer.stop();
 
         switch (audioplayer.audio.repeat) {
@@ -402,7 +397,7 @@ var audioplayer = {
                 break;
         }
     },
-    timeUpdate: function() {
+    timeUpdate: () => {
         var percent = (audioplayer.audio.object.currentTime / audioplayer.audio.object.duration) * 100;
         audioplayer.elements.timeline.input.style.left = "calc(" + percent + "% - 5px)";
 
@@ -428,7 +423,7 @@ var audioplayer = {
         audioplayer.elements.timeline.played.innerHTML = curMin + ":" + curSec;
     },
 
-    scroll: function(parent, element, duration) {
+    scroll: (parent, element, duration) => {
         if (duration <= 0) {
             return;
         }
@@ -450,7 +445,7 @@ var audioplayer = {
             var diff = px - parent.scrollTop;
             var perTick = diff / duration * 10;
 
-            setTimeout(function () {
+            setTimeout(() => {
                 parent.scrollTop = parent.scrollTop + perTick;
                 if (parent.scrollTop == px) {
                     return;
@@ -459,12 +454,14 @@ var audioplayer = {
             }, 10);
         }
     },
-    loadFromLocalStorage: function() {
+    loadFromLocalStorage: () => {
         var lsAudioVolume = localStorage.getItem("audioVolume");
         if (lsAudioVolume == null) {
-            localStorage.setItem("audioVolume", audioplayer.audio.volume)
+            localStorage.setItem("audioVolume", audioplayer.audio.volume);
+            audioplayer.elements.buttons.volumeRange.value = audioplayer.audio.volume;
         } else {
             audioplayer.audio.volume = parseInt(lsAudioVolume);
+            audioplayer.elements.buttons.volumeRange.value = audioplayer.audio.volume;
         }
 
         for (var i = 0; i < audioplayer.elements.buttons.volumeIndicator.length; i++) {
@@ -508,7 +505,7 @@ var audioplayer = {
             }
         }
     },
-    log: function(txt) {
+    log: (txt) => {
         if (audioplayer.log) {
             console.info(audioplayer.name + ": " + txt);
         }
@@ -551,6 +548,7 @@ function initVariables() {
     audioplayer.elements.buttons.volumeUp = audioplayer.elements.player.querySelector("[name='volume'][data-mode='up']");
     audioplayer.elements.buttons.volumeDown = audioplayer.elements.player.querySelector("[name='volume'][data-mode='down']");
     audioplayer.elements.buttons.volumeMute = audioplayer.elements.player.querySelector("[name='volume'][data-mode='mute']");
+    audioplayer.elements.buttons.volumeRange = audioplayer.elements.player.querySelector("[name='volumeRange']");
 
 
     audioplayer.elements.timeline.timeline = audioplayer.elements.player.getElementsByClassName("range")[0];

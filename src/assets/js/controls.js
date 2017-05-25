@@ -100,54 +100,74 @@ if (typeof audioplayer === "undefined") {
         var newLeftMargin = e.pageX - element.getBoundingClientRect().left;
     }
 
-    window.addEventListener("variablesLoaded", function() {
-        audioplayer.elements.timeline.timeline.addEventListener("click", function() {
+    window.addEventListener("variablesLoaded", () => {
+        audioplayer.elements.timeline.timeline.addEventListener("click", () => {
             if (audioplayer.audio.object.src) {
                 movePlayHead(audioplayer.elements.timeline.timeline, event);
                 audioplayer.audio.object.currentTime = audioplayer.audio.object.duration * clickPercent(audioplayer.elements.timeline.timeline, event);
             }
         }, false);
 
-        audioplayer.elements.buttons.play.addEventListener("click", function() {
+        audioplayer.elements.buttons.play.addEventListener("click", () => {
             audioplayer.play();
         }, false);
 
-        audioplayer.elements.buttons.pause.addEventListener("click", function() {
+        audioplayer.elements.buttons.pause.addEventListener("click", () => {
             audioplayer.pause();
         }, false);
 
-        audioplayer.elements.buttons.stop.addEventListener("click", function() {
+        audioplayer.elements.buttons.stop.addEventListener("click", () => {
             audioplayer.stop();
         }, false);
 
-        audioplayer.elements.buttons.previousSong.addEventListener("click", function() {
+        audioplayer.elements.buttons.previousSong.addEventListener("click", () => {
             audioplayer.previousSong();
         }, false);
 
-        audioplayer.elements.buttons.nextSong.addEventListener("click", function() {
+        audioplayer.elements.buttons.nextSong.addEventListener("click", () => {
             audioplayer.nextSong();
         }, false);
 
-        for (var i=0; i < audioplayer.elements.buttons.repeat.length; i++) {
-            audioplayer.elements.buttons.repeat[i].addEventListener("click", function() {
+
+        audioplayer.elements.buttons.repeat.forEach((element) => {
+            element.addEventListener("click", function() {
                 audioplayer.repeat(this);
             }, false);
-        }
+        });
 
-        for (var i=0; i < audioplayer.elements.buttons.random.length; i++) {
-            audioplayer.elements.buttons.random[i].addEventListener("click", function() {
+        audioplayer.elements.buttons.random.forEach((element) => {
+            element.addEventListener("click", () => {
                 audioplayer.random();
-            });
-        }
+            }, false);
+        });
 
-        for (var i=0; i < audioplayer.elements.buttons.volumeIndicator.length; i++) {
-            audioplayer.elements.buttons.volumeIndicator[i].addEventListener("click", function() {
+        audioplayer.elements.buttons.volumeIndicator.forEach((element) => {
+            element.addEventListener("contextmenu", () => {
                 audioplayer.volumeMute();
             }, false);
-        }
+        });
+
+        audioplayer.elements.buttons.volumeIndicator.forEach((element) => {
+            element.addEventListener("click", () => {
+                if (audioplayer.elements.buttons.volumeRange.style.display == "block") {
+                    audioplayer.elements.buttons.volumeRange.style.display = "none";
+                } else {
+                    audioplayer.elements.buttons.volumeRange.style.display = "block";
+                }
+            }, false);
+        });
+
+        audioplayer.elements.buttons.volumeRange.addEventListener("mouseup", () => {
+            audioplayer.elements.buttons.volumeRange.style.display = "none";
+        }, false);
+
+        audioplayer.elements.buttons.volumeRange.addEventListener("input", () => {
+            audioplayer.setVolume(audioplayer.elements.buttons.volumeRange.value);
+        }, false);
+
 
         var hotKeys;
-        require("electron").ipcRenderer.on("keyPress", (event, action) => {
+        ipcRenderer.on("keyPress", (event, action) => {
 
             switch (action) {
                 case "volumeUp":

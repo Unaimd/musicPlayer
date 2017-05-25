@@ -5,10 +5,10 @@ var songsLoader = {
     sortMethod: null,
 
     sortFunctions: {
-        moddate: function(a, b) {
+        moddate: (a, b) => {
             return a.moddate - b.moddate;
         },
-        title: function(a, b) {
+        title: (a, b) => {
             a = a.title.toLowerCase();
             b = b.title.toLowerCase();
 
@@ -20,7 +20,7 @@ var songsLoader = {
                 return 0;
             }
         },
-        artist: function(a, b) {
+        artist: (a, b) => {
             a = a.artist.toString().toLowerCase();
             b = b.artist.toString().toLowerCase();
 
@@ -36,7 +36,7 @@ var songsLoader = {
                 return 0;
             }
         },
-        album: function(a, b) {
+        album: (a, b) => {
             a = a.album.toLowerCase();
             b = b.album.toLowerCase();
 
@@ -52,11 +52,11 @@ var songsLoader = {
                 return songsLoader.sortFunctions.title;
             }
         },
-        duration: function(a, b) {
+        duration: (a, b) => {
             return a.duration - b.duration;
         }
     },
-    sort: function(songs, mode, fnc) {
+    sort: (songs, mode, fnc) => {
         switch(mode) {
             case "moddate":
                 fnc = songsLoader.sortFunctions.moddate;
@@ -89,7 +89,7 @@ var songsLoader = {
             return songs;
         }
     },
-    loadGroup: function(songs, start, num, order, method) {
+    loadGroup: (songs, start, num, order, method) => {
         if (typeof num !== "number") {
             throw new Error("Unspecified number of songs to be shown");
             return;
@@ -125,7 +125,7 @@ var songsLoader = {
         }
 
     },
-    writeSong: function(songJSON) {
+    writeSong: (songJSON) => {
         while (document.querySelectorAll("#songs [data-type='info']").length > 0) {
             document.querySelector("#songs [data-type='info']").remove();
         }
@@ -183,7 +183,7 @@ var songsLoader = {
 
         updateSongs();
     },
-    formatDuration: function (seconds) {
+    formatDuration: (seconds) => {
         var sec = Math.round(seconds);
         var min = 0;
         var hour = 0;
@@ -211,10 +211,10 @@ var songsLoader = {
             return min + ":" + sec;
         }
     },
-    addLoader: function () {
+    addLoader: () => {
         document.getElementById("songs").innerHTML = "<li data-type='info' style='text-align: center;'>Scanning songs...<br><div class='loader'></div></li>";
     },
-    order: function() {
+    order: () => {
         var order = document.querySelector("select[name='order']");
         var method = document.querySelector("[name='method']:checked");
         var active;
@@ -238,7 +238,7 @@ var songsLoader = {
             songsLoader.noSongsFound();
         }
     },
-    updateSortIcons: function(mode) {
+    updateSortIcons: (mode) => {
         if (mode != "num" & mode != "alpha") {
             mode = "other";
         }
@@ -262,7 +262,7 @@ var songsLoader = {
 
         });
     },
-    noSongsFound: function() {
+    noSongsFound: () => {
         document.getElementById("songs").querySelectorAll("[data-type='info']").forEach((element) => {
             element.remove();
         });
@@ -272,7 +272,7 @@ var songsLoader = {
     }
 };
 
-document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", () => {
     // save last selected directory
     ipcRenderer.on("selAudioDir", (event, dir) => {
         localStorage.setItem("selAudioDir", dir);
