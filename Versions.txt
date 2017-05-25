@@ -1,4 +1,17 @@
-# v1.1.0 (working on it)
+# v1.0.3 (working on it)
+
+Secondary click over a song to show some options:
+ - Add to favourites (not yet implemented)
+ - Change album art image (not yet implemented)
+ - Show app options (not yet implemented)
+
+
+# v1.0.2
+
+Added small guide telling the controls and explanation of how to scan a folder
+
+
+# v1.0.1
 
 Custom album art images, can be saved on the albumArt folder. On the case of matching more the first one will be used:
 
@@ -9,9 +22,6 @@ albumArt/title.jpg
 albumArt/album.jpg
 
 Secondary click over a song to show some options:
- - Add to favourites (not yet implemented)
- - Change album art (not yet implemented)
- - Show app options (not yet implemented)
  - Toggle dark/light theme
 
 GUI changes:
@@ -22,6 +32,7 @@ GUI changes:
 
 Debugger:
  - Use ctrl + shift + I to toggle the developer tools
+
 
 # v1.0.0
 
