@@ -15,11 +15,15 @@
 }
 
 #titleBar img {
+    cursor: pointer;
     display: inline-block;
     width: 20px;
     margin: 5px 0px 0px 5px;
     border: 1px solid;
     border-radius: 3px;
+}
+[data-action="openDir"] {
+    cursor: pointer;
 }
 
 body[data-theme="dark"] #titleBar img {
