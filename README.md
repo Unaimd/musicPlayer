@@ -15,6 +15,9 @@ Here can be seen an image with some songs loaded and one playing:
 
 ![playing song](https://raw.githubusercontent.com/alexbcberio/musicPlayer/master/docs/images/playing%20audio.PNG)
 
+## Right click on a song to show some options
+More options will be available on future versions, currently you can switch the theme from dark to light
+
 ## controls
 On the current version the controls can't be changed, it'll be implemented on future versions. Here are the currently available controls:
 * **Play** and **Pause**: ALT + SPACEBAR or PlayPause button media key
@@ -23,6 +26,7 @@ On the current version the controls can't be changed, it'll be implemented on fu
 * **Next Song**: ALT + RIGHT_ARROW or NextSong media key
 * **Volume Up**: ALT + UP_ARROW or VolumeUp media key
 * **Volume Down**: ALT + DOWN_ARROW or VolumeDown media key
-* **Toggle Mute**: ALT + M
+* **Change Volume**: Click on the volume icon and drag the circle up and down
+* **Toggle Mute**: ALT + M or right click on the volume icon
 
 **Important! The controls will be available too outside the program**
