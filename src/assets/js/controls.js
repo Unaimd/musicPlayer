@@ -25,6 +25,8 @@ if (typeof audioplayer === "undefined") {
 
                     var styles = document.head.querySelectorAll("[href$='.css']");
 
+                    document.body.className += " no-transition";
+
                     if (document.body.getAttribute("data-theme") == "dark") {
                         document.body.setAttribute("data-theme", "light");
 
@@ -44,6 +46,11 @@ if (typeof audioplayer === "undefined") {
                         });
 
                     }
+                    document.body.className = document.body.className.replace(" no-transition", "");
+                    break;
+
+                case "settings":
+                    ipcRenderer.send("showOptions");
                     break;
 
                 default:
