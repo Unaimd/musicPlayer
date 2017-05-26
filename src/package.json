@@ -1,11 +1,17 @@
 {
-    "name": "musicplayer",
-    "productName": "musicPlayer",
-    "version": "1.0.3",
     "main": "main.js",
 
-    "author": "alexbcberio",
-    "description": "A music player",
+    "name": "musicplayer",
+    "productName": "musicPlayer",
+    "description": "A MP3 music player",
+    "license": "SD-3-Clause",
+
+    "version": "1.0.3",
+
+    "author": {
+        "name": "alexbcberio",
+        "email": "alexbcberio@gmail.com"
+    },
 
     "devDependencies": {
         "electron": "^1.4.15",
@@ -17,6 +23,12 @@
         "musicmetadata": "2.0.5",
         "curl": "0.1.4"
     },
+
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/alexbcberio/musicPlayer.git"
+    },
+
     "build": {
         "AasarUnpack": "assets #folder to not compile into asar file",
         "publish": [{
