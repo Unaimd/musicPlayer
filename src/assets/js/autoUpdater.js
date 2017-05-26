@@ -9,7 +9,8 @@ var autoUpdater = {
         console.info("autoUpdater: newer update was not found");
     },
     error: (error) => {
-        console.error("autoUpdater: " + erorr);
+        swal("Error", "There was an error trying to search updates, open the developer console for more details", "error");
+        console.error("autoUpdater: " + error);
     },
     downloadProgress: (progressObj) => {
         var bytesPerSecond = progressObj.bytesPerSecond;
@@ -62,7 +63,7 @@ ipcRenderer.on("autoUpdater", (event, obj) => {
             break;
 
         case "error":
-            autoUpdater.console.error(obj.data);
+            autoUpdater.error(obj.data);
             break;
 
         case "downloadProgress":
