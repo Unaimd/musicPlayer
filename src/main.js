@@ -93,7 +93,12 @@ app.on('ready', () => {
             console.log(type + " " + data);
         }
 
-        autoUpdater.checkForUpdates();
+        try {
+            autoUpdater.checkForUpdates();
+        } catch (error) {
+            console.log("\nError finding updates");
+            updateMsg("error", error);
+        }
     });
 
     // hotkeys
