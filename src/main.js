@@ -103,6 +103,12 @@ app.on('ready', () => {
 
     // hotkeys
     win.webContents.on("did-finish-load", () => {
+
+        // toggle debugger
+        ipcMain.on("toggleDevTools", () => {
+            win.webContents.toggleDevTools();
+        });
+        
         // volume up
         globalShortcut.register("volumeUp", () => {
             win.webContents.send("keyPress", "volumeUp");
@@ -190,11 +196,6 @@ app.on('ready', () => {
         }
 
         event.returnValue = "ok";
-    });
-
-    // toggle debugger
-    ipcMain.on("toggleDevTools", () => {
-        win.webContents.toggleDevTools();
     });
 
     ipcMain.on("showOptions", () => {
