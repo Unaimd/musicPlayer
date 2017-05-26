@@ -47,7 +47,8 @@
         },
 
         "linux": {
-            "target": ["deb", "rpm", "pacman", "7z"]
+            "target": ["7z"],
+            "Wantedtarget": ["deb", "rpm", "pacman", "7z"]
         }
     }
 }
