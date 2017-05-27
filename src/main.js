@@ -108,7 +108,7 @@ app.on('ready', () => {
         ipcMain.on("toggleDevTools", () => {
             win.webContents.toggleDevTools();
         });
-        
+
         // volume up
         globalShortcut.register("volumeUp", () => {
             win.webContents.send("keyPress", "volumeUp");
@@ -284,24 +284,15 @@ function sortSongs(dir, files, mode, callback) {
 
 function getSongMetadata(file, callback) {
     var filemtime;
+
     fs.stat(file, (err, stats) => {
         filemtime = new Date(stats.mtime).valueOf();
     });
 
-    var resp = {
-        path: file,
-        title: undefined,
-        artist: undefined,
-        album: undefined,
-        duration: undefined,
-        cover: undefined,
-        moddate: filemtime
-    };
-
     var readableStream = fs.createReadStream(file);
-    var parser = id3(readableStream, {duration: true}, function (err, metadata) {
+    id3(readableStream, {duration: true}, function (err, metadata) {
 
-        albumArt(file, (coverPath) => {
+        albumArt(metadata, file, (coverPath) => {
             resp = {
                 path: file,
                 title: metadata.title,
@@ -322,7 +313,8 @@ function getSongMetadata(file, callback) {
     });
 }
 
-function albumArt(file, callback) {
+function albumArt(metadata, file, callback) {
+
     var imgPath = path.resolve("./albumArt/");
     var filename = undefined;
 
@@ -334,25 +326,31 @@ function albumArt(file, callback) {
         });
     }
 
-    var stream = fs.createReadStream(file);
-    var parser = id3(stream, (error, meta) => {
+    // if no title use the filename
+    if (!metadata.title.length) {
+        var filename = file.replace(path.dirname(file) + path.sep, "");
+        var dotSplit = filename.split(".");
 
-        var metadata = {
-            title: meta.title,
-            artist: meta.artist[0],
-            album: meta.album
-        }
+        metadata.title = filename.replace("." + dotSplit[dotSplit.length - 1], "");
+    }
 
-        if (meta.picture[0]) {
-            var image = meta.picture[0];
+    try {
+        // file contains album art image
+        if (metadata.picture[0]) {
+            var image = metadata.picture[0];
             var format = image.format;
 
             if (metadata.album) {
                 filename = metadata.album;
 
-                if (metadata.artist) {
-                    imgPath = path.resolve(imgPath, metadata.artist);
+                if (metadata.artist[0]) {
+                    imgPath = path.resolve(imgPath, metadata.artist[0]);
                 }
+
+            } else if (metadata.artist[0] ) {
+                imgPath = path.resolve(imgPath, metadata.artist[0]);
+
+                filename = metadata.title;
 
             } else {
                 filename = metadata.title;
@@ -381,16 +379,16 @@ function albumArt(file, callback) {
             imgPath = path.resolve(imgPath, filename);
 
         // artist/title.jpg
-        } else if (metadata.artist && metadata.title && fs.existsSync(path.resolve(imgPath, metadata.artist, metadata.title + ".jpg"))) {
-                imgPath = path.resolve(imgPath, metadata.artist, metadata.title + ".jpg");
+        } else if (metadata.artist[0] && metadata.title && fs.existsSync(path.resolve(imgPath, metadata.artist[0], metadata.title + ".jpg"))) {
+            imgPath = path.resolve(imgPath, metadata.artist[0], metadata.title + ".jpg");
 
         // artist/album.jpg
-        } else if (metadata.artist && metadata.album && fs.existsSync(path.resolve(imgPath, metadata.artist, metadata.album + ".jpg"))) {
-            imgPath = path.resolve(imgPath, metadata.artist, metadata.album + ".jpg");
+        } else if (metadata.artist[0] && metadata.album && fs.existsSync(path.resolve(imgPath, metadata.artist[0], metadata.album + ".jpg"))) {
+            imgPath = path.resolve(imgPath, metadata.artist[0], metadata.album + ".jpg");
 
         // artist.jpg
-        } else if (metadata.artist && fs.existsSync(path.resolve(imgPath, metadata.artist + ".jpg"))) {
-            imgPath = path.resolve(imgPath, metadata.artist + ".jpg");
+        } else if (metadata.artist[0] && fs.existsSync(path.resolve(imgPath, metadata.artist[0] + ".jpg"))) {
+            imgPath = path.resolve(imgPath, metadata.artist[0] + ".jpg");
 
         // title.jpg
         } else if ( metadata.title && fs.existsSync(path.resolve(imgPath, metadata.title + ".jpg"))) {
@@ -405,12 +403,17 @@ function albumArt(file, callback) {
             imgPath = undefined;
         }
 
-        if (typeof callback === "function") {
-            callback(imgPath);
+    } catch (error) {
+        if (error) {
+            console.log("Error searching arbum art");
         }
+        imgPath = undefined;
+    }
 
-        stream.close();
-    });
+    if (typeof callback === "function") {
+        callback(imgPath);
+    }
+
 
     /********************************************************
 
