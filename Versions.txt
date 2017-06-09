@@ -16,7 +16,7 @@ Added small guide telling the controls and explanation of how to scan a folder
 
 # v1.0.1
 
-Custom album art images, can be saved on the albumArt folder. On the case of matching more the first one will be used:
+Custom album art images, can be saved on the albumArt folder. On the case of matching the first one will be used:
 
 albumArt/artist/title.jpg
 albumArt/artist/album.jpg
