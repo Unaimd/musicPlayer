@@ -6,8 +6,9 @@ Secondary click over a song to show some options:
  - Show app options (not yet implemented)
 
 # v1.0.3
+
 Bug fix
- - The first launch of the app crashed. This was repeated everytime the system was rebooted.
+ - The first launch of the app crashed. This was repeated every time the system was rebooted.
 
 # v1.0.2
 
@@ -16,7 +17,7 @@ Added small guide telling the controls and explanation of how to scan a folder
 
 # v1.0.1
 
-Custom album art images, can be saved on the albumArt folder. On the case of matching the first one will be used:
+Custom album art images, can be saved on the albumArt folder. On the case of matching more than one, the first one will be used:
 
 albumArt/artist/title.jpg
 albumArt/artist/album.jpg
