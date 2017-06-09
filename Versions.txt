@@ -5,10 +5,12 @@ Secondary click over a song to show some options:
  - Change album art image (not yet implemented)
  - Show app options (not yet implemented)
 
+
 # v1.0.3
 
 Bug fix
  - The first launch of the app crashed. This was repeated every time the system was rebooted.
+
 
 # v1.0.2
 
