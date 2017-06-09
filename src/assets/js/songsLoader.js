@@ -220,7 +220,7 @@ var songsLoader = {
         var active;
 
         if (document.querySelector("#songs .active")) {
-            active = document.querySelector("#songs .active").getAttribute("data-moddate");
+            active = document.querySelector("#songs .active").getAttribute("data-path");
         }
         songsLoader.addLoader();
 
@@ -233,7 +233,14 @@ var songsLoader = {
 
         if (localStorage.getItem("songsJSON") !== null) {
             songsLoader.loadGroup(JSON.parse(localStorage.getItem("songsJSON")), 0, songsLoader.INITIAL_LOAD, order.value, method.value);
-            document.querySelector("#songs [data-moddate='" + active + "']").className = "active";
+
+            document.querySelectorAll("#songs [data-path]").forEach((element) => {
+                if (element.getAttribute("data-path") == active) {
+                    element.className += " active";
+                    return;
+                }
+            });
+
         } else {
             songsLoader.noSongsFound();
         }
