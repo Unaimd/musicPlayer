@@ -1,5 +1,7 @@
 # v1.0.4 (working on it)
 
+Window can be smaller, UI changes
+
 Secondary click over a song to show some options:
  - Add to favourites (not yet implemented)
  - Change album art image (not yet implemented)
