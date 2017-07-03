@@ -43,7 +43,7 @@ app.on('ready', () => {
 
         width: 800,
         height: 600,
-        minWidth: 741,
+        minWidth: 490,
         minHeight: 541,
 
         center: true,
