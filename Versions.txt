@@ -1,5 +1,10 @@
 # v1.0.4 (working on it)
 
+Started implementing the settings window.
+ - Options (change theme)
+ - Hotkeys (not changeable yet)
+ - About
+
 Window can be smaller, UI changes
 
 Secondary click over a song to show some options:
