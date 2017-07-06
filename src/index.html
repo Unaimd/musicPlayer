@@ -20,11 +20,14 @@
 
     <link rel="stylesheet" href="./assets/css/utilities.css">
     <link rel="stylesheet" href="./assets/css/player.css">
+
+    <link rel="stylesheet" href="./assets/css/themes/dark/main.css">
+    <link rel="stylesheet" href="./assets/css/themes/dark/ui.css">
     <link rel="stylesheet" href="./assets/css/themes/dark/player.css">
 </head>
 <body data-theme="dark" data-default-title="musicPlayer">
 
-    <div id="titleBar">
+    <div id="titleBar" data-win="main">
         <img src="./assets/img/favicon.png" />
         <i class="fa fa-close" data-action="close"></i>
         <i class="fa fa-window-maximize" data-action="maximize"></i>
@@ -202,6 +205,7 @@
         </ul>
     </div>
 
+    <script src="./assets/js/Dropable.js"></script>
     <script src="./assets/js/Hotkey.js"></script>
     <script src="./assets/js/main.js"></script>
     <script src="./assets/js/ui.js"></script>
