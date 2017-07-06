@@ -22,16 +22,9 @@
     border: 1px solid;
     border-radius: 3px;
 }
+
 [data-action="openDir"] {
     cursor: pointer;
-}
-
-body[data-theme="dark"] #titleBar img {
-    border-color: white;
-}
-
-body[data-theme="light"] #titleBar img {
-    border-color: black;
 }
 
 #titleBar i {

@@ -307,7 +307,6 @@
         float: right;
         width: 45%;
         margin-right: 10px;
-        padding-bottom: 20px;
     }
 
     #audioplayer .albumArt {
@@ -357,7 +356,7 @@
     #songs {
         float: left;
         width: 50%;
-        max-height: calc(100vh - 50px);
+        max-height: calc(100vh - 60px);
         margin-top: 10px;
         overflow-y: auto;
         margin-left: 10px;
