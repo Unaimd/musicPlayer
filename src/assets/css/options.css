@@ -1,0 +1,91 @@
+p {
+    text-align: justify;
+}
+
+nav {
+    position: absolute;
+    left: 0px;
+    display: block;
+    width: 25%;
+    height: calc(100vh - 38px);
+    border-top: 2px solid;
+    border-right: 2px solid;
+    border-radius: 0px 5px 0px 0px;
+
+    border-color: white;
+}
+
+nav > ul {
+    list-style: none;
+    padding-left: 0px;
+    margin: 14px auto;
+}
+
+nav > ul > li {
+    display: block;
+    width: 100%;
+    line-height: 25px;
+    margin: 3px 0px;
+    padding: 3px 10px;
+    cursor: pointer;
+}
+
+nav > ul > li:hover,
+nav > ul > li.active {
+    background-color: rgba(255, 255, 255, 0.4);
+}
+
+body > .category {
+    position: absolute;
+    right: 0px;
+    max-height: calc(100vh - 45px);
+    display: block;
+    width: calc(75% - 10px);
+    overflow: auto;
+}
+
+.subcategory {
+    width: calc(100% - 5px);
+}
+
+.subcategory h2 {
+    border-bottom: 1px solid white;
+}
+
+.subcategory label {
+    display: block;
+    width: 100%;
+    height: auto;
+    margin: 5px auto;
+}
+
+.subcategory label input[type=radio],
+.subcategory label input[type=checkbox] {
+    display: none;
+}
+
+.subcategory label span {
+    display: block;
+    padding: 3px 10px;
+    border-radius: 5px;
+}
+
+.subcategory label input + span {
+    cursor: pointer;
+}
+
+.subcategory label input:checked + span {
+    background-color: rgba(255, 255, 255, 0.3);
+}
+
+.subcategory label:hover input:not(:checked) + span {
+    background-color: rgba(0, 255, 255, 0.3);
+}
+
+.subcategory a {
+    color: white;
+}
+
+.subcategory a:hover {
+    color: #717171;
+}

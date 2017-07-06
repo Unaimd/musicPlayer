@@ -1,0 +1,3 @@
+body[data-theme="light"] #titleBar img {
+    border-color: black;
+}
