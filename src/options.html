@@ -1,10 +1,253 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <meta charset="utf-8">
-        <title>Options</title>
+        <meta charset="UTF-8">
+        <meta name="author" value="@alexbcberio">
+        <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+        <link rel="shortcut icon" href="./assets/img/favicon.png" type="image/png">
+        <title>
+            options | musicPlayer
+        </title>
+        <!-- -->
+
+        <link rel="stylesheet" href="./assets/lib/sweetalert/sweetalert.css">
+        <script src="./assets/lib/sweetalert/sweetalert.js"></script>
+
+        <link rel="stylesheet" href="./assets/lib/font-awesome/css/font-awesome.css">
+        <!-- -->
+        <link rel="stylesheet" href="./assets/css/main.css">
+        <link rel="stylesheet" href="./assets/css/ui.css">
+
+        <link rel="stylesheet" href="./assets/css/utilities.css">
+
+        <link rel="stylesheet" href="./assets/css/options.css">
+
+        <link rel="stylesheet" href="./assets/css/themes/dark/main.css">
+        <link rel="stylesheet" href="./assets/css/themes/dark/ui.css">
+        <link rel="stylesheet" href="./assets/css/themes/dark/player.css">
     </head>
-    <body>
-        <h1>App options</h1>
+    <body data-theme="dark">
+
+        <div id="titleBar" data-win="options">
+            <i class="fa fa-close" data-action="close"></i>
+        </div>
+
+        <nav>
+            <ul>
+                <li class="active" data-target="options">Options</li>
+                <li data-target="hotkeys">Hotkeys</li>
+                <li data-target="about">About</li>
+            </ul>
+        </nav>
+
+        <div class="category active" data-category="options">
+
+            <div class="subcategory">
+                <h2>
+                    Theme
+                </h2>
+
+                <p>
+                    Select the theme that will be used on the app.
+                </p>
+
+                <label>
+                    <input type="radio" name="theme" value="dark" checked>
+                    <span>
+                        Dark
+                    </span>
+                </label>
+
+                <label>
+                    <input type="radio" name="theme" value="light">
+                    <span>
+                        Light
+                    </span>
+                </label>
+            </div>
+
+            <div class="subcategory">
+                <h2>
+                    Subcat #2
+                </h2>
+
+                <p>
+                    A brief explanation of the subcategory
+                </p>
+
+                <p>
+                    Some
+                    <br>
+                    options
+                    <br>
+                    of
+                    <br>
+                    the
+                    <br>
+                    subcategory
+                    <br>
+                    would
+                    <br>
+                    be
+                    <br>
+                    here,
+                    <br>
+                    if
+                    <br>
+                    there's
+                    <br>
+                    no
+                    <br>
+                    enought
+                    <br>
+                    vertical
+                    <br>
+                    space
+                    <br>
+                    a
+                    <br>
+                    vertical
+                    <br>
+                    srollbar
+                    <br>
+                    will
+                    <br>
+                    be
+                    <br>
+                    added
+                </p>
+            </div>
+
+        </div>
+
+        <div class="category hidden" data-category="hotkeys">
+
+            <div class="subcategory">
+                <h2>
+                    Hotkeys
+                    <small>
+                        not customizable yet
+                    </small>
+                </h2>
+
+                <ul>
+                    <li>
+                        <strong>Play</strong> and <strong>Pause</strong>: ALT + SPACEBAR or PlayPause button media key
+                    </li>
+                    <li>
+                        <strong>Previous Song</strong>: ALT + LEFT_ARROW or PreviousSong media key
+                    </li>
+                    <li>
+                        <strong>Stop</strong>: ALT + ENTER or Stop media key
+                    </li>
+                    <li>
+                        <strong>Next Song</strong>: ALT + RIGHT_ARROW or NextSong media key
+                    </li>
+                    <li>
+                        <strong>Volume Up</strong>: ALT + UP_ARROW or VolumeUp media key
+                    </li>
+                    <li>
+                        <strong>Volume Down</strong>: ALT + DOWN_ARROW or VolumeDown media key
+                    </li>
+                    <li>
+                        <strong>Change Volume</strong>: Click on the volume icon and drag the circle up and down
+                    </li>
+                    <li>
+                        <strong>Toggle Mute</strong>: ALT + M or right click on the volume icon
+                    </li>
+                </ul>
+            </div>
+
+        </div>
+
+        <div class="category hidden" data-category="about">
+
+            <div class="subcategory">
+                <h2>
+                    Me
+                </h2>
+                <p>
+                    Hi, my name is Alexander and I'm an Spanish guy that loves programming in his free time.
+                </p>
+
+                <p>
+                    I started with this proyect as a website, made by PHP. What I wanted was to take out the metadata of the songs and a player. I had all done when later I found Electron, a NodeJS project by Github that makes easy creating a web based application. So I started porting what I got to NodeJS, and here it is.
+                </p>
+
+                <p>
+                    Contact with me by <a href="https://twitter.com/alexbcberio" target="_blank">Twitter <i class="fa fa-twitter"></i></a>
+                </p>
+                <p>
+                    Check my <a href="https://github.com/alexbcberio" target="_blank">GitHub <i class="fa fa-github"></i></a> to find other interesting things or to contribute with a push request.
+                </p>
+
+            </div>
+
+            <div class="subcategory">
+                <h2>
+                    Credits
+                </h2>
+
+                <ul>
+                    <li>
+                        Electron, the core of the application
+                    </li>
+                    <li>
+                        musicmetadata, NPM module to get ID3 tags
+                    </li>
+                    <li>
+                        Curl, NPM module
+                    </li>
+                    <li>
+                        Font-Awesome, for the amazing icons
+                    </li>
+                    <li>
+                        SweetAlert, beautier alerts
+                    </li>
+                </ul>
+
+            </div>
+        </div>
+
+        <script type="text/javascript">
+            document.querySelectorAll("nav > ul > li").forEach((element) => {
+                element.addEventListener("click", changeCategory, false);
+            });
+
+            function changeCategory() {
+                if (this.className.indexOf("active") == -1) {
+                    showCategory(this);
+                }
+            }
+
+            function showCategory(target) {
+                document.querySelectorAll("ul > li").forEach((element) => {
+                    var category = document.querySelector(".category[data-category=\"" + element.getAttribute("data-target") + "\"]");
+
+                    if (target == element) {
+                        element.className = "active";
+
+                        category.className = category.className.replace("hidden", "active");
+
+                    } else {
+                        element.className = null;
+
+                        try {
+                            category.className = category.className.replace("active", "hidden");
+                        } catch (e) {
+                            //console.error(e);
+                        }
+                    }
+
+                });
+            }
+
+        </script>
+
+        <script src="./assets/js/Dropable.js"></script>
+        <script src="./assets/js/Hotkey.js"></script>
+        <script src="./assets/js/main.js"></script>
+        <script src="./assets/js/ui.js"></script>
+        <script src="./assets/js/autoUpdater.js"></script>
     </body>
 </html>

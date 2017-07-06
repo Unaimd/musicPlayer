@@ -63,21 +63,21 @@ app.on('ready', () => {
         modal: true,
         show: false,
 
-        //width: 0,
+        width: 700,
         //height: 0,
         center: true,
         resizable: false,
         autoHideMenuBar: true,
-        frame: true
+        frame: false
 
     });
 
     optionsWin.loadURL("file://" + __dirname + "/options.html");
 
     optionsWin.on("close", (event) => {
-        optionsWin.hide();
-
         event.preventDefault();
+
+        optionsWin.hide();
     });
 
     // hide preload and show main window
@@ -166,28 +166,43 @@ app.on('ready', () => {
 
     // user interface titlebar actions
     ipcMain.on("titleBar", (event, arg) => {
+        var window = arg.win;
+        var action = arg.action;
+
+        if (window == "main") {
+            window = win;
+        } else if (window == "options") {
+            window = optionsWin;
+        } else {
+            return;
+        }
 
         // close
-        if (arg == "close") {
-            win.close();
-            app.quit();
+        if (action == "close") {
 
-        // maximize unmazimize
-        } else if (arg == "maximize") {
-
-            // is maximized
-            if (win.isMaximized()) {
-                win.unmaximize();
-
-            // is not maximized
+            if (window == win) {
+                window.close();
+                app.quit();
             } else {
-                win.maximize();
+                window.hide();
             }
 
-        } else if (arg == "minimize") {
-            win.minimize();
+        // maximize unmazimize
+        } else if (action == "maximize") {
 
-        } else if (arg == "loadFolder") {
+                // is maximized
+                if (window.isMaximized()) {
+                    window.unmaximize();
+
+                // is not maximized
+                } else {
+                    window.maximize();
+                }
+
+        } else if (action == "minimize") {
+            window.minimize();
+
+        } else if (action == "loadFolder") {
             if (loadMusicFromDir(event)) {
                 event.returnValue = true;
             } else {
