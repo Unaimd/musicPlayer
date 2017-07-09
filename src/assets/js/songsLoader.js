@@ -171,7 +171,7 @@ var songsLoader = {
             num = parseInt(songs[songs.length - 1].getAttribute("data-num")) + 1;
         }
 
-        var template = '<li class="hidden" data-type="audio" data-num="' + num + '" data-path="' + path + '" data-cover-path="' + cover + '" data-moddate="' + moddate + '" data-random-played="false">';
+        var template = '<li class="hidden" data-type="audio" data-num="' + num + '" data-path="' + path + '" data-cover-path="' + cover + '" data-moddate="' + moddate + '"">';
         template += '<img src="' + cover + '" draggable="false">';
         template += '<p><span class="artist">' + artist + '</span>';
         if (album) {

@@ -99,22 +99,22 @@ var audioplayer = {
 
 
         // set new info
-        audioplayer.elements.title.innerHTML = title.innerHTML;
+        audioplayer.elements.title.innerText = title.innerText;
 
         if (typeof artist != "undefined") {
-            audioplayer.elements.artist.innerHTML = artist.innerHTML;
+            audioplayer.elements.artist.innerText = artist.innerText;
         } else {
-            audioplayer.elements.artist.innerHTML = null;
+            audioplayer.elements.artist.innerText = null;
         }
 
         if (typeof album != "undefined") {
-            audioplayer.elements.album.innerHTML = album.innerHTML;
+            audioplayer.elements.album.innerText = album.innerText;
         } else {
-            audioplayer.elements.album.innerHTML = null;
+            audioplayer.elements.album.innerText = null;
         }
 
         audioplayer.elements.cover.setAttribute("src", coverImage);
-        audioplayer.elements.timeline.total.innerHTML = duration.innerHTML;
+        audioplayer.elements.timeline.total.innerText = duration.innerText;
 
         // test if browser supports audio format
         var extSplit = path.split(".");
@@ -123,8 +123,8 @@ var audioplayer = {
         if (!! audioplayer.audio.object.canPlayType("audio/" + format) === false) {
 
             swal({
-                title: "Formato no soportado",
-                text: "No es posible reproducir la cancion, tu navegador no soporta el formato " + format.toUpperCase(),
+                title: "Invalid format",
+                text: "We can't play that song as it's file format " + format.toUpperCase() + " is not supported by this player",
                 type:  "error",
                 showConfirmButton: false,
                 timer: audioplayer.config.swalTimer
@@ -133,6 +133,10 @@ var audioplayer = {
         } else {
             audioplayer.audio.object = new Audio(path);
             audioplayer.play();
+
+            if (audioplayer.random && document.querySelectorAll("#songs [data-random-num]").length == 0) {
+                audioplayer.randomOrder();
+            }
 
             audioplayer.audio.object.addEventListener("timeupdate", audioplayer.timeUpdate, false);
         }
@@ -156,7 +160,7 @@ var audioplayer = {
         }
         var activeSong = document.querySelector("#songs .active");
         // ─ = alt + 196
-        document.title = activeSong.querySelector(".title").innerHTML + " ─ " + activeSong.querySelector(".artist").innerHTML + " ── " + audioplayer.windowDefaultTitle;
+        document.title = activeSong.querySelector(".title").innerText + " ─ " + activeSong.querySelector(".artist").innerText + " ── " + audioplayer.windowDefaultTitle;
 
         audioplayer.audio.object.volume = audioplayer.audio.volume / 100;
         audioplayer.audio.object.muted = audioplayer.audio.muted;
@@ -165,10 +169,6 @@ var audioplayer = {
         audioplayer.audio.object.addEventListener("ended", () => {
             audioplayer.onended();
         }, false);
-
-        if (audioplayer.audio.random) {
-            document.querySelector(".active").setAttribute("data-random-played", true);
-        }
 
         audioplayer.scroll(document.getElementById("songs"), document.querySelector("#songs .active"), audioplayer.config.scrollAnimationDuration);
 
@@ -197,11 +197,12 @@ var audioplayer = {
             return;
         }
 
+        var songs = document.querySelectorAll("#songs [data-type='audio']");
+        var totalSongs = parseInt(songs[songs.length - 1].getAttribute("data-num"));
+
         if (!audioplayer.audio.random) {
 
             active = parseInt(active.getAttribute("data-num"));
-            var songs = document.querySelectorAll("#songs [data-type='audio']");
-            var totalSongs = parseInt(songs[songs.length - 1].getAttribute("data-num"));
 
             if (active < totalSongs) {
                 next = new Song(document.querySelector("#songs [data-num='" + (active + 1) + "']"));
@@ -212,31 +213,24 @@ var audioplayer = {
             }
 
         } else {
-            var availableSongs = document.querySelectorAll("#songs [data-type='audio'][data-random-played='false']");
-            var totalSongs = document.querySelectorAll("#songs [data-type='audio']").length;
+            active = parseInt(active.getAttribute("data-random-num"));
 
-            if (availableSongs.length > 0) {
-                var rndSongNumber = Math.round(Math.random() * (availableSongs.length - 1));
-                next = new Song(availableSongs[rndSongNumber]);
+            if (active < totalSongs) {
+                next = new Song(document.querySelector("#songs [data-random-num='" + (active + 1) + "']"));
 
             } else if (audioplayer.config.restartOnLast) {
-                var songs = document.querySelectorAll("#songs [data-type='audio'][data-random-played='true']");
-                songs.forEach((song) => {
-                    song.setAttribute("data-random-played", false);
-                });
+                next = new Song(document.querySelector("#songs [data-random-num='0']"));
 
-                // repeat function
-                audioplayer.nextSong();
-                return;
             }
 
         }
+
         if (next == null) {
             swal({
-                title: 'Siguiente canción no disponible ',
-                text: 'No hay mas canciones que reproducir',
-                type: 'info',
+                title: 'Next song not available!',
+                text: 'There aren\'t more songs to play',
                 showConfirmButton: false,
+                type: 'info',
                 timer: audioplayer.config.swalTimer
             });
         } else {
@@ -245,34 +239,59 @@ var audioplayer = {
         }
     },
     previousSong: () => {
-        var firstSong = document.querySelector("#songs [data-type='audio']");
         var active = document.querySelector("#songs .active");
+        var previous = null;
         if (!active) {
             return;
         }
 
-        active = parseInt(active.getAttribute("data-num"));
+        if (audioplayer.audio.object.currentTime > 3) {
+            previous = new Song(document.querySelector("#songs .active"));
 
-        if (active > parseInt(firstSong.getAttribute("data-num"))) {
-            var previous = new Song(document.querySelector("#songs [data-num='" + (active - 1)  + "']"));
+        } else if (!audioplayer.audio.random) {
 
-        } else if (active == parseInt(firstSong.getAttribute("data-num")) && audioplayer.config.restartOnFirst) {
-            var allSongs = document.querySelectorAll("#songs [data-type='audio']");
-            var previous = new Song(allSongs[allSongs.length - 1]);
+            var firstSong = document.querySelector("#songs [data-type='audio']");
+            active = parseInt(active.getAttribute("data-num"));
+
+            if (active > parseInt(firstSong.getAttribute("data-num"))) {
+                previous = new Song(document.querySelector("#songs [data-num='" + (active - 1)  + "']"));
+
+            } else if (active == parseInt(firstSong.getAttribute("data-num")) && audioplayer.config.restartOnFirst) {
+                var allSongs = document.querySelectorAll("#songs [data-type='audio']");
+                previous = new Song(allSongs[allSongs.length - 1]);
+            }
 
         } else {
+
+            var firstSong = document.querySelector("#songs [data-random-num='0']");
+            active = parseInt(active.getAttribute("data-random-num"));
+
+            if (active > parseInt(firstSong.getAttribute("data-random-num"))) {
+                previous = new Song(document.querySelector("#songs [data-random-num='" + (active - 1) + "']"));
+
+            } else if (active == parseInt(firstSong.getAttribute("data-random-num")) && audioplayer.config.restartOnLast) {
+                var allSongs = document.querySelectorAll("#songs [data-type='audio']");
+                previous = new Song(document.querySelector("#songs [data-random-num='" + (allSongs.length - 1) + "']"));
+
+            }
+
+        }
+
+        if (previous == null) {
             swal({
-                title: '¡Canción anterior no disponible!',
-                text: 'No hay ninguna cancion anterior a la actual',
+                title: 'Previous song not available!',
+                text: 'There isn\'t any song previous to the one is playing',
                 type: 'error',
                 showConfirmButton: false,
                 timer: audioplayer.config.swalTimer
             });
 
             return;
+
+        } else {
+            previous.parse();
+            audioplayer.newSong(previous);
         }
-        previous.parse();
-        audioplayer.newSong(previous);
     },
     repeat: (repeat) => {
         var mode = repeat.getAttribute("data-mode");
@@ -363,13 +382,13 @@ var audioplayer = {
     },
     random: () => {
         var random;
+        var songs = [].slice.call(document.querySelectorAll("#songs [data-type='audio']"), 0);
 
         if (audioplayer.audio.random) {
             random = +false;
 
-            var songs = document.querySelectorAll("#songs [data-random-played='true']");
             songs.forEach((song) => {
-                song.setAttribute("data-random-played", false);
+                song.removeAttribute("data-random-num");
             });
 
             audioplayer.elements.buttons.randomOn.style.display = "none";
@@ -378,12 +397,27 @@ var audioplayer = {
         } else {
             random = +true;
 
+            audioplayer.randomOrder();
+
             audioplayer.elements.buttons.randomOff.style.display = "none";
             audioplayer.elements.buttons.randomOn.style.display = "inline-block";
         }
 
         audioplayer.audio.random = random;
         localStorage.setItem("audioRandom", random);
+    },
+    randomOrder: (songs) => {
+        var songs = [].slice.call(document.querySelectorAll("#songs [data-type='audio']"), 0);
+        var rndSongNumber;
+
+        while(songs.length > 0) {
+            rndSongNumber = Math.round(Math.random() * (songs.length - 1));
+
+            songs[rndSongNumber].setAttribute("data-random-num", document.querySelectorAll("#songs [data-type='audio']").length - songs.length);
+            songs.splice(rndSongNumber, 1);
+        }
+
+        return true;
     },
     onended: () => {
         audioplayer.stop();
@@ -420,7 +454,7 @@ var audioplayer = {
             curSec = "0" + curSec;
         }
 
-        audioplayer.elements.timeline.played.innerHTML = curMin + ":" + curSec;
+        audioplayer.elements.timeline.played.innerText = curMin + ":" + curSec;
     },
 
     scroll: (parent, element, duration) => {
@@ -556,6 +590,6 @@ function initVariables() {
     audioplayer.elements.timeline.played = audioplayer.elements.player.getElementsByClassName("begin")[0];
     audioplayer.elements.timeline.total = audioplayer.elements.player.getElementsByClassName("end")[0];
 
-    audioplayer.log("Variabled loaded");
+    audioplayer.log("Variables loaded");
     window.dispatchEvent(variablesLoadedEvnt);
 }
