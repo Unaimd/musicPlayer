@@ -1,5 +1,8 @@
 # v1.0.4 (working on it)
 
+If the song has played more than 3 seconds changing to the previous song will restart the active song.
+Shuffle now reproduces the previous random song. 
+
 Started implementing the settings window.
  - Options (change theme)
  - Hotkeys (not changeable yet)
@@ -10,7 +13,7 @@ Window can be smaller, UI changes
 Secondary click over a song to show some options:
  - Add to favourites (not yet implemented)
  - Change album art image (not yet implemented)
- - Show app options (not yet implemented)
+ - Show app options
 
 
 # v1.0.3
