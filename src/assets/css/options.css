@@ -45,7 +45,7 @@ body > .category {
 }
 
 .subcategory {
-    width: calc(100% - 5px);
+    padding-right: 20px;
 }
 
 .subcategory h2 {
