@@ -81,14 +81,35 @@ if (typeof audioplayer === "undefined") {
     }
 
     function showContextMenu(e) {
+        e.preventDefault();
+
+        var contextMenu = document.getElementById("contextMenu");
+        var documentWidth = document.body.offsetWidth;
+        var documentHeight = document.body.offsetHeight + 30;
+
         var posX = e.clientX;
         var posY = e.clientY;
 
-        document.getElementById("contextMenu").style.display = "block";
-        document.getElementById("contextMenu").style.left = posX + "px";
-        document.getElementById("contextMenu").style.top = posY + "px";
+        contextMenu.style.display = "block";
 
-        e.preventDefault();
+        if (documentWidth > posX + contextMenu.offsetWidth) {
+            contextMenu.style.left = posX + "px";
+            contextMenu.style.right = null;
+        } else {
+            contextMenu.style.left = null;
+            contextMenu.style.right = documentWidth - posX + "px";
+        }
+
+        if (documentHeight > posY + contextMenu.offsetHeight) {
+            contextMenu.style.top = posY + "px";
+            contextMenu.style.bottom = null;
+
+        } else {
+            contextMenu.style.top = null;
+            contextMenu.style.bottom = documentHeight - posY + "px";
+
+        }
+
     }
 
     function clickPercent(element, e) {
