@@ -1,7 +1,9 @@
 # v1.0.4 (working on it)
 
+Drop a directory to show music from there
+
 If the song has played more than 3 seconds changing to the previous song will restart the active song.
-Shuffle now reproduces the previous random song. 
+Shuffle now reproduces the previous random song.
 
 Started implementing the settings window.
  - Options (change theme)

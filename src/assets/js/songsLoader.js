@@ -330,4 +330,22 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
+    var dragAndLoad = new Dropable(document.body, {
+        dragenter: (event) => {
+            var folderIcon = document.querySelector(".dropzone .box");
+            if (event.srcElement == folderIcon) {
+                folderIcon.querySelector(".fa").className = folderIcon.querySelector(".fa").className.replace(" fa-folder-o ", " fa-folder-open-o ");
+            }
+        },
+        dragleave: (event) => {
+            var folderIcon = document.querySelector(".dropzone .box");
+            folderIcon.querySelector(".fa").className = folderIcon.querySelector(".fa").className.replace(" fa-folder-open-o ", " fa-folder-o ");
+        },
+        drop: (event, files) => {
+            if(fs.statSync(files[0].path).isDirectory()) {
+                ipcRenderer.send("loadAudioFromDir", files[0].path);
+            }
+        }
+    });
+
 }, false);
