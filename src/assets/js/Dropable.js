@@ -3,7 +3,7 @@ function Dropable(element, callbacks) {
 
     this.element = element;
 
-    this.dragenter = () => {
+    this.dragenter = (event) => {
         this.childrens++;
 
         if (this.element.className.indexOf(" dragenter") == -1) {
@@ -13,15 +13,15 @@ function Dropable(element, callbacks) {
         }
 
         if (typeof callbacks.dragenter === "function") {
-            callbacks.dragenter();
+            callbacks.dragenter(event);
         }
 
     };
 
-    this.dragover = () => {
+    this.dragover = (event) => {
 
         if (typeof callbacks.dragover === "function") {
-            callbacks.dragover();
+            callbacks.dragover(event);
         }
 
     };
@@ -40,7 +40,7 @@ function Dropable(element, callbacks) {
         }
     };
 
-    this.dragleave = () => {
+    this.dragleave = (event) => {
         this.childrens--;
 
         if (this.childrens == 0) {
@@ -54,7 +54,7 @@ function Dropable(element, callbacks) {
             }
 
             if (typeof callbacks.dragleave === "function") {
-                callbacks.dragleave();
+                callbacks.dragleave(event);
             }
         }
     };
