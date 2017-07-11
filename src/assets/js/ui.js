@@ -1,5 +1,3 @@
-const {shell} = require("electron");
-
 document.addEventListener("DOMContentLoaded", () => {
 
     // titlebar elements
