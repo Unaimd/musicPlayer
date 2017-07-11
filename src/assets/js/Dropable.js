@@ -1,50 +1,77 @@
-function Dropable(element, action) {
-    this.element = element;
-    this.action = action;
+function Dropable(element, callbacks) {
+    this.childrens = 0;
 
+    this.element = element;
+
+    this.dragenter = () => {
+        this.childrens++;
+
+        if (this.element.className.indexOf(" dragenter") == -1) {
+            this.element.className = this.element.className.replace(" drop", "");
+            this.element.className = this.element.className.replace(" dragleave", "");
+            this.element.className += " dragenter";
+        }
+
+        if (typeof callbacks.dragenter === "function") {
+            callbacks.dragenter();
+        }
+
+    };
+
+    this.dragover = () => {
+
+        if (typeof callbacks.dragover === "function") {
+            callbacks.dragover();
+        }
+
+    };
+
+    this.drop = (event) => {
+        this.childrens = 0;
+
+        if (this.element.className.indexOf(" dragenter") > -1) {
+            this.element.className = this.element.className.replace(" dragenter", " drop");
+            this.element.className = this.element.className.replace(" drop", "");
+
+        }
+
+        if (typeof callbacks.drop === "function") {
+            callbacks.drop(event, event.dataTransfer.files);
+        }
+    };
+
+    this.dragleave = () => {
+        this.childrens--;
+
+        if (this.childrens == 0) {
+
+            if (this.element.className.indexOf(" dragenter") > -1) {
+                this.element.className = this.element.className.replace(" dragenter", " dragleave");
+
+                setTimeout(() => {
+                    this.element.className = this.element.className.replace(" dragleave", "");
+                }, 1000);
+            }
+
+            if (typeof callbacks.dragleave === "function") {
+                callbacks.dragleave();
+            }
+        }
+    };
+
+    this.element.addEventListener("dragenter", this.stopAndPreventDefault, false);
+    this.element.addEventListener("dragover", this.stopAndPreventDefault, false);
+    this.element.addEventListener("drop", this.stopAndPreventDefault, false);
+    this.element.addEventListener("dragleave", this.stopAndPreventDefault, false);
+
+    this.element.addEventListener("dragenter", this.dragenter, false);
     this.element.addEventListener("dragover", this.dragover, false);
-    this.element.addEventListener("drop", this.drop, false);
     this.element.addEventListener("dragleave", this.dragleave, false);
+    this.element.addEventListener("drop", this.drop, false);
+
 }
 
-Dropable.prototype.dragover = function(event) {
+Dropable.prototype.stopAndPreventDefault = function(event) {
     event.stopPropagation();
     event.preventDefault();
-
-    if (this.className.indexOf("dragging") == -1) {
-        this.className += " dragging";
-        console.log("dragover");
-    }
-
-};
-
-Dropable.prototype.drop = function(event) {
-    event.stopPropagation();
-    event.preventDefault();
-
-    if (this.className.indexOf("drop") == -1) {
-        this.className = this.className.replace("dragging", "drop");
-    }
-
-    var files = event.dataTransfer.files[0];
-
-    if (typeof this.action === "function") {
-        this.action();
-
-    } else {
-        console.log(files);
-    }
-
-};
-
-Dropable.prototype.dragleave = function(event) {
-    event.stopPropagation();
-    event.preventDefault();
-
-    this.className = this.className.replace(" dragging", "");
-    console.log("dragend");
-};
-
-var d = new Dropable(document.body, () => {
-    swal("drop");
-});
+}
