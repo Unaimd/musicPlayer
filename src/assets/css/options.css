@@ -79,7 +79,7 @@ body > .category {
 }
 
 .subcategory label:hover input:not(:checked) + span {
-    background-color: rgba(0, 255, 255, 0.3);
+    background-color: rgba(255, 255, 255, 0.5);
 }
 
 .subcategory a {
