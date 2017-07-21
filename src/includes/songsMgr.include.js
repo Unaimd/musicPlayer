@@ -9,15 +9,13 @@ const fs = require('fs');
 const id3 = require('musicmetadata');
 const curl = require('curl');
 
+// visible variables from inport
 module.exports = {
-    selectFolder: selectFolder,
-    getSongMetadata: getSongMetadata,
-    albumArt: albumArt,
     loadMusicFromDir: loadMusicFromDir,
-    scanSongsFromDir: scanSongsFromDir,
-    readFromJson: readFromJson
 
 };
+
+var songs = new Array();
 
 function selectFolder() {
     var dir = dialog.showOpenDialog({
@@ -185,10 +183,10 @@ function albumArt(metadata, file, callback) {
 }
 
 function loadMusicFromDir(event, dir) {
+    songs = new Array();
+
     var cachedDir = "./metadata.json";
     var mostRecentFileModdate = -1;
-
-    var songs = new Array();
 
     if (typeof dir === "undefined") {
         dir = selectFolder();
@@ -277,43 +275,49 @@ function loadMusicFromDir(event, dir) {
 function scanSongsFromDir(dir, callback) {
     var songs = new Array();
     var totalSongs = 0;
-    fs.readdir(dir, (error, files) => {
 
-        files.forEach((file, index) => {
-            var filePath = path.resolve(dir, file);
+    if (songs.length == 0) {
+        fs.readdir(dir, (error, files) => {
 
-            // directory
-            if (fs.lstatSync(filePath).isDirectory()) {
+            files.forEach((file, index) => {
+                var filePath = path.resolve(dir, file);
 
-            // file
-            } else if (fs.lstatSync(filePath).isFile()) {
-                var dotSplit = file.split(".");
+                // directory
+                if (fs.lstatSync(filePath).isDirectory()) {
 
-                if (dotSplit[dotSplit.length - 1].toUpperCase() == "MP3") {
-                    totalSongs++;
+                // file
+                } else if (fs.lstatSync(filePath).isFile()) {
+                    var dotSplit = file.split(".");
 
-                    getSongMetadata(filePath, function(metadata) {
-                        songs.push(metadata);
-                    });
-                }
-            }
+                    if (dotSplit[dotSplit.length - 1].toUpperCase() == "MP3") {
+                        totalSongs++;
 
-            // execute code on scanning last file
-            if (files.length - index == 1) {
-                var interval = setInterval(() => {
-                    if (songs.length == totalSongs) {
-                        if (typeof callback === "function") {
-                            callback(songs);
-                        }
-                        clearInterval(interval);
+                        getSongMetadata(filePath, function(metadata) {
+                            songs.push(metadata);
+                        });
                     }
-                }, 10);
-            }
+                }
+
+                // execute code on scanning last file
+                if (files.length - index == 1) {
+                    var interval = setInterval(() => {
+                        if (songs.length == totalSongs) {
+                            if (typeof callback === "function") {
+                                callback(songs);
+                            }
+                            clearInterval(interval);
+                        }
+                    }, 10);
+                }
+
+            });
 
         });
-
-    });
-
+    } else {
+        if (typeof callback === "function") {
+            callback(songs);
+        }
+    }
 }
 
 function readFromJson(event, json) {
