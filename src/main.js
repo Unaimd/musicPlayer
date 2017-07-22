@@ -223,6 +223,10 @@ app.on('ready', () => {
         return;
     });
 
+    ipcMain.on("changeAlbumart", (event, songPath) => {
+        songsMgr.setAlbumArt(songPath);
+    });
+
     ipcMain.on("update", () => {
         autoUpdater.quitAndInstall();
     });

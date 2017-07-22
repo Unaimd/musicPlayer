@@ -12,7 +12,7 @@ const curl = require('curl');
 // visible variables from inport
 module.exports = {
     loadMusicFromDir: loadMusicFromDir,
-
+    setAlbumArt: setAlbumArt
 };
 
 var songs = new Array();
@@ -26,6 +26,20 @@ function selectFolder() {
         return false;
     } else {
         return dir[0];
+    }
+}
+
+function selectImage() {
+    var image = dialog.showOpenDialog({
+        filters: [{
+            name: 'Images', extensions: ['jpg', 'jpeg']
+        }]
+    });
+
+    if (typeof image === "undefined") {
+        return false;
+    } else {
+        return image[0]
     }
 }
 
@@ -152,7 +166,7 @@ function albumArt(metadata, file, callback) {
 
     } catch (error) {
         if (error) {
-            console.log("Error searching arbum art");
+            console.log("Error searching album art");
         }
         imgPath = undefined;
     }
@@ -180,6 +194,126 @@ function albumArt(metadata, file, callback) {
     }
 
     ********************************************************/
+}
+
+function createAlbumArt(metadata, songPath, imagePath) {
+    var imgPath = path.resolve("./albumArt/");
+    var filename = undefined;
+
+    if (!fs.existsSync(imgPath)) {
+        fs.mkdir(imgPath, function(error) {
+            if (error) {
+                console.log("error creating albumArt folder: " + imgPath);
+            }
+        });
+    }
+
+    // if no title use the filename
+    if (!metadata.title.length) {
+        var filename = songPath.replace(path.dirname(songPath) + path.sep, "");
+        var dotSplit = filename.split(".");
+
+        metadata.title = filename.replace("." + dotSplit[dotSplit.length - 1], "");
+    }
+
+    try {
+        // file contains album art image
+        if (imagePath || metadata.picture[0]) {
+            var format = "jpg";
+
+            if (metadata.album) {
+                filename = metadata.album;
+
+                if (metadata.artist[0]) {
+                    imgPath = path.resolve(imgPath, metadata.artist[0]);
+                }
+
+            } else if (metadata.artist[0] ) {
+                imgPath = path.resolve(imgPath, metadata.artist[0]);
+
+                filename = metadata.title;
+
+            } else {
+                filename = metadata.title;
+            }
+
+            filename += "." + format;
+
+            // copy from given image
+            if (imagePath) {
+                fs.createReadStream(imagePath).pipe(fs.createWriteStream(path.resolve(imgPath, filename)));
+
+            // create from metadata
+            } else {
+                var image = metadata.picture[0];
+                format = image.format;
+
+                if (!fs.existsSync(imgPath)) {
+
+                    fs.mkdir(imgPath, function(error) {
+                        if (error) {
+                            console.log("error creating artist folder: " + imgPath);
+                        }
+                    });
+                }
+
+                if (!fs.existsSync(path.resolve(imgPath, filename))) {
+                    var base64buffer = new Buffer(image.data, "base64");
+                    fs.writeFile(path.resolve(imgPath, filename), base64buffer, function(error) {
+                        if (error) {
+                            console.log("error creating album image: " + path.resolve(imgPath, filename));
+                        }
+                    });
+                }
+            }
+
+            imgPath = path.resolve(imgPath, filename);
+
+        // artist/title.jpg
+        } else if (metadata.artist[0] && metadata.title && fs.existsSync(path.resolve(imgPath, metadata.artist[0], metadata.title + ".jpg"))) {
+            imgPath = path.resolve(imgPath, metadata.artist[0], metadata.title + ".jpg");
+
+        // artist/album.jpg
+        } else if (metadata.artist[0] && metadata.album && fs.existsSync(path.resolve(imgPath, metadata.artist[0], metadata.album + ".jpg"))) {
+            imgPath = path.resolve(imgPath, metadata.artist[0], metadata.album + ".jpg");
+
+        // artist.jpg
+        } else if (metadata.artist[0] && fs.existsSync(path.resolve(imgPath, metadata.artist[0] + ".jpg"))) {
+            imgPath = path.resolve(imgPath, metadata.artist[0] + ".jpg");
+
+        // title.jpg
+        } else if ( metadata.title && fs.existsSync(path.resolve(imgPath, metadata.title + ".jpg"))) {
+            imgPath = path.resolve(imgPath, metadata.title + ".jpg");
+
+        // album.jpg
+        } else if (metadata.album && fs.existsSync(path.resolve(imgPath, metadata.album + ".jpg"))) {
+            imgPath = path.resolve(imgPath, metadata.album + ".jpg");
+
+        // default
+        } else {
+            imgPath = undefined;
+        }
+
+    } catch (error) {
+        if (error) {
+            console.log("Error creating album art");
+        }
+        imgPath = undefined;
+    }
+
+}
+
+function setAlbumArt(songPath) {
+
+    if (fs.existsSync(songPath)) {
+        var img = selectImage()
+
+        if (img !== false) {
+            getSongMetadata(songPath, (metadata) => {
+                createAlbumArt(metadata, songPath, img);
+            });
+        }
+    }
 }
 
 function loadMusicFromDir(event, dir) {

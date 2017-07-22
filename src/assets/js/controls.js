@@ -52,6 +52,10 @@ if (typeof audioplayer === "undefined") {
                 case "settings":
                     ipcRenderer.send("showOptions");
                     break;
+                case "change-albumart":
+                    var songPath = element.parentNode.parentNode.getAttribute("data-path");
+                    ipcRenderer.send("changeAlbumart", songPath);
+                    break;
 
                 default:
                     swal({
@@ -90,6 +94,7 @@ if (typeof audioplayer === "undefined") {
         var posX = e.clientX;
         var posY = e.clientY;
 
+        contextMenu.setAttribute("data-path", this.getAttribute("data-path"))
         contextMenu.style.display = "block";
 
         if (documentWidth > posX + contextMenu.offsetWidth) {
