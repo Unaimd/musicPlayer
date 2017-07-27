@@ -127,9 +127,10 @@
     left: 253px;
     transform: rotate(270deg);
     display: none;
+    background-color: transparent;
 
     -webkit-appearance: none;
-    margin: 18px 0;
+    padding: 18px 0;
     width: 110px;
 }
 
@@ -407,6 +408,10 @@
 
     #audioplayer .info .moreinfo {
         margin: 5px 0px;
+    }
+
+    #audioplayer input[type=range] {
+        left: 406px;
     }
 
     #audioplayer .sorting {

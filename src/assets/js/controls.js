@@ -173,18 +173,31 @@ if (typeof audioplayer === "undefined") {
             }, false);
         });
 
+        var volumeRangeHiderTimer;
         audioplayer.elements.buttons.volumeIndicator.forEach((element) => {
             element.addEventListener("click", () => {
+                clearInterval(volumeRangeHiderTimer);
                 if (audioplayer.elements.buttons.volumeRange.style.display == "block") {
                     audioplayer.elements.buttons.volumeRange.style.display = "none";
+
                 } else {
                     audioplayer.elements.buttons.volumeRange.style.display = "block";
+
+                    volumeRangeHiderTimer = setTimeout(() => {
+                        var element = document.querySelector("input:hover");
+
+                        if (!element || element.getAttribute("name") != "volumeRange") {
+                            clearInterval(volumeRangeHiderTimer);
+                            audioplayer.elements.buttons.volumeRange.style.display = "none";
+                        }
+                    }, 2000);
                 }
             }, false);
         });
 
-        audioplayer.elements.buttons.volumeRange.addEventListener("mouseup", () => {
+        audioplayer.elements.buttons.volumeRange.addEventListener("mouseout", () => {
             audioplayer.elements.buttons.volumeRange.style.display = "none";
+            clearInterval(volumeRangeHiderTimer);
         }, false);
 
         audioplayer.elements.buttons.volumeRange.addEventListener("input", () => {
