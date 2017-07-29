@@ -34,13 +34,14 @@
 
         <nav>
             <ul>
-                <li class="active" data-target="options">Options</li>
-                <li data-target="hotkeys">Hotkeys</li>
+                <li data-target="options" style="display:none;">Options</li>
+                <li class="active" data-target="hotkeys">Hotkeys</li>
                 <li data-target="about">About</li>
+                <li data-target="changelog">Changelog</li>
             </ul>
         </nav>
 
-        <div class="category active" data-category="options">
+        <div class="category hidden" data-category="options">
 
             <div class="subcategory">
                 <h2>
@@ -120,7 +121,7 @@
 
         </div>
 
-        <div class="category hidden" data-category="hotkeys">
+        <div class="category active" data-category="hotkeys">
 
             <div class="subcategory">
                 <h2>
@@ -209,45 +210,62 @@
             </div>
         </div>
 
-        <script type="text/javascript">
-            document.querySelectorAll("nav > ul > li").forEach((element) => {
-                element.addEventListener("click", changeCategory, false);
-            });
+        <div class="category hidden" data-category="changelog">
+            <div class="subcategory">
+                <h2>
+                    Changelog
+                </h2>
 
-            function changeCategory() {
-                if (this.className.indexOf("active") == -1) {
-                    showCategory(this);
-                }
-            }
+                Here you have it in case you missed it.
+                <div>
 
-            function showCategory(target) {
-                document.querySelectorAll("ul > li").forEach((element) => {
-                    var category = document.querySelector(".category[data-category=\"" + element.getAttribute("data-target") + "\"]");
-
-                    if (target == element) {
-                        element.className = "active";
-
-                        category.className = category.className.replace("hidden", "active");
-
-                    } else {
-                        element.className = null;
-
-                        try {
-                            category.className = category.className.replace("active", "hidden");
-                        } catch (e) {
-                            //console.error(e);
-                        }
-                    }
-
-                });
-            }
-
-        </script>
+                </div>
+            </div>
+        </div>
 
         <script src="./assets/js/main.js"></script>
         <script src="./assets/js/Dropable.js"></script>
         <script src="./assets/js/Hotkey.js"></script>
         <script src="./assets/js/ui.js"></script>
         <script src="./assets/js/autoUpdater.js"></script>
+
+        <script type="text/javascript">
+        // add changelog
+        document.querySelector("[data-category='changelog'] .subcategory div").innerHTML = ipcRenderer.sendSync("changelog", "getChangelog");
+
+        document.querySelectorAll("nav > ul > li").forEach((element) => {
+            element.addEventListener("click", changeCategory, false);
+        });
+
+
+        function changeCategory() {
+            if (this.className.indexOf("active") == -1) {
+                showCategory(this);
+            }
+        }
+
+        function showCategory(target) {
+            document.querySelectorAll("ul > li").forEach((element) => {
+                var category = document.querySelector(".category[data-category=\"" + element.getAttribute("data-target") + "\"]");
+
+                if (target == element) {
+                    element.className = "active";
+
+                    category.className = category.className.replace("hidden", "active");
+
+                } else {
+                    element.className = null;
+
+                    try {
+                        category.className = category.className.replace("active", "hidden");
+                    } catch (e) {
+                        //console.error(e);
+                    }
+                }
+
+            });
+        }
+
+        </script>
     </body>
 </html>
