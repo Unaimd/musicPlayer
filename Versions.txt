@@ -1,4 +1,11 @@
-# v1.0.4 (working on it)
+# v1.0.5 (working on it)
+
+Secondary click over a song to show some options:
+ - Add to favourites (not yet implemented)
+
+# v1.0.4
+
+Added changelog
 
 Drop a directory to show music from there
 
@@ -10,13 +17,11 @@ Started implementing the settings window.
  - Hotkeys (not changeable yet)
  - About
 
-Window can be smaller, UI changes
+ Window can be smaller, UI changes
 
 Secondary click over a song to show some options:
- - Add to favourites (not yet implemented)
- - Change album art image (not yet implemented)
+ - Change album art image
  - Show app options
-
 
 # v1.0.3
 
