@@ -165,6 +165,25 @@ app.on('ready', () => {
 
     });
 
+    // changelog
+    ipcMain.on("changelog", (event, action) => {
+
+        switch(action) {
+            case "getVersion":
+                event.returnValue = app.getVersion();
+                break;
+            case "getChangelog":
+                event.returnValue = fs.readFileSync(path.resolve("./src/changelog.html"), {
+                    "encoding": "utf8"
+                });
+                break;
+
+            default:
+            event.returnValue = "uknown action, sent " + action;
+        }
+        
+    });
+
     // user interface titlebar actions
     ipcMain.on("titleBar", (event, arg) => {
         var window = arg.win;
