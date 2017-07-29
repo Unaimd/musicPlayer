@@ -9,6 +9,7 @@ var Changelog = {
             localStorage.setItem("version", Changelog.runnningVersion);
 
             Changelog.setTitle();
+            Changelog.setContent();
             Changelog.show();
         }
     },
@@ -48,7 +49,3 @@ var Changelog = {
     }
 
 }
-
-Changelog.show();
-Changelog.setTitle();
-Changelog.setContent();
