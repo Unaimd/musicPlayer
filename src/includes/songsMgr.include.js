@@ -15,6 +15,10 @@ module.exports = {
     setAlbumArt: setAlbumArt
 };
 
+/*
+ *
+ */
+
 var songs = new Array();
 
 function selectFolder() {
