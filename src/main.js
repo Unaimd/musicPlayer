@@ -173,7 +173,7 @@ app.on('ready', () => {
                 event.returnValue = app.getVersion();
                 break;
             case "getChangelog":
-                event.returnValue = fs.readFileSync(path.resolve("./src/changelog.html"), {
+                event.returnValue = fs.readFileSync(path.resolve("./changelog.html"), {
                     "encoding": "utf8"
                 });
                 break;
@@ -181,7 +181,7 @@ app.on('ready', () => {
             default:
             event.returnValue = "uknown action, sent " + action;
         }
-        
+
     });
 
     // user interface titlebar actions
