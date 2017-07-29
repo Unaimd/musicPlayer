@@ -173,7 +173,7 @@ app.on('ready', () => {
                 event.returnValue = app.getVersion();
                 break;
             case "getChangelog":
-                event.returnValue = fs.readFileSync(path.resolve("./changelog.html"), {
+                event.returnValue = fs.readFileSync(__dirname + "/changelog.html", {
                     "encoding": "utf8"
                 });
                 break;
