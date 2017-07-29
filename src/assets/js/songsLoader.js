@@ -342,8 +342,11 @@ document.addEventListener("DOMContentLoaded", () => {
             folderIcon.querySelector(".fa").className = folderIcon.querySelector(".fa").className.replace(" fa-folder-open-o ", " fa-folder-o ");
         },
         drop: (event, files) => {
-            if(fs.statSync(files[0].path).isDirectory()) {
+            if (fs.statSync(files[0].path).isDirectory()) {
                 ipcRenderer.send("loadAudioFromDir", files[0].path);
+                
+            } else {
+                swal("Invalid file", "The dropped file should be a folder", "error");
             }
         }
     });
