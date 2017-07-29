@@ -1,5 +1,8 @@
-const {ipcRenderer} = require("electron");
-const {shell} = require("electron");
+const {
+    ipcRenderer,
+    shell
+} = require("electron");
+
 const fs = require("fs");
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -17,5 +20,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
 
     }
+
+    Changelog.init();
 
 }, false);
