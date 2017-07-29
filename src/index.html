@@ -16,6 +16,7 @@
     <link rel="stylesheet" href="./assets/lib/font-awesome/css/font-awesome.css">
     <!-- -->
     <link rel="stylesheet" href="./assets/css/main.css">
+    <link rel="stylesheet" href="./assets/css/changelog.css">
     <link rel="stylesheet" href="./assets/css/ui.css">
 
     <link rel="stylesheet" href="./assets/css/utilities.css">
@@ -138,11 +139,11 @@
 
     <div id="contextMenu">
         <ul>
-            <li data-target="toggle-favourite">
+            <li class="hidden" data-target="toggle-favourite">
                 <i class="fa fa-star"></i>&nbsp;Add to Favourites
             </li>
             <li data-target="change-albumart">
-                <i class="fa fa-picture-o"></i>&nbsp;Change albumart
+                <i class="fa fa-picture-o"></i>&nbsp;Change album art
             </li>
             <li class="separator"></li>
             <li data-target="toggle-theme">
@@ -165,7 +166,6 @@
             </h3>
         </div>
     </div>
-
 
     <div class="content">
         <ul id="songs">
@@ -215,11 +215,26 @@
         </ul>
     </div>
 
+    <div class="changelog-offset" style="display: none"></div>
+    <div class="changelog" style="display: none">
+        <div class="changelogHead">
+            <span class="title">
+                Welcome to version
+                <span class="version"></span>
+            </span>
+            <span class="close">
+                &times;
+            </span>
+        </div>
+        <div class="changelogContent"></div>
+    </div>
+
     <script src="./assets/js/main.js"></script>
+    <script src="./assets/js/Changelog.js"></script>
     <script src="./assets/js/Dropable.js"></script>
     <script src="./assets/js/Hotkey.js"></script>
+    <script src="./assets/js/AutoUpdater.js"></script>
     <script src="./assets/js/ui.js"></script>
-    <script src="./assets/js/autoUpdater.js"></script>
 
     <script src="./assets/js/Song.js"></script>
     <script src="./assets/js/audioplayer.js"></script>
