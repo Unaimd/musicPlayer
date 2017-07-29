@@ -9,7 +9,7 @@
 
 ::selection {
   background-color: none;
-  color: white;
+  color: inherit;
 }
 
 ::-webkit-scrollbar {
@@ -31,6 +31,7 @@
 *::before,
 *::after {
     box-sizing: border-box;
+    -webkit-user-select: none;
 }
 
 body {

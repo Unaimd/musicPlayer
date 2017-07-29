@@ -42,6 +42,7 @@ body > .category {
     display: block;
     width: calc(75% - 10px);
     overflow: auto;
+    cursor: default;
 }
 
 .subcategory {
