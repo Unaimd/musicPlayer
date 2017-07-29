@@ -1,16 +1,16 @@
-var autoUpdater = {
+var AutoUpdater = {
     checking: () => {
-        console.info("autoUpdater: searching for updates");
+        AutoUpdater.log("Searching for updates");
     },
     updateAvailable: () => {
-        console.info("autoUpdater: newer update was found");
+        AutoUpdater.log("Newer update was found");
     },
     updateNotAvailable: () => {
-        console.info("autoUpdater: newer update was not found");
+        AutoUpdater.log("Newer update was not found");
     },
     error: (error) => {
-        swal("Error", "There was an error trying to search updates, open the developer console for more details", "error");
-        console.error("autoUpdater: " + error);
+        swal("Error", "There was an error trying to search updates, check the developer console for more details", "error");
+        console.error("AutoUpdater: " + error);
     },
     downloadProgress: (progressObj) => {
         var bytesPerSecond = progressObj.bytesPerSecond;
@@ -35,47 +35,51 @@ var autoUpdater = {
             cancelButtonText: "No"
 
         }, () => {
-            autoUpdater.quitAndInstall();
+            AutoUpdater.quitAndInstall();
         });
     },
     quitAndInstall: () => {
         ipcRenderer.send("update");
+    },
+
+    log: (txt) => {
+        console.info("autoUpdater: " + txt);
     }
 };
 
-ipcRenderer.on("autoUpdater", (event, obj) => {
+ipcRenderer.on("AutoUpdater", (event, obj) => {
 
     switch (obj.type) {
         case "checking":
-            autoUpdater.checking(obj.data);
+            AutoUpdater.checking(obj.data);
             break;
 
         case "checking":
-            autoUpdater.checking(obj.data);
+            AutoUpdater.checking(obj.data);
             break;
 
         case "updateAvailable":
-            autoUpdater.updateAvailable(obj.data);
+            AutoUpdater.updateAvailable(obj.data);
             break;
 
         case "updateNotAvailable":
-            autoUpdater.updateNotAvailable(obj.data);
+            AutoUpdater.updateNotAvailable(obj.data);
             break;
 
         case "error":
-            autoUpdater.error(obj.data);
+            AutoUpdater.error(obj.data);
             break;
 
         case "downloadProgress":
-            autoUpdater.downloadProgress(obj.data);
+            AutoUpdater.downloadProgress(obj.data);
             break;
 
         case "updateDownloaded":
-            autoUpdater.updateDownloaded();
+            AutoUpdater.updateDownloaded();
             break;
 
         default:
-            console.log("autoUpdater: " + obj.type + "\n" + obj.data);
+            console.log("AutoUpdater: " + obj.type + "\n" + obj.data);
             break;
     }
 });
