@@ -6,19 +6,15 @@ import {
     dialog
 } from 'electron';
 
+import {autoUpdater} from "electron-updater";
+import curl from 'curl';
+import fs from 'fs';
+import id3 from 'musicmetadata';
 import path from 'path';
+import songsMgr from "./includes/songsMgr.include.js";
 import url from 'url';
 
-import fs from 'fs';
 
-import id3 from 'musicmetadata';
-import curl from 'curl';
-
-import {autoUpdater} from "electron-updater";
-
-import songsMgr from "./includes/songsMgr.include.js";
-
-// window objects
 let win,
     optionsWin,
     updateMsg;
@@ -173,48 +169,38 @@ app.on('ready', () => {
         let window = arg.win;
         let action = arg.action;
 
-        if (window == "main") {
-            window = win;
-        } else if (window == "options") {
-            window = optionsWin;
-        } else {
-            return;
+        switch(window) {
+            case "main":
+                window = win;
+                break;
+            case "options":
+                window = optionsWin;
+                break;
+            default:
+                return;
         }
 
-        // close
-        if (action == "close") {
+        switch (action) {
+            case "close":
+                (window == win) ? window.close() && app.quit() : window.hide();
+                break;
 
-            if (window == win) {
-                window.close();
-                app.quit();
-            } else {
-                window.hide();
-            }
+            case "maximize":
+                window.isMaximized() ? window.unmaximize() : window.maximize();
+                break;
 
-        // maximize unmazimize
-        } else if (action == "maximize") {
+            case "minimize":
+                window.minimize();
+                break;
 
-            // is maximized
-            if (window.isMaximized()) {
-                window.unmaximize();
+            case "loadFolder":
+                event.retrunValue = (songsMgr.loadMusicFromDir(event)) ? true : false;
+                break;
 
-            // is not maximized
-            } else {
-                window.maximize();
-            }
-
-        } else if (action == "minimize") {
-            window.minimize();
-
-        } else if (action == "loadFolder") {
-            if (songsMgr.loadMusicFromDir(event)) {
-                event.returnValue = true;
-            } else {
-                event.returnValue = false;
-            }
+            default:
+                event.returnValue = "ok";
         }
 
-        event.returnValue = "ok";
     });
 
     ipcMain.on("showOptions", () => {
