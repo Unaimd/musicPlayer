@@ -118,8 +118,8 @@ var songsLoader = {
             songs.reverse();
         }
 
-        for (i = start; i < songs.length; i++) {
-            song = songs[i];
+        for (let i = start; i < songs.length; i++) {
+            var song = songs[i];
 
             songsLoader.writeSong(song);
         }
@@ -344,7 +344,7 @@ document.addEventListener("DOMContentLoaded", () => {
         drop: (event, files) => {
             if (fs.statSync(files[0].path).isDirectory()) {
                 ipcRenderer.send("loadAudioFromDir", files[0].path);
-                
+
             } else {
                 swal("Invalid file", "The dropped file should be a folder", "error");
             }

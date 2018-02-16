@@ -58,7 +58,7 @@ function getSongMetadata(file, callback) {
     id3(readableStream, {duration: true}, function (err, metadata) {
 
         albumArt(metadata, file, (coverPath) => {
-            resp = {
+            var resp = {
                 path: file,
                 title: metadata.title,
                 artist: metadata.artist,
@@ -341,7 +341,7 @@ function loadMusicFromDir(event, dir) {
             // send the selected audio folder
             event.sender.send("selAudioDir", dir);
 
-            cachedJson = JSON.parse(fs.readFileSync(cachedDir));
+            var cachedJson = JSON.parse(fs.readFileSync(cachedDir));
 
             if (cachedJson.folder == dir) {
                 scanSongsFromDir(dir, (songs) => {
