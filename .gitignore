@@ -1,8 +1,8 @@
+albumArt
+node_modules
+out
+
+metadata.json
+
 *.bat
 *.sh
-
-src/node_modules/*
-src/dist/*
-
-albumArt/*
-metadata.json
