@@ -1,29 +1,28 @@
-const {
+import {
     app,
     BrowserWindow,
     globalShortcut,
     ipcMain,
     dialog
-} = require('electron');
+} from 'electron';
 
-const path = require('path');
-const url = require('url');
+import path from 'path';
+import url from 'url';
 
-const fs = require('fs');
+import fs from 'fs';
 
-const id3 = require('musicmetadata');
-const curl = require('curl');
+import id3 from 'musicmetadata';
+import curl from 'curl';
 
-const {autoUpdater} = require("electron-updater");
+import {autoUpdater} from "electron-updater";
 
-const songsMgr = require("./includes/songsMgr.include.js");
+import songsMgr from "./includes/songsMgr.include.js";
 
 // window objects
 let win,
     preloadWin,
-    optionsWin;
-
-let updateMsg
+    optionsWin,
+    updateMsg;
 
 app.on('ready', () => {
     preloadWin = new BrowserWindow({
@@ -186,8 +185,8 @@ app.on('ready', () => {
 
     // user interface titlebar actions
     ipcMain.on("titleBar", (event, arg) => {
-        var window = arg.win;
-        var action = arg.action;
+        let window = arg.win;
+        let action = arg.action;
 
         if (window == "main") {
             window = win;
