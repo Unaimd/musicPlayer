@@ -20,24 +20,10 @@ import songsMgr from "./includes/songsMgr.include.js";
 
 // window objects
 let win,
-    preloadWin,
     optionsWin,
     updateMsg;
 
 app.on('ready', () => {
-    preloadWin = new BrowserWindow({
-        width: 300,
-        height: 350,
-        show: true,
-
-        center: true,
-        resizable: false,
-        autoHideMenuBar: true,
-        frame: false,
-        transparent: true
-    });
-
-    preloadWin.loadURL("file://" + __dirname + "/preload.html");
 
     win = new BrowserWindow({
         show: false,
@@ -82,7 +68,6 @@ app.on('ready', () => {
 
     // hide preload and show main window
     win.once("ready-to-show", () => {
-        preloadWin.close();
         win.show();
 
         updateMsg = function(type, data) {
@@ -209,14 +194,14 @@ app.on('ready', () => {
         // maximize unmazimize
         } else if (action == "maximize") {
 
-                // is maximized
-                if (window.isMaximized()) {
-                    window.unmaximize();
+            // is maximized
+            if (window.isMaximized()) {
+                window.unmaximize();
 
-                // is not maximized
-                } else {
-                    window.maximize();
-                }
+            // is not maximized
+            } else {
+                window.maximize();
+            }
 
         } else if (action == "minimize") {
             window.minimize();
