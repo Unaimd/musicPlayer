@@ -17,7 +17,6 @@ module.exports = {
 /*
  *
  */
-
 let songs = new Array();
 
 function selectFolder() {
@@ -46,161 +45,161 @@ function selectImage() {
     }
 }
 
-function getSongMetadata(file, callback) {
-    let filemtime;
+function getSongMetadata(file) {
+    return new Promise((resolve, reject) => {
+        let filemtime,
+            readableStream;
 
-    fs.stat(file, (error, stats) => {
-        filemtime = new Date(stats.mtime).valueOf();
-    });
+        fs.stat(file, (error, stats) => {
+            filemtime = new Date(stats.mtime).valueOf();
+        });
 
-    let readableStream = fs.createReadStream(file);
+        readableStream = fs.createReadStream(file);
 
-    id3(readableStream, {
-        duration: true
-    }, function (err, metadata) {
+        id3(readableStream, {
+            duration: true
+        }, function (err, metadata) {
 
-        albumArt(metadata, file, (coverPath) => {
-            let resp = {
-                path: file,
-                title: metadata.title,
-                artist: metadata.artist,
-                album: metadata.album,
-                duration: metadata.duration,
-                cover: coverPath,
-                moddate: filemtime
-            }
+            albumArt(metadata, file)
+                .then((coverPath) => {
 
-            readableStream.close();
+                    readableStream.close();
 
-            if (typeof callback === "function") {
-                callback(resp);
-            }
+                    resolve({
+                        path: file,
+                        title: metadata.title,
+                        artist: metadata.artist,
+                        album: metadata.album,
+                        duration: metadata.duration,
+                        cover: coverPath,
+                        moddate: filemtime
+                    });
+            });
+
         });
 
     });
+
 }
 
-function albumArt(metadata, file, callback) {
+function albumArt(metadata, file) {
+    return new Promise((resolve, reject) => {
 
-    let imgPath = path.resolve("./albumArt/");
-    let filename = undefined;
+        let imgPath = path.resolve("./albumArt/");
+        let filename = undefined;
 
-    if (!fs.existsSync(imgPath)) {
-        fs.mkdir(imgPath, function(error) {
-            if (error) {
-                console.log("Image folder could't be created");
-            }
-        });
-    }
+        if (!fs.existsSync(imgPath)) {
+            fs.mkdir(imgPath, function(error) {
+                if (error) {
+                    console.log("Image folder could't be created");
+                }
+            });
+        }
 
-    // if no title use the filename
-    if (!metadata.title.length) {
-        filename = file.replace(path.dirname(file) + path.sep, "");
-        let dotSplit = filename.split(".");
+        // if no title use the filename
+        if (!metadata.title.length) {
+            filename = file.replace(path.dirname(file) + path.sep, "");
+            let dotSplit = filename.split(".");
 
-        metadata.title = filename.replace("." + dotSplit[dotSplit.length - 1], "");
-    }
+            metadata.title = filename.replace("." + dotSplit[dotSplit.length - 1], "");
+        }
 
-    try {
-        // file contains album art image
-        if (metadata.picture[0]) {
-            let image = metadata.picture[0];
-            let format = image.format;
+        try {
+            // file contains album art image
+            if (metadata.picture[0]) {
+                let image = metadata.picture[0];
+                let format = image.format;
 
-            if (metadata.album) {
-                filename = metadata.album;
+                if (metadata.album) {
+                    filename = metadata.album;
 
-                if (metadata.artist[0]) {
+                    if (metadata.artist[0]) {
+                        imgPath = path.resolve(imgPath, metadata.artist[0]);
+                    }
+
+                } else if (metadata.artist[0] ) {
                     imgPath = path.resolve(imgPath, metadata.artist[0]);
+
+                    filename = metadata.title;
+
+                } else {
+                    filename = metadata.title;
                 }
 
-            } else if (metadata.artist[0] ) {
-                imgPath = path.resolve(imgPath, metadata.artist[0]);
+                filename += "." + format;
 
-                filename = metadata.title;
+                if (!fs.existsSync(imgPath)) {
 
+                    fs.mkdir(imgPath, function(error) {
+                        if (error) {
+                            console.log("Artist folder couln't be created");
+                        }
+                    });
+                }
+
+                if (!fs.existsSync(path.resolve(imgPath, filename))) {
+                    let base64buffer = new Buffer(image.data, "base64");
+                    fs.writeFile(path.resolve(imgPath, filename), base64buffer, function(error) {
+                        if (error) {
+                            console.log("Error creating image \"" + filename + "\" on " + imgPath);
+                        }
+                    });
+                }
+
+                imgPath = path.resolve(imgPath, filename);
+
+            // artist/title.jpg
+            } else if (metadata.artist[0] && metadata.title && fs.existsSync(path.resolve(imgPath, metadata.artist[0], metadata.title + ".jpg"))) {
+                imgPath = path.resolve(imgPath, metadata.artist[0], metadata.title + ".jpg");
+
+            // artist/album.jpg
+            } else if (metadata.artist[0] && metadata.album && fs.existsSync(path.resolve(imgPath, metadata.artist[0], metadata.album + ".jpg"))) {
+                imgPath = path.resolve(imgPath, metadata.artist[0], metadata.album + ".jpg");
+
+            // artist.jpg
+            } else if (metadata.artist[0] && fs.existsSync(path.resolve(imgPath, metadata.artist[0] + ".jpg"))) {
+                imgPath = path.resolve(imgPath, metadata.artist[0] + ".jpg");
+
+            // title.jpg
+            } else if ( metadata.title && fs.existsSync(path.resolve(imgPath, metadata.title + ".jpg"))) {
+                imgPath = path.resolve(imgPath, metadata.title + ".jpg");
+
+            // album.jpg
+            } else if (metadata.album && fs.existsSync(path.resolve(imgPath, metadata.album + ".jpg"))) {
+                imgPath = path.resolve(imgPath, metadata.album + ".jpg");
+
+            // default
             } else {
-                filename = metadata.title;
+                imgPath = undefined;
             }
 
-            filename += "." + format;
-
-            if (!fs.existsSync(imgPath)) {
-
-                fs.mkdir(imgPath, function(error) {
-                    if (error) {
-                        console.log("Artist folder couln't be created");
-                    }
-                });
+        } catch (error) {
+            if (error) {
+                console.log("Error searching album art");
             }
-
-            if (!fs.existsSync(path.resolve(imgPath, filename))) {
-                let base64buffer = new Buffer(image.data, "base64");
-                fs.writeFile(path.resolve(imgPath, filename), base64buffer, function(error) {
-                    if (error) {
-                        console.log("Error creating image \"" + filename + "\" on " + imgPath);
-                    }
-                });
-            }
-
-            imgPath = path.resolve(imgPath, filename);
-
-        // artist/title.jpg
-        } else if (metadata.artist[0] && metadata.title && fs.existsSync(path.resolve(imgPath, metadata.artist[0], metadata.title + ".jpg"))) {
-            imgPath = path.resolve(imgPath, metadata.artist[0], metadata.title + ".jpg");
-
-        // artist/album.jpg
-        } else if (metadata.artist[0] && metadata.album && fs.existsSync(path.resolve(imgPath, metadata.artist[0], metadata.album + ".jpg"))) {
-            imgPath = path.resolve(imgPath, metadata.artist[0], metadata.album + ".jpg");
-
-        // artist.jpg
-        } else if (metadata.artist[0] && fs.existsSync(path.resolve(imgPath, metadata.artist[0] + ".jpg"))) {
-            imgPath = path.resolve(imgPath, metadata.artist[0] + ".jpg");
-
-        // title.jpg
-        } else if ( metadata.title && fs.existsSync(path.resolve(imgPath, metadata.title + ".jpg"))) {
-            imgPath = path.resolve(imgPath, metadata.title + ".jpg");
-
-        // album.jpg
-        } else if (metadata.album && fs.existsSync(path.resolve(imgPath, metadata.album + ".jpg"))) {
-            imgPath = path.resolve(imgPath, metadata.album + ".jpg");
-
-        // default
-        } else {
             imgPath = undefined;
         }
 
-    } catch (error) {
-        if (error) {
-            console.log("Error searching album art");
-        }
-        imgPath = undefined;
-    }
+        resolve(imgPath);
 
-    if (typeof callback === "function") {
-        callback(imgPath);
-    }
+        // TODO: get albumart from iTunes api
+        // iTunes API albumart query
+        // let albumQuery = resp.title;
+        //
+        // curl.get("https://itunes.apple.com/search?country=US&entity=album&term=" + albumQuery, {}, (error, response) => {
+        //
+        // if (error) {
+        //     console.log(error);
+        // } else {
+        //     let json = JSON.parse(response.body);
+        //
+        //     if (json.resultCount > 0) {
+        //         // set the first image
+        //         resp.cover = json.results[0].artworkUrl100.replace("100x100", "512x512");
+        //     }
+        // }
 
-
-    /********************************************************
-
-    // iTunes API albumart query
-    let albumQuery = resp.title;
-
-    curl.get("https://itunes.apple.com/search?country=US&entity=album&term=" + albumQuery, {}, (error, response) => {
-
-    if (error) {
-        console.log(error);
-    } else {
-        let json = JSON.parse(response.body);
-
-        if (json.resultCount > 0) {
-            // set the first image
-            resp.cover = json.results[0].artworkUrl100.replace("100x100", "512x512");
-        }
-    }
-
-    ********************************************************/
+    });
 }
 
 function createAlbumArt(metadata, songPath, imagePath) {
@@ -308,9 +307,10 @@ function setAlbumArt(songPath) {
         let img = selectImage()
 
         if (img !== false) {
-            getSongMetadata(songPath, (metadata) => {
-                createAlbumArt(metadata, songPath, img);
-            });
+            getSongMetadata(songPath)
+                .then((metadata) => {
+                    createAlbumArt(metadata, songPath, img);
+                });
         }
     }
 }
@@ -331,7 +331,7 @@ function loadMusicFromDir(event, dir) {
 
     if (fs.existsSync(dir)) {
 
-        if (fs.existsSync(cachedDir)) {
+        if (false && fs.existsSync(cachedDir)) {
 
             // send the selected audio folder
             event.sender.send("selAudioDir", dir);
@@ -339,28 +339,32 @@ function loadMusicFromDir(event, dir) {
             let cachedJson = JSON.parse(fs.readFileSync(cachedDir));
 
             if (cachedJson.folder == dir) {
-                scanSongsFromDir(dir, (songs) => {
-                    songs.forEach((song, index) => {
+                scanSongsFromDir(dir)
+                    .then((songs) => {
 
-                        if (song.moddate > mostRecentFileModdate) {
-                            mostRecentFileModdate = song.moddate;
-                        }
+                        // TODO: test if this works and replace the "mostRecentFileModdate if"
+                        mostRecentFileModdate = Math.max.apply(null, songs.max(song => song.moddate));
 
-                        // execute on end
-                        if ((songs.length - 1) == index) {
+                        songs.forEach((song, index) => {
+                            // if (song.moddate > mostRecentFileModdate) {
+                            //     mostRecentFileModdate = song.moddate;
+                            // }
 
-                            // json updated
-                            if (cachedJson.mostRecentFileModdate <= mostRecentFileModdate) {
-                                readFromJson(event, fs.readFileSync(cachedDir, {
-                                    "encoding": "utf8"
-                                }));
+                            // execute on end
+                            if ((songs.length - 1) == index) {
 
-                                return true;
+                                // json updated
+                                if (cachedJson.mostRecentFileModdate <= mostRecentFileModdate) {
+                                    readFromJson(event, fs.readFileSync(cachedDir, {
+                                        "encoding": "utf8"
+                                    }));
+
+                                    return true;
+                                }
                             }
-                        }
-                    });
+                        });
 
-                });
+                    });
 
             }
         }
@@ -371,7 +375,8 @@ function loadMusicFromDir(event, dir) {
         data.mostRecentFileModdate = -1;
         data.songs = new Array();
 
-        scanSongsFromDir(dir, (songs) => {
+        scanSongsFromDir(dir)
+            .then((songs) => {
             // no songs found
             if (songs.length == 0) {
                 event.sender.send("addSongs", false);
@@ -405,52 +410,35 @@ function loadMusicFromDir(event, dir) {
     return true;
 }
 
-function scanSongsFromDir(dir, callback) {
-    let songs = new Array();
-    let totalSongs = 0;
+function scanSongsFromDir(dir) {
+    return new Promise((resolve, reject) => {
+        let songs = new Array();
 
-    if (songs.length == 0) {
         fs.readdir(dir, (error, files) => {
 
             files.forEach((file, index) => {
-                let filePath = path.resolve(dir, file);
+                let dotSplit = file.split(".");
 
-                // directory
-                if (fs.lstatSync(filePath).isDirectory()) {
+                file = path.resolve(dir, file);
 
-                // file
-                } else if (fs.lstatSync(filePath).isFile()) {
-                    let dotSplit = file.split(".");
-
-                    if (dotSplit[dotSplit.length - 1].toUpperCase() == "MP3") {
-                        totalSongs++;
-
-                        getSongMetadata(filePath, function(metadata) {
-                            songs.push(metadata);
-                        });
-                    }
+                if (fs.lstatSync(file).isDirectory() || dotSplit[dotSplit.length - 1].toUpperCase() != "MP3") {
+                    files.splice(index, 1);
                 }
+            });
 
-                // execute code on scanning last file
-                if (files.length - index == 1) {
-                    let interval = setInterval(() => {
-                        if (songs.length == totalSongs) {
-                            if (typeof callback === "function") {
-                                callback(songs);
-                            }
-                            clearInterval(interval);
-                        }
-                    }, 10);
-                }
+            let songsPromises = files.map(song => getSongMetadata(path.resolve(dir, song)));
 
+            Promise.all(songsPromises)
+            .then((metadatas) => {
+                metadatas.forEach((metadata) => {
+                    songs.push(metadata);
+                });
+                resolve(songs);
             });
 
         });
-    } else {
-        if (typeof callback === "function") {
-            callback(songs);
-        }
-    }
+
+    });
 }
 
 function readFromJson(event, json) {
