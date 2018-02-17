@@ -1,15 +1,14 @@
-const {
+import curl from 'curl';
+import {
     dialog
-} = require('electron');
+} from 'electron';
 
-const path = require('path');
+import fs from 'fs';
+import id3 from 'musicmetadata';
+import path from 'path';
 
-const fs = require('fs');
 
-const id3 = require('musicmetadata');
-const curl = require('curl');
-
-// visible variables from inport
+// visible letiables from inport
 module.exports = {
     loadMusicFromDir: loadMusicFromDir,
     setAlbumArt: setAlbumArt
@@ -19,10 +18,10 @@ module.exports = {
  *
  */
 
-var songs = new Array();
+let songs = new Array();
 
 function selectFolder() {
-    var dir = dialog.showOpenDialog({
+    let dir = dialog.showOpenDialog({
         properties: ['openDirectory']
     });
 
@@ -34,7 +33,7 @@ function selectFolder() {
 }
 
 function selectImage() {
-    var image = dialog.showOpenDialog({
+    let image = dialog.showOpenDialog({
         filters: [{
             name: 'Images', extensions: ['jpg', 'jpeg']
         }]
@@ -48,17 +47,20 @@ function selectImage() {
 }
 
 function getSongMetadata(file, callback) {
-    var filemtime;
+    let filemtime;
 
-    fs.stat(file, (err, stats) => {
+    fs.stat(file, (error, stats) => {
         filemtime = new Date(stats.mtime).valueOf();
     });
 
-    var readableStream = fs.createReadStream(file);
-    id3(readableStream, {duration: true}, function (err, metadata) {
+    let readableStream = fs.createReadStream(file);
+
+    id3(readableStream, {
+        duration: true
+    }, function (err, metadata) {
 
         albumArt(metadata, file, (coverPath) => {
-            var resp = {
+            let resp = {
                 path: file,
                 title: metadata.title,
                 artist: metadata.artist,
@@ -80,21 +82,21 @@ function getSongMetadata(file, callback) {
 
 function albumArt(metadata, file, callback) {
 
-    var imgPath = path.resolve("./albumArt/");
-    var filename = undefined;
+    let imgPath = path.resolve("./albumArt/");
+    let filename = undefined;
 
     if (!fs.existsSync(imgPath)) {
         fs.mkdir(imgPath, function(error) {
             if (error) {
-                console.log("error creating albumArt folder: " + imgPath);
+                console.log("Image folder could't be created");
             }
         });
     }
 
     // if no title use the filename
     if (!metadata.title.length) {
-        var filename = file.replace(path.dirname(file) + path.sep, "");
-        var dotSplit = filename.split(".");
+        filename = file.replace(path.dirname(file) + path.sep, "");
+        let dotSplit = filename.split(".");
 
         metadata.title = filename.replace("." + dotSplit[dotSplit.length - 1], "");
     }
@@ -102,8 +104,8 @@ function albumArt(metadata, file, callback) {
     try {
         // file contains album art image
         if (metadata.picture[0]) {
-            var image = metadata.picture[0];
-            var format = image.format;
+            let image = metadata.picture[0];
+            let format = image.format;
 
             if (metadata.album) {
                 filename = metadata.album;
@@ -127,16 +129,16 @@ function albumArt(metadata, file, callback) {
 
                 fs.mkdir(imgPath, function(error) {
                     if (error) {
-                        console.log("error creating artist folder: " + imgPath);
+                        console.log("Artist folder couln't be created");
                     }
                 });
             }
 
             if (!fs.existsSync(path.resolve(imgPath, filename))) {
-                var base64buffer = new Buffer(image.data, "base64");
+                let base64buffer = new Buffer(image.data, "base64");
                 fs.writeFile(path.resolve(imgPath, filename), base64buffer, function(error) {
                     if (error) {
-                        console.log("error creating album image: " + path.resolve(imgPath, filename));
+                        console.log("Error creating image \"" + filename + "\" on " + imgPath);
                     }
                 });
             }
@@ -183,16 +185,17 @@ function albumArt(metadata, file, callback) {
     /********************************************************
 
     // iTunes API albumart query
-    var albumQuery = resp.title;
+    let albumQuery = resp.title;
 
     curl.get("https://itunes.apple.com/search?country=US&entity=album&term=" + albumQuery, {}, (error, response) => {
 
     if (error) {
         console.log(error);
     } else {
-        var json = JSON.parse(response.body);
+        let json = JSON.parse(response.body);
 
         if (json.resultCount > 0) {
+            // set the first image
             resp.cover = json.results[0].artworkUrl100.replace("100x100", "512x512");
         }
     }
@@ -201,21 +204,13 @@ function albumArt(metadata, file, callback) {
 }
 
 function createAlbumArt(metadata, songPath, imagePath) {
-    var imgPath = path.resolve("./albumArt/");
-    var filename = undefined;
-
-    if (!fs.existsSync(imgPath)) {
-        fs.mkdir(imgPath, function(error) {
-            if (error) {
-                console.log("error creating albumArt folder: " + imgPath);
-            }
-        });
-    }
+    let imgPath = path.resolve("./albumArt/");
+    let filename = undefined;
 
     // if no title use the filename
     if (!metadata.title.length) {
-        var filename = songPath.replace(path.dirname(songPath) + path.sep, "");
-        var dotSplit = filename.split(".");
+        let filename = songPath.replace(path.dirname(songPath) + path.sep, "");
+        let dotSplit = filename.split(".");
 
         metadata.title = filename.replace("." + dotSplit[dotSplit.length - 1], "");
     }
@@ -223,7 +218,7 @@ function createAlbumArt(metadata, songPath, imagePath) {
     try {
         // file contains album art image
         if (imagePath || metadata.picture[0]) {
-            var format = "jpg";
+            let format = "jpg";
 
             if (metadata.album) {
                 filename = metadata.album;
@@ -249,7 +244,7 @@ function createAlbumArt(metadata, songPath, imagePath) {
 
             // create from metadata
             } else {
-                var image = metadata.picture[0];
+                let image = metadata.picture[0];
                 format = image.format;
 
                 if (!fs.existsSync(imgPath)) {
@@ -262,7 +257,7 @@ function createAlbumArt(metadata, songPath, imagePath) {
                 }
 
                 if (!fs.existsSync(path.resolve(imgPath, filename))) {
-                    var base64buffer = new Buffer(image.data, "base64");
+                    let base64buffer = new Buffer(image.data, "base64");
                     fs.writeFile(path.resolve(imgPath, filename), base64buffer, function(error) {
                         if (error) {
                             console.log("error creating album image: " + path.resolve(imgPath, filename));
@@ -310,7 +305,7 @@ function createAlbumArt(metadata, songPath, imagePath) {
 function setAlbumArt(songPath) {
 
     if (fs.existsSync(songPath)) {
-        var img = selectImage()
+        let img = selectImage()
 
         if (img !== false) {
             getSongMetadata(songPath, (metadata) => {
@@ -323,8 +318,8 @@ function setAlbumArt(songPath) {
 function loadMusicFromDir(event, dir) {
     songs = new Array();
 
-    var cachedDir = "./metadata.json";
-    var mostRecentFileModdate = -1;
+    let cachedDir = "./metadata.json";
+    let mostRecentFileModdate = -1;
 
     if (typeof dir === "undefined") {
         dir = selectFolder();
@@ -341,7 +336,7 @@ function loadMusicFromDir(event, dir) {
             // send the selected audio folder
             event.sender.send("selAudioDir", dir);
 
-            var cachedJson = JSON.parse(fs.readFileSync(cachedDir));
+            let cachedJson = JSON.parse(fs.readFileSync(cachedDir));
 
             if (cachedJson.folder == dir) {
                 scanSongsFromDir(dir, (songs) => {
@@ -371,7 +366,7 @@ function loadMusicFromDir(event, dir) {
         }
 
         // save songs metadata to json file
-        var data = {};
+        let data = {};
         data.folder = dir;
         data.mostRecentFileModdate = -1;
         data.songs = new Array();
@@ -411,21 +406,21 @@ function loadMusicFromDir(event, dir) {
 }
 
 function scanSongsFromDir(dir, callback) {
-    var songs = new Array();
-    var totalSongs = 0;
+    let songs = new Array();
+    let totalSongs = 0;
 
     if (songs.length == 0) {
         fs.readdir(dir, (error, files) => {
 
             files.forEach((file, index) => {
-                var filePath = path.resolve(dir, file);
+                let filePath = path.resolve(dir, file);
 
                 // directory
                 if (fs.lstatSync(filePath).isDirectory()) {
 
                 // file
                 } else if (fs.lstatSync(filePath).isFile()) {
-                    var dotSplit = file.split(".");
+                    let dotSplit = file.split(".");
 
                     if (dotSplit[dotSplit.length - 1].toUpperCase() == "MP3") {
                         totalSongs++;
@@ -438,7 +433,7 @@ function scanSongsFromDir(dir, callback) {
 
                 // execute code on scanning last file
                 if (files.length - index == 1) {
-                    var interval = setInterval(() => {
+                    let interval = setInterval(() => {
                         if (songs.length == totalSongs) {
                             if (typeof callback === "function") {
                                 callback(songs);
