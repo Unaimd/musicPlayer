@@ -6,8 +6,10 @@ import {
     dialog
 } from 'electron';
 
-import {autoUpdater} from "electron-updater";
-import curl from 'curl';
+import {
+    autoUpdater
+} from "electron-updater";
+
 import fs from 'fs';
 import id3 from 'musicmetadata';
 import path from 'path';
@@ -27,7 +29,7 @@ app.on('ready', () => {
         width: 800,
         height: 600,
         minWidth: 490,
-        minHeight: 541,
+        minHeight: 540,
 
         center: true,
 
@@ -62,7 +64,6 @@ app.on('ready', () => {
         optionsWin.hide();
     });
 
-    // hide preload and show main window
     win.once("ready-to-show", () => {
         win.show();
 
@@ -75,7 +76,8 @@ app.on('ready', () => {
         }
 
         try {
-            autoUpdater.checkForUpdates();
+            // TODO: fix autoupdater not founding updates
+            // autoUpdater.checkForUpdates();
         } catch (error) {
             console.log("\nError finding updates");
             updateMsg("error", error);
@@ -152,14 +154,12 @@ app.on('ready', () => {
             case "getVersion":
                 event.returnValue = app.getVersion();
                 break;
+
             case "getChangelog":
                 event.returnValue = fs.readFileSync(__dirname + "/changelog.html", {
                     "encoding": "utf8"
                 });
                 break;
-
-            default:
-            event.returnValue = "uknown action, sent " + action;
         }
 
     });
@@ -173,9 +173,11 @@ app.on('ready', () => {
             case "main":
                 window = win;
                 break;
+
             case "options":
                 window = optionsWin;
                 break;
+
             default:
                 return;
         }
@@ -196,9 +198,6 @@ app.on('ready', () => {
             case "loadFolder":
                 event.retrunValue = (songsMgr.loadMusicFromDir(event)) ? true : false;
                 break;
-
-            default:
-                event.returnValue = "ok";
         }
 
     });
@@ -209,7 +208,6 @@ app.on('ready', () => {
 
     ipcMain.on("loadAudioFromDir", (event, dir) => {
         songsMgr.loadMusicFromDir(event, dir);
-        return;
     });
 
     ipcMain.on("changeAlbumart", (event, songPath) => {
