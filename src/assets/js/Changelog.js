@@ -1,6 +1,6 @@
-var Changelog = {
-    offset: document.querySelector(".changelog-offset"),
-    changelog: document.querySelector(".changelog"),
+const Changelog = {
+    offset: document.getElementsByClassName("changelog-offset")[0],
+    changelog: document.getElementsByClassName("changelog")[0],
     version: localStorage.getItem("version"),
     runnningVersion: ipcRenderer.sendSync("changelog", "getVersion"),
 
@@ -16,15 +16,15 @@ var Changelog = {
 
     show: () => {
         Changelog.offset.addEventListener("click", Changelog.close, false);
-        Changelog.changelog.querySelector(".close").addEventListener("click", Changelog.close, false);
+        Changelog.changelog.getElementsByClassName("close")[0].addEventListener("click", Changelog.close, false);
 
         Changelog.offset.style.display = "block";
         Changelog.changelog.style.display = "block";
     },
 
     close: () => {
-        Changelog.changelog.className += " hide";
-        Changelog.offset.className += " hide";
+        Changelog.changelog.classList.add("hide");
+        Changelog.offset.classList.add("hide");
 
         setTimeout(() => {
             Changelog.changelog.remove();
@@ -33,11 +33,7 @@ var Changelog = {
     },
 
     setTitle: (txt) => {
-        if (!txt) {
-            Changelog.changelog.querySelector(".version").innerText = Changelog.runnningVersion;
-        } else {
-            Changelog.changelog.querySelector(".title").innerText = txt;
-        }
+        Changelog.changelog.getElementsByClassName("version")[0].innerText = txt ? txt : Changelog.runnningVersion;
     },
 
     setContent: (html) => {
@@ -45,7 +41,7 @@ var Changelog = {
             html = ipcRenderer.sendSync("changelog", "getChangelog");
         }
 
-        Changelog.changelog.querySelector(".changelogContent").innerHTML = html;
+        Changelog.changelog.getElementsByClassName("changelogContent")[0].innerHTML = html;
     }
 
 }
