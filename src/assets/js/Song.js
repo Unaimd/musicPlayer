@@ -9,18 +9,14 @@ function Song(element, path, options) {
     this.cover = "./assets/img/default.jpg";
     this.moddate = "";
 
-    if (typeof element === "undefined") {
-        return;
-    } else if (typeof element !== "object") {
+    if (typeof element !== "object") {
         throw new Error("element should be an object, " + typeof element + " was given");
         return;
     } else {
         this.element = element;
     }
 
-    if (typeof path === "undefined") {
-        return;
-    } else if (typeof path !== "string") {
+    if (typeof path !== "string") {
         throw new Error("path sould be a string, " + typeof path + " was given");
         return;
     } else {
@@ -61,32 +57,32 @@ Song.prototype.toString = function() {
 Song.prototype.parse = function() {
     this.path = this.element.getAttribute("data-path");
 
-    var title = this.element.querySelector(".title");
+    let title = this.element.getElementsByClassName("title")[0];
     if (typeof title !== "undefined" && title) {
         this.title = title;
     }
 
-    var artist = this.element.querySelector(".artist");
+    let artist = this.element.getElementsByClassName("artist")[0];
     if (typeof artist !== "undefined" && artist) {
         this.artist = artist;
     }
 
-    var album = this.element.querySelector(".album");
+    let album = this.element.getElementsByClassName("album")[0];
     if (typeof album !== "undefined" && album) {
         this.album = album;
     }
 
-    var duration = this.element.querySelector(".duration");
+    let duration = this.element.getElementsByClassName("duration")[0];
     if (typeof duration !== "undefined" && duration) {
         this.duration = duration;
     }
 
-    var cover = this.element.getAttribute("data-cover-path");
+    let cover = this.element.getAttribute("data-cover-path");
     if (typeof cover !== "undefined" && cover) {
         this.cover = cover;
     }
 
-    var moddate = this.element.getAttribute("data-moddate");
+    let moddate = this.element.getAttribute("data-moddate");
     if (typeof moddate !== "undefined" && moddate) {
         this.moddate = moddate;
     }
