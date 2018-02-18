@@ -1,3 +1,7 @@
+import {
+    ipcRenderer
+} from 'electron';
+
 function updateSongs() {
     var songs = document.querySelectorAll(".hidden[data-type='audio']");
     for (var i = 0; i < songs.length; i++) {

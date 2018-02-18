@@ -1,3 +1,7 @@
+import {
+    ipcRenderer
+} from 'electron';
+
 const songsLoader = {
     sortProp: null,
     sortMethod: null,

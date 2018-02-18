@@ -1,3 +1,8 @@
+import {
+    ipcRenderer,
+    shell
+} from 'electron';
+
 document.addEventListener("DOMContentLoaded", () => {
 
     // titlebar elements

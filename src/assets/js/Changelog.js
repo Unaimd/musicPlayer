@@ -1,3 +1,7 @@
+import {
+    ipcRenderer
+} from 'electron';
+
 const Changelog = {
     offset: document.getElementsByClassName("changelog-offset")[0],
     changelog: document.getElementsByClassName("changelog")[0],
