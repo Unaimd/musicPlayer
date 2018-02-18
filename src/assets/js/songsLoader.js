@@ -1,6 +1,4 @@
 var songsLoader = {
-    INITIAL_LOAD: 100,
-    MAX_LOAD_PER_ROUND: 50,
     sortProp: null,
     sortMethod: null,
 
@@ -89,11 +87,7 @@ var songsLoader = {
             return songs;
         }
     },
-    loadGroup: (songs, start, num, order, method) => {
-        if (typeof num !== "number") {
-            throw new Error("Unspecified number of songs to be shown");
-            return;
-        }
+    loadGroup: (songs, order, method) => {
         if (typeof order === "undefined") {
 
             if (songsLoader.orderProperty != "") {
@@ -118,47 +112,46 @@ var songsLoader = {
             songs.reverse();
         }
 
-        for (let i = start; i < songs.length; i++) {
-            var song = songs[i];
-
+        songs.forEach(song => {
             songsLoader.writeSong(song);
-        }
+        });
 
     },
     writeSong: (songJSON) => {
-        while (document.querySelectorAll("#songs [data-type='info']").length > 0) {
-            document.querySelector("#songs [data-type='info']").remove();
-        }
+        document.querySelectorAll("#songs [data-type='info']").forEach((element) => {
+            element.remove();
+        });
 
-        var num = 0;
-        var path = songJSON.path;
+        let num = 0;
+        let path = songJSON.path;
 
-        var title = songJSON.title;
+        let title = songJSON.title;
         if (!title) {
             while(path.indexOf("\\") > 0) {
                 path = path.replace("\\", "/");
             }
 
-            var splPath = path.split("/");
+            let splPath = path.split("/");
             filename = splPath[splPath.length - 1];
 
             // take title from filename without extension
-            title = filename.replace("." + filename.split(".")[filename.split(".").length - 1], "");
+            let dotSplit = filename.split(".");
+            title = filename.replace("." + dotSplit[dotSplit.length - 1], "");
         }
 
-        var artist = songJSON.artist[0];
+        let artist = songJSON.artist[0];
         if (typeof artist === "undefined") {
             artist = "unknown artist";
         }
 
-        var album = songJSON.album;
+        let album = songJSON.album;
         if (typeof album === "undefined" || album == "") {
             album = "unknown album";
         }
 
-        var duration = songsLoader.formatDuration(songJSON.duration);
-        var moddate = songJSON.moddate;
-        var cover = null;
+        let duration = songsLoader.formatDuration(songJSON.duration);
+        let moddate = songJSON.moddate;
+        let cover = null;
 
         if (songJSON.cover) {
             cover = songJSON.cover;
@@ -166,27 +159,60 @@ var songsLoader = {
             cover = "./assets/img/default.jpg";
         }
 
-        var songs = document.querySelectorAll("#songs [data-type='audio']");
+        let songs = document.querySelectorAll("#songs [data-type='audio']");
         if (songs.length > 0) {
             num = parseInt(songs[songs.length - 1].getAttribute("data-num")) + 1;
         }
 
-        var template = '<li class="hidden" data-type="audio" data-num="' + num + '" data-path="' + path + '" data-cover-path="' + cover + '" data-moddate="' + moddate + '"">';
-        template += '<img src="' + cover + '" draggable="false">';
-        template += '<p><span class="artist">' + artist + '</span>';
-        if (album) {
-            template += '&nbsp;<span class="album">' + album + '</span>';
-        }
-        template += '</p><p><span class="title">' + title + '</span><span class="duration">' + duration + '</span></p></li>';
+        let songElement = document.createElement("li");
+        songElement.className = "hidden";
+        songElement.setAttribute("data-type", "audio");
+        songElement.setAttribute("data-num", num);
+        songElement.setAttribute("data-path", path);
+        songElement.setAttribute("data-cover-path", cover);
+        songElement.setAttribute("data-moddate", moddate);
 
-        document.getElementById("songs").insertAdjacentHTML("beforeend",template);
+        let coverElement = document.createElement("img");
+        coverElement.src = cover;
+        coverElement.draggable = false;
+        songElement.appendChild(coverElement);
+
+        let artistAlbumElement = document.createElement("p");
+        songElement.appendChild(artistAlbumElement);
+
+        let artistElement = document.createElement("span");
+        artistElement.className = "artist";
+        artistElement.innerText = artist;
+        artistAlbumElement.appendChild(artistElement);
+
+        if (album) {
+            let albumElement = document.createElement("span");
+            albumElement.className = "album";
+            albumElement.innerText = album;
+            artistAlbumElement.appendChild(albumElement);
+        }
+
+        let titleDurationElement = document.createElement("p");
+        songElement.appendChild(titleDurationElement);
+
+        let titleElement = document.createElement("span");
+        titleElement.className = "title";
+        titleElement.innerText = title;
+        titleDurationElement.appendChild(titleElement);
+
+        let durationElement = document.createElement("span");
+        durationElement.className = "duration";
+        durationElement.innerText = duration;
+        titleDurationElement.appendChild(durationElement);
+
+        document.getElementById("songs").appendChild(songElement);
 
         updateSongs();
     },
     formatDuration: (seconds) => {
-        var sec = Math.round(seconds);
-        var min = 0;
-        var hour = 0;
+        let sec = Math.round(seconds);
+        let min = 0;
+        let hour = 0;
 
         while(sec >= 60) {
             sec -= 60;
@@ -212,12 +238,23 @@ var songsLoader = {
         }
     },
     addLoader: () => {
-        document.getElementById("songs").innerHTML = "<li data-type='info' style='text-align: center;'>Scanning songs...<br><div class='loader'></div></li>";
+        let loaderElement = document.createElement("li");
+        loaderElement.setAttribute("data-type", "info");
+        loaderElement.style.textAlign = "center";
+        loaderElement.innerText = "Scanning songs";
+
+        loaderElement.appendChild(document.createElement("br"));
+
+        let loaderDivElement = document.createElement("div");
+        loaderDivElement.className = "loader";
+        loaderElement.appendChild(loaderDivElement);
+
+        document.getElementById("songs").appendChild(loaderElement);
     },
     order: () => {
-        var order = document.querySelector("select[name='order']");
-        var method = document.querySelector("[name='method']:checked");
-        var active;
+        let order = document.querySelector("select[name='order']");
+        let method = document.querySelector("[name='method']:checked");
+        let active;
 
         if (document.querySelector("#songs .active")) {
             active = document.querySelector("#songs .active").getAttribute("data-path");
@@ -232,7 +269,7 @@ var songsLoader = {
         songsLoader.updateSortIcons(order.options[order.selectedIndex].getAttribute("data-mode"));
 
         if (localStorage.getItem("songsJSON") !== null) {
-            songsLoader.loadGroup(JSON.parse(localStorage.getItem("songsJSON")), 0, songsLoader.INITIAL_LOAD, order.value, method.value);
+            songsLoader.loadGroup(JSON.parse(localStorage.getItem("songsJSON")), order.value, method.value);
 
             document.querySelectorAll("#songs [data-path]").forEach((element) => {
                 if (element.getAttribute("data-path") == active) {
@@ -251,19 +288,19 @@ var songsLoader = {
         }
 
         document.querySelectorAll("[name='method'] + label > i").forEach((element) => {
-            var classes = element.className;
-            var type = element.getAttribute("data-mode");
+            let classes = element.className;
+            let type = element.getAttribute("data-mode");
 
             // show
             if (mode == type) {
                 if (classes.indexOf("hidden") > 0) {
-                    element.className = classes.replace("hidden", "").replace("  ", "");
+                    element.classList.remove("hidden");
                 }
 
             // hide
             } else {
                 if (classes.indexOf("hidden") < 0) {
-                    element.className += " hidden";
+                    element.classList.add("hidden");
                 }
             }
 
@@ -274,8 +311,22 @@ var songsLoader = {
             element.remove();
         });
 
-        document.getElementById("songs").innerHTML = "<li data-type='info' style='text-align: center;'><i class='fa fa-exclamation-circle'></i>&nbsp;No songs found on the following path:<br><strong>" + localStorage.getItem("selAudioDir") + "</strong></li>";
-        swal("No songs found", "Please select other folder", "info");
+        let liElement = document.createElement("li");
+        liElement.setAttribute("data-type", "info");
+        liElement.style.textAlign = "center";
+
+        let iconElement = document.createElement("i");
+        iconElement.className = "fa fa-exclamation-circle";
+        liElement.appendChild(iconElement);
+
+        liElement.innerText = "no songs found on the following path";
+        liElement.appendChild(document.createElement("br"));
+
+        let pathElement = document.createElement("strong");
+        pathElement.innerText = localStorage.getItem("selAudioDir");
+        liElement.appendChild(pathElement);
+
+        document.getElementById("songs").appendChild(liElement);
     }
 };
 
@@ -297,7 +348,7 @@ document.addEventListener("DOMContentLoaded", () => {
             songsLoader.noSongsFound();
         } else {
             document.getElementById("songs").innerHTML = "";
-            songsLoader.loadGroup(songs, 0, songsLoader.INITIAL_LOAD);
+            songsLoader.loadGroup(songs);
 
             localStorage.setItem("songsJSON", JSON.stringify(songs));
         }
@@ -311,7 +362,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (localStorage.getItem("orderProperty")) {
         songsLoader.orderProperty = localStorage.getItem("orderProperty");
 
-        var option = document.querySelector("option[value='" + songsLoader.orderProperty + "']");
+        let option = document.querySelector("option[value='" + songsLoader.orderProperty + "']");
 
         option.setAttribute("selected", "selected");
         songsLoader.updateSortIcons(option.getAttribute("data-mode"));
@@ -330,16 +381,16 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    var dragAndLoad = new Dropable(document.body, {
+    let dragAndLoad = new Dropable(document.body, {
         dragenter: (event) => {
-            var folderIcon = document.querySelector(".dropzone .box");
+            let folderIcon = document.querySelector(".dropzone .box");
             if (event.srcElement == folderIcon) {
-                folderIcon.querySelector(".fa").className = folderIcon.querySelector(".fa").className.replace(" fa-folder-o ", " fa-folder-open-o ");
+                folderIcon.getElementsByClassName("fa")[0].className = folderIcon.getElementsByClassName("fa")[0].className.replace(" fa-folder-o ", " fa-folder-open-o ");
             }
         },
         dragleave: (event) => {
             var folderIcon = document.querySelector(".dropzone .box");
-            folderIcon.querySelector(".fa").className = folderIcon.querySelector(".fa").className.replace(" fa-folder-open-o ", " fa-folder-o ");
+            folderIcon.getElementsByClassName("fa")[0].className = folderIcon.getElementsByClassName("fa")[0].className.replace(" fa-folder-open-o ", " fa-folder-o ");
         },
         drop: (event, files) => {
             if (fs.statSync(files[0].path).isDirectory()) {
