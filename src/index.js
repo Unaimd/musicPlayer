@@ -196,7 +196,7 @@ app.on('ready', () => {
                 break;
 
             case "loadFolder":
-                event.retrunValue = (songsMgr.loadMusicFromDir(event)) ? true : false;
+                event.returnValue = (songsMgr.loadMusicFromDir(event)) ? true : false;
                 break;
         }
 
