@@ -331,7 +331,7 @@ function loadMusicFromDir(event, dir) {
 
     if (fs.existsSync(dir)) {
 
-        if (false && fs.existsSync(cachedDir)) {
+        if (fs.existsSync(cachedDir)) {
 
             // send the selected audio folder
             event.sender.send("selAudioDir", dir);
@@ -342,13 +342,8 @@ function loadMusicFromDir(event, dir) {
                 scanSongsFromDir(dir)
                     .then((songs) => {
 
-                        // TODO: test if this works and replace the "mostRecentFileModdate if"
-                        mostRecentFileModdate = Math.max.apply(null, songs.max(song => song.moddate));
-
+                        mostRecentFileModdate = Math.max.apply(null, songs.map(song => song.moddate));
                         songs.forEach((song, index) => {
-                            // if (song.moddate > mostRecentFileModdate) {
-                            //     mostRecentFileModdate = song.moddate;
-                            // }
 
                             // execute on end
                             if ((songs.length - 1) == index) {
@@ -429,12 +424,12 @@ function scanSongsFromDir(dir) {
             let songsPromises = files.map(song => getSongMetadata(path.resolve(dir, song)));
 
             Promise.all(songsPromises)
-            .then((metadatas) => {
-                metadatas.forEach((metadata) => {
-                    songs.push(metadata);
+                .then((metadatas) => {
+                    metadatas.forEach((metadata) => {
+                        songs.push(metadata);
+                    });
+                    resolve(songs);
                 });
-                resolve(songs);
-            });
 
         });
 
