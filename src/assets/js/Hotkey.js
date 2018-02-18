@@ -1,4 +1,5 @@
-
+// TODO: convert to class
+// TODO: return promise instead of callback
 function Hotkey(shortcut, callback) {
     if (typeof shortcut === "undefined") {
         throw new Error("Shortcut was not sent");
@@ -54,7 +55,7 @@ Hotkey.prototype.destroy = () => {
 }
 
 Hotkey.prototype.toString = () => {
-    var hotkey = "";
+    let hotkey = "";
 
     this.getShortcutKeys().forEach((key, index) => {
         if (index > 0) {
@@ -67,7 +68,7 @@ Hotkey.prototype.toString = () => {
 }
 
 Hotkey.prototype.getShortcutKeys = () => {
-    var keys = new Array();
+    let keys = new Array();
     if (this.ctrlKey) {
         keys.push("ctrl");
     }
@@ -91,7 +92,7 @@ Hotkey.prototype.keyUp = () => {
 }
 
 Hotkey.prototype.check = function(e) {
-    var dntKeys = new Array(16, 17, 18);
+    const dntKeys = new Array(16, 17, 18);
 
     if (dntKeys.indexOf(e.keyCode) == -1 && this.pressingKeys.indexOf(e.key.toUpperCase()) == -1) {
         this.pressingKeys.push(e.key.toUpperCase());
