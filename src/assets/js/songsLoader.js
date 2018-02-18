@@ -1,4 +1,4 @@
-var songsLoader = {
+const songsLoader = {
     sortProp: null,
     sortMethod: null,
 
