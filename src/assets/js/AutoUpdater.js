@@ -17,10 +17,10 @@ const AutoUpdater = {
         console.error("AutoUpdater: " + error);
     },
     downloadProgress: (progressObj) => {
-        var bytesPerSecond = progressObj.bytesPerSecond;
-        var percent = progressObj.percent;
-        var transferred = progressObj.transferred;
-        var total = progressObj.total;
+        let bytesPerSecond = progressObj.bytesPerSecond;
+        let percent = progressObj.percent;
+        let transferred = progressObj.transferred;
+        let total = progressObj.total;
 
         swal({
             title: "Downloading new update...",
