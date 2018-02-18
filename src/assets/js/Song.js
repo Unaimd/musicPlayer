@@ -17,7 +17,11 @@ function Song(element, path, options) {
         this.element = element;
     }
 
-    if (typeof path !== "string") {
+    if (typeof path === "undefined") {
+        // required
+        return;
+
+    } else if (typeof path !== "string") {
         throw new Error("path sould be a string, " + typeof path + " was given");
         return;
     } else {
