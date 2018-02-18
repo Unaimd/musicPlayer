@@ -1,9 +1,8 @@
-const {
+import {
     ipcRenderer,
-    shell
-} = require("electron");
+} from 'electron';
 
-const fs = require("fs");
+import fs from "fs";
 
 document.addEventListener("DOMContentLoaded", () => {
 
