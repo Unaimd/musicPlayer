@@ -1,4 +1,8 @@
-var AutoUpdater = {
+import {
+    ipcRenderer
+} from 'electron';
+
+const AutoUpdater = {
     checking: () => {
         AutoUpdater.log("Searching for updates");
     },
