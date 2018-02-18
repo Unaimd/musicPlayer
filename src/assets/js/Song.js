@@ -1,3 +1,4 @@
+// TODO: change to class
 function Song(element, path, options) {
     this.element = "";
     this.path = "";
