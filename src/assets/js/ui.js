@@ -1,7 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
 
     // titlebar elements
-    document.querySelectorAll("#titleBar i").forEach((element, index, array) => {
+    document.querySelectorAll("#titleBar i").forEach((element) => {
         element.addEventListener("click", () => {
             ipcRenderer.send("titleBar", {
                 win: element.parentNode.getAttribute("data-win"),
@@ -16,9 +16,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 win: element.parentNode.getAttribute("data-win"),
                 action: "loadFolder"
             }) == true) {
-                while (document.querySelectorAll("#songs [data-type='audio']").length > 0) {
-                    document.querySelector("#songs [data-type='audio']").remove();
-                }
+                document.querySelectorAll("#songs [data-type='audio']").forEach(element => {
+                    element.remove();
+                });
             }
         });
     });
