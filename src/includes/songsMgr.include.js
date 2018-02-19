@@ -89,11 +89,7 @@ function albumArt(metadata, file) {
         let filename = undefined;
 
         if (!fs.existsSync(imgPath)) {
-            fs.mkdir(imgPath, function(error) {
-                if (error) {
-                    console.log("Image folder could't be created");
-                }
-            });
+            fs.mkdirSync(imgPath);
         }
 
         // if no title use the filename
@@ -130,11 +126,7 @@ function albumArt(metadata, file) {
 
                 if (!fs.existsSync(imgPath)) {
 
-                    fs.mkdir(imgPath, function(error) {
-                        if (error) {
-                            console.log("Artist folder couln't be created");
-                        }
-                    });
+                    fs.mkdirSync(imgPath);
                 }
 
                 if (!fs.existsSync(path.resolve(imgPath, filename))) {
@@ -248,11 +240,7 @@ function createAlbumArt(metadata, songPath, imagePath) {
 
                 if (!fs.existsSync(imgPath)) {
 
-                    fs.mkdir(imgPath, function(error) {
-                        if (error) {
-                            console.log("error creating artist folder: " + imgPath);
-                        }
-                    });
+                    fs.mkdirSync(imgPath);
                 }
 
                 if (!fs.existsSync(path.resolve(imgPath, filename))) {
