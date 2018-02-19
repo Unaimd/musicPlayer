@@ -63,8 +63,6 @@ function getSongMetadata(file) {
             albumArt(metadata, file)
                 .then((coverPath) => {
 
-                    readableStream.close();
-
                     resolve({
                         path: file,
                         title: metadata.title,
@@ -76,6 +74,7 @@ function getSongMetadata(file) {
                     });
             });
 
+            readableStream.close();
         });
 
     });
