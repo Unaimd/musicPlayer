@@ -263,6 +263,7 @@ const songsLoader = {
         if (document.querySelector("#songs .active")) {
             active = document.querySelector("#songs .active").getAttribute("data-path");
         }
+        document.getElementById("songs").innerHTML = "";
         songsLoader.addLoader();
 
         localStorage.setItem("orderProperty", order.value);
@@ -275,12 +276,9 @@ const songsLoader = {
         if (localStorage.getItem("songsJSON") !== null) {
             songsLoader.loadGroup(JSON.parse(localStorage.getItem("songsJSON")), order.value, method.value);
 
-            document.querySelectorAll("#songs [data-path]").forEach((element) => {
-                if (element.getAttribute("data-path") == active) {
-                    element.className += " active";
-                    return;
-                }
-            });
+            if (active) {
+                document.querySelector("#songs [data-path=\"" + active + "\"]").classList.add("active");
+            }
 
         } else {
             songsLoader.noSongsFound();
