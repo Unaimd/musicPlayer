@@ -326,7 +326,7 @@ function loadMusicFromDir(event, dir) {
 
             let cachedJson = JSON.parse(fs.readFileSync(cachedDir));
 
-            if (cachedJson.folder == dir) {
+            if (false || cachedJson.folder == dir) {
                 scanSongsFromDir(dir)
                     .then((songs) => {
 
