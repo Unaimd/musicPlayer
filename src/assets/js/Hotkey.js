@@ -45,9 +45,7 @@ function Hotkey(shortcut, callback) {
     document.addEventListener("keydown", () => {
         this.check(event)
     });
-    document.addEventListener("keyup", () => {
-        this.keyUp();
-    });
+    document.addEventListener("keyup", this.keyUp);
 }
 
 Hotkey.prototype.destroy = () => {
@@ -55,16 +53,7 @@ Hotkey.prototype.destroy = () => {
 }
 
 Hotkey.prototype.toString = () => {
-    let hotkey = "";
-
-    this.getShortcutKeys().forEach((key, index) => {
-        if (index > 0) {
-            hotkey += " + ";
-        }
-        hotkey += key;
-    });
-
-    return hotkey;
+    return this.getShortcutKeys().join(" + ");
 }
 
 Hotkey.prototype.getShortcutKeys = () => {
@@ -87,7 +76,7 @@ Hotkey.prototype.getShortcutKeys = () => {
     return keys;
 }
 
-Hotkey.prototype.keyUp = () => {
+Hotkey.prototype.keyUp = function () {
     this.pressingKeys = new Array();
 }
 
